@@ -39,11 +39,8 @@
 ehthumbs.db
 Thumbs.db
 
-# Sass cache and node modules #
+# Sass cache and vendor folders #
 ###############################
 .sass-cache/
 node_modules/
-
-# Couscous #
-############
-.couscous
+bower_components/
