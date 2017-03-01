@@ -13,11 +13,11 @@
   },
   "homepage": "http://tweektheme.com",
   "dependencies": {
-    "glidejs": "^2.0.8",
-    "ionicons": "^2.0.1",
+    "glidejs": "^2.1.0",
+    "ionicons": "^3.0.0",
     "magnific-popup": "^1.1.0",
-    "normalize.css": "^4.1.1",
-    "velocity-animate": "^1.2.3",
-    "waypoints": "^4.0.0"
+    "normalize.css": "^5.0.0",
+    "velocity-animate": "^1.4.3",
+    "waypoints": "^4.0.1"
   }
 }
