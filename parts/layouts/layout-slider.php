@@ -6,10 +6,10 @@
       <div class="glide">
         <div class="glide__arrows">
           <button class="glide__arrow prev" data-glide-dir="<">
-            <i class="ion-chevron-left"></i>
+            <i class="ion ion-ios-arrow-back"></i>
           </button>
           <button class="glide__arrow next" data-glide-dir=">">
-            <i class="ion-chevron-right"></i>
+            <i class="ion ion-ios-arrow-forward"></i>
           </button>
         </div>
         <div class="glide__wrapper">
