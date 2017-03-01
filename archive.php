@@ -2,8 +2,6 @@
 
 <main>
 
-<p class="center">This is the archive.php file</p>
-
   <section class="wrap hpad clearfix">
 
   <?php if (have_posts()): ?>

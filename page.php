@@ -2,8 +2,6 @@
 
 <main>
 
-  <p class="center">This is the page.php file</p>
-
   <section class="wrap hpad clearfix">
 
     <article id="post-<?php the_ID(); ?>"
