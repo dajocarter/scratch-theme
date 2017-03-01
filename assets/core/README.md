@@ -1,4 +1,4 @@
-# Scratch Theme for WordPress + ACF
+# Tweek Theme for WordPress + ACF
 
 ## Core
 

@@ -1,17 +1,17 @@
 {
-  "name": "scratch-theme",
+  "name": "tweek-theme",
   "version": "1.6.18",
-  "description": "Scratch is the world's first Advanced Custom Fields-ready WordPress theme. It's not so much a theme as a springboard for building your own fully custom WordPress themes.",
+  "description": "Tweek is an Advanced Custom Fields-ready WordPress theme. It's not so much a theme, but more of a starting point to start tweeking your own theme.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zackphilipps/scratch-theme.git"
+    "url": "git+https://github.com/dajocarter/tweek-theme.git"
   },
-  "author": "Tribeswell LLC",
+  "author": "dajocarter",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/zackphilipps/scratch-theme/issues"
+    "url": "https://github.com/dajocarter/tweek-theme/issues"
   },
-  "homepage": "http://scratchtheme.com",
+  "homepage": "http://tweektheme.com",
   "dependencies": {
     "glidejs": "^2.0.8",
     "ionicons": "^2.0.1",
