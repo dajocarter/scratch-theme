@@ -70,7 +70,9 @@
                             "other_choice": 0,
                             "save_other_choice": 0,
                             "default_value": "Center",
-                            "layout": "horizontal"
+                            "layout": "horizontal",
+                            "allow_null": 0,
+                            "return_format": "value"
                         },
                         {
                             "key": "field_54171a5e6fa32",
@@ -93,7 +95,9 @@
                             "other_choice": 0,
                             "save_other_choice": 0,
                             "default_value": "Middle",
-                            "layout": "horizontal"
+                            "layout": "horizontal",
+                            "allow_null": 0,
+                            "return_format": "value"
                         },
                         {
                             "key": "field_5411772229ef6",
@@ -116,7 +120,9 @@
                             "other_choice": 0,
                             "save_other_choice": 0,
                             "default_value": "",
-                            "layout": "horizontal"
+                            "layout": "horizontal",
+                            "allow_null": 0,
+                            "return_format": "value"
                         },
                         {
                             "key": "field_54171af1f5c0d",
@@ -294,7 +300,10 @@
                                 "id": ""
                             },
                             "message": "Use Custom Columns",
-                            "default_value": 0
+                            "default_value": 0,
+                            "ui": 0,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
                         },
                         {
                             "key": "field_54130f7a69f9e",
@@ -316,7 +325,9 @@
                             "other_choice": 0,
                             "save_other_choice": 0,
                             "default_value": "",
-                            "layout": "horizontal"
+                            "layout": "horizontal",
+                            "allow_null": 0,
+                            "return_format": "value"
                         },
                         {
                             "key": "field_5409d74ad3962",
@@ -332,8 +343,8 @@
                                 "id": ""
                             },
                             "collapsed": "",
-                            "min": "",
-                            "max": "",
+                            "min": 0,
+                            "max": 0,
                             "layout": "table",
                             "button_label": "Add Column",
                             "sub_fields": [
@@ -342,7 +353,7 @@
                                     "label": "Icon",
                                     "name": "icon",
                                     "type": "text",
-                                    "instructions": "Get it from <a href=\"http:\/\/ionicons.com\" target=\"_blank\">here<\/a>",
+                                    "instructions": "Get it from <a href=\"http:\/\/ionicframework.com\/docs\/v2\/ionicons\/\" target=\"_blank\">here<\/a> and prepend with \"ion-\"",
                                     "required": 0,
                                     "conditional_logic": [
                                         [
@@ -362,9 +373,7 @@
                                     "placeholder": "",
                                     "prepend": "",
                                     "append": "",
-                                    "maxlength": "",
-                                    "readonly": 0,
-                                    "disabled": 0
+                                    "maxlength": ""
                                 },
                                 {
                                     "key": "field_54130fa069f9f",
@@ -552,12 +561,11 @@
                                 "class": "",
                                 "id": ""
                             },
-                            "row_min": "",
-                            "row_limit": "",
-                            "layout": "table",
-                            "button_label": "Add Slide",
+                            "collapsed": "",
                             "min": 0,
                             "max": 0,
+                            "layout": "table",
+                            "button_label": "Add Slide",
                             "sub_fields": [
                                 {
                                     "key": "field_5409d8f637709",
@@ -670,8 +678,7 @@
                                     "readonly": 0,
                                     "disabled": 0
                                 }
-                            ],
-                            "collapsed": ""
+                            ]
                         }
                     ],
                     "min": "",
@@ -703,7 +710,9 @@
                             "other_choice": 0,
                             "save_other_choice": 0,
                             "default_value": "",
-                            "layout": "vertical"
+                            "layout": "vertical",
+                            "allow_null": 0,
+                            "return_format": "value"
                         },
                         {
                             "key": "field_5409d95c3770f",
@@ -718,19 +727,18 @@
                                 "class": "",
                                 "id": ""
                             },
-                            "row_min": "",
-                            "row_limit": "",
-                            "layout": "table",
-                            "button_label": "Add Row",
+                            "collapsed": "",
                             "min": 0,
                             "max": 0,
+                            "layout": "table",
+                            "button_label": "Add Row",
                             "sub_fields": [
                                 {
                                     "key": "field_54130ffb69fa1",
                                     "label": "Icon",
                                     "name": "icon",
                                     "type": "text",
-                                    "instructions": "Get it from <a href=\"http:\/\/ionicons.com\" target=\"_blank\">here<\/a>",
+                                    "instructions": "Get it from <a href=\"http:\/\/ionicframework.com\/docs\/v2\/ionicons\/\" target=\"_blank\">here<\/a> and prepend with \"ion-\"",
                                     "required": 0,
                                     "conditional_logic": [
                                         [
@@ -750,9 +758,7 @@
                                     "placeholder": "",
                                     "prepend": "",
                                     "append": "",
-                                    "maxlength": "",
-                                    "readonly": 0,
-                                    "disabled": 0
+                                    "maxlength": ""
                                 },
                                 {
                                     "key": "field_5409d96a37710",
@@ -873,8 +879,7 @@
                                     "readonly": 0,
                                     "disabled": 0
                                 }
-                            ],
-                            "collapsed": ""
+                            ]
                         }
                     ],
                     "min": "",
@@ -928,7 +933,9 @@
                             "other_choice": 0,
                             "save_other_choice": 0,
                             "default_value": "",
-                            "layout": "vertical"
+                            "layout": "vertical",
+                            "allow_null": 0,
+                            "return_format": "value"
                         },
                         {
                             "key": "field_5412c2c02a2f7",
@@ -943,17 +950,18 @@
                                 "class": "",
                                 "id": ""
                             },
-                            "min": "",
-                            "max": "",
+                            "min": 0,
+                            "max": 0,
                             "layout": "table",
                             "button_label": "Add WYSIWYG",
+                            "collapsed": "",
                             "sub_fields": [
                                 {
                                     "key": "field_5412c2da2a2f8",
                                     "label": "WYSIWYG",
                                     "name": "wysiwyg",
                                     "type": "wysiwyg",
-                                    "instructions": "Switch from \"Visual\" tab to \"Text\" tab to write code. <strong>Button example:<\/strong><br>\r\n<code>&lt;a class=\"button\" href=\"\/page\/\" title=\"Page\"&gt;Page&lt;\/a&gt;<\/code>\r\n",
+                                    "instructions": "Switch from \"Visual\" tab to \"Text\" tab to write code. <strong>Button example:<\/strong><br>\r\n<code>&lt;a class=\"button\" href=\"\/page\/\" title=\"Page\"&gt;Page&lt;\/a&gt;<\/code>",
                                     "required": 0,
                                     "conditional_logic": 0,
                                     "wrapper": {
@@ -964,10 +972,10 @@
                                     "default_value": "",
                                     "tabs": "all",
                                     "toolbar": "full",
-                                    "media_upload": 1
+                                    "media_upload": 1,
+                                    "delay": 0
                                 }
-                            ],
-                            "collapsed": ""
+                            ]
                         }
                     ],
                     "min": "",
@@ -1007,5 +1015,5 @@
     ],
     "active": 1,
     "description": "",
-    "modified": 1455119581
+    "modified": 1488397813
 }
