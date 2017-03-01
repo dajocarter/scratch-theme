@@ -1,5 +1,5 @@
 <?php global $layout_count; ?>
-<section id="scratch-layout-<?php echo $layout_count; ?>-id-<?php the_ID(); ?>"
+<section id="tweek-layout-<?php echo $layout_count; ?>-id-<?php the_ID(); ?>"
          class="wysiwygs">
   <div class="wrap hpad clearfix">
     <?php if(get_sub_field('header')): ?>
@@ -17,11 +17,11 @@
         $flex = true;
         $offset = null;
       }
-      scratch_layout_declare(get_sub_field('wysiwygs'), 2, $flex, $offset);
+      tweek_layout_declare(get_sub_field('wysiwygs'), 2, $flex, $offset);
       while(has_sub_field('wysiwygs')) {
-        scratch_layout_start();
+        tweek_layout_start();
           the_sub_field('wysiwyg');
-        scratch_layout_end();
+        tweek_layout_end();
       }
     ?>
   </div>

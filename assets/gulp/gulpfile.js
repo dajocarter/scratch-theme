@@ -70,7 +70,7 @@ gulp.task('watch', function() {
 
 gulp.task('browserSync', function() {
   browserSync.init({
-    proxy: 'scratch.dev', // change this to match your host
+    proxy: 'tweek.dev', // change this to match your host
     watchTask: true
   });
 });

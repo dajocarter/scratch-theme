@@ -1,7 +1,7 @@
 <?php
 
 /* Do not remove this line. */
-require_once('includes/scratch.php');
+require_once('includes/tweek.php');
 
 
 
@@ -12,10 +12,10 @@ require_once('includes/scratch.php');
 
 
 /*
- * scratch_meta() adds all meta information to the <head> element for us.
+ * tweek_meta() adds all meta information to the <head> element for us.
  */
 
-function scratch_meta() { ?>
+function tweek_meta() { ?>
 
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="description" content="<?php bloginfo('description'); ?>">
@@ -26,17 +26,17 @@ function scratch_meta() { ?>
 
 <?php }
 
-add_action('wp_head', 'scratch_meta');
+add_action('wp_head', 'tweek_meta');
 
 /* Theme CSS */
 
 function theme_styles() {
 
-  wp_register_style( 'scratch-main', get_template_directory_uri() . '/assets/css/master.css', false, filemtime(dirname(__FILE__) . '/assets/css/master.css') );
-  wp_enqueue_style( 'scratch-main' );
+  wp_register_style( 'tweek-main', get_template_directory_uri() . '/assets/css/master.css', false, filemtime(dirname(__FILE__) . '/assets/css/master.css') );
+  wp_enqueue_style( 'tweek-main' );
 
-  wp_register_style( 'scratch-custom', get_template_directory_uri() . '/custom.css', false, filemtime(dirname(__FILE__) . '/custom.css') );
-  wp_enqueue_style( 'scratch-custom' );
+  wp_register_style( 'tweek-custom', get_template_directory_uri() . '/custom.css', false, filemtime(dirname(__FILE__) . '/custom.css') );
+  wp_enqueue_style( 'tweek-custom' );
 
 }
 
@@ -48,15 +48,15 @@ function theme_js() {
 
   wp_enqueue_script( 'modernizr', get_template_directory_uri() . '/assets/js/vendor/modernizr-2.8.3.min.js', false, false, false );
 
-  wp_register_script( 'scratch-main-concat', get_template_directory_uri() . '/assets/js/concat/main.js', array('jquery'), filemtime(dirname(__FILE__) . '/assets/js/concat/main.js'), true );
+  wp_register_script( 'tweek-main-concat', get_template_directory_uri() . '/assets/js/concat/main.js', array('jquery'), filemtime(dirname(__FILE__) . '/assets/js/concat/main.js'), true );
 
-  wp_register_script( 'scratch-main-min', get_template_directory_uri() . '/assets/js/compiled/main.min.js', array('jquery'), filemtime(dirname(__FILE__) . '/assets/js/compiled/main.min.js'), true );
+  wp_register_script( 'tweek-main-min', get_template_directory_uri() . '/assets/js/compiled/main.min.js', array('jquery'), filemtime(dirname(__FILE__) . '/assets/js/compiled/main.min.js'), true );
 
   /* FOR DEVELOPMENT */
-  wp_enqueue_script( 'scratch-main-concat' );
+  wp_enqueue_script( 'tweek-main-concat' );
 
   /* FOR PRODUCTION */
-  /*wp_enqueue_script( 'scratch-main-min' );*/
+  /*wp_enqueue_script( 'tweek-main-min' );*/
 
 }
 
@@ -83,44 +83,44 @@ add_theme_support( 'menus' );
 
 register_nav_menus(
   array(
-    'scratch-main-nav' => __( 'Main Nav', 'scratch' )   // main nav in header
+    'tweek-main-nav' => __( 'Main Nav', 'tweek' )   // main nav in header
   )
 );
 
-function scratch_main_nav() {
+function tweek_main_nav() {
   // display the wp3 menu if available
   wp_nav_menu(array(
     'container' => false, // remove nav container
     'container_class' => '', // class of container (should you choose to use it)
-    'menu' => __( 'Main Nav', 'scratch' ), // nav name
+    'menu' => __( 'Main Nav', 'tweek' ), // nav name
     'menu_class' => 'main-nav', // adding custom nav class
-    'theme_location' => 'scratch-main-nav', // where it's located in the theme
+    'theme_location' => 'tweek-main-nav', // where it's located in the theme
     'before' => '', // before the menu
     'after' => '', // after the menu
     'link_before' => '', // before each link
     'link_after' => '', // after each link
     'depth' => 0    // fallback function
   ));
-} /* end scratch main nav */
+} /* end tweek main nav */
 
-function scratch_login_stylesheet() { ?>
+function tweek_login_stylesheet() { ?>
   <link rel="stylesheet"
         id="custom_wp_admin_css"
         href="<?php echo get_template_directory_uri() . '/assets/css/login.css?ver=' . filemtime(dirname(__FILE__) . '/assets/css/login.css'); ?>"
         type="text/css"
         media="all" />
 <?php }
-add_action( 'login_enqueue_scripts', 'scratch_login_stylesheet' );
+add_action( 'login_enqueue_scripts', 'tweek_login_stylesheet' );
 
-function scratch_login_logo_url() {
+function tweek_login_logo_url() {
   return home_url();
 }
-add_filter( 'login_headerurl', 'scratch_login_logo_url' );
+add_filter( 'login_headerurl', 'tweek_login_logo_url' );
 
-function scratch_login_logo_url_title() {
+function tweek_login_logo_url_title() {
   return get_bloginfo('name');
 }
-add_filter( 'login_headertitle', 'scratch_login_logo_url_title' );
+add_filter( 'login_headertitle', 'tweek_login_logo_url_title' );
 
 
 

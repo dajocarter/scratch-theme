@@ -4,7 +4,7 @@
  * LAYOUT DECLARATIONS (v1.2 and up)
  */
 
-function scratch_row_start() {
+function tweek_row_start() {
   global $row_count, $column_count, $columns;
   if($columns !== 'custom') {
     if(($column_count - 1) % $columns === 0) {
@@ -13,20 +13,20 @@ function scratch_row_start() {
   }
 }
 
-function scratch_column_start() {
+function tweek_column_start() {
   global $cells, $column_count, $last, $twelvecol, $columns;
-  $class = scratch_column_class();
+  $class = tweek_column_class();
   echo '<div class="' . $class . ' column-' . $column_count . '">';
   $last = strpos($class, 'last');
   $twelvecol = strpos($class, 'twelvecol');
 }
 
-function scratch_column_end() {
+function tweek_column_end() {
   global $column_count;
   echo '</div> <!-- /.column-' . $column_count . ' -->';
 }
 
-function scratch_row_end() {
+function tweek_row_end() {
   global $row_count, $column_count, $last, $twelvecol, $columns;
   if($columns !== 'custom') {
     if($last !== false || $twelvecol !== false) {
@@ -37,7 +37,7 @@ function scratch_row_end() {
   $column_count++;
 }
 
-function scratch_column_class() {
+function tweek_column_class() {
   global $cells, $column_count, $columns, $flex, $offset;
   switch($columns) {
     case 2:
@@ -98,7 +98,7 @@ function scratch_column_class() {
   }
 }
 
-function scratch_layout_declare($cells, $columns, $flex = true, $offset = null) {
+function tweek_layout_declare($cells, $columns, $flex = true, $offset = null) {
   $GLOBALS['cells'] = $cells;
   $GLOBALS['row_count'] = $GLOBALS['column_count'] = 1;
   $GLOBALS['last'] = $GLOBALS['twelvecol'] = false;
@@ -107,14 +107,14 @@ function scratch_layout_declare($cells, $columns, $flex = true, $offset = null) 
   $GLOBALS['offset'] = $offset;
 }
 
-function scratch_layout_start() {
-  scratch_row_start();
-  scratch_column_start();
+function tweek_layout_start() {
+  tweek_row_start();
+  tweek_column_start();
 }
 
-function scratch_layout_end() {
-  scratch_column_end();
-  scratch_row_end();
+function tweek_layout_end() {
+  tweek_column_end();
+  tweek_row_end();
 }
 
 ?>

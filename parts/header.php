@@ -28,7 +28,7 @@
     </span>
 
     <nav id="nav">
-      <?php scratch_main_nav(); ?>
+      <?php tweek_main_nav(); ?>
     </nav>
 
   </div>

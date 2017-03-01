@@ -1,5 +1,5 @@
 <?php global $layout_count; ?>
-<section id="scratch-layout-<?php echo $layout_count; ?>-id-<?php the_ID(); ?>"
+<section id="tweek-layout-<?php echo $layout_count; ?>-id-<?php the_ID(); ?>"
          class="staggered">
   <?php
     if(get_sub_field('icon_or_image') === 'Icon') {
@@ -20,7 +20,7 @@
             <?php endif; ?>
           <?php else: ?>
             <?php if(get_sub_field('image')): ?>
-              <div class="scratch-bg circle"
+              <div class="tweek-bg circle"
                    style="background-image: url('<?php the_sub_field('image'); ?>');">
               </div>
             <?php endif; ?>

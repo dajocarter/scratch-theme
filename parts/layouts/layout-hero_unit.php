@@ -1,6 +1,6 @@
 <?php
-if(!function_exists('scratch_bg_position')) {
-  function scratch_bg_position() {
+if(!function_exists('tweek_bg_position')) {
+  function tweek_bg_position() {
     $string = null;
     if(get_sub_field('image_position_y') === 'Top') {
       $string = 'top';
@@ -22,10 +22,10 @@ if(!function_exists('scratch_bg_position')) {
 ?>
 
 <?php global $layout_count; ?>
-<section id="scratch-layout-<?php echo $layout_count; ?>-id-<?php the_ID(); ?>"
+<section id="tweek-layout-<?php echo $layout_count; ?>-id-<?php the_ID(); ?>"
          class="hero-unit">
-  <div class="scratch-bg"
-          style="background-image: url('<?php the_sub_field('image'); ?>'); background-position: <?php scratch_bg_position(); ?>">
+  <div class="tweek-bg"
+          style="background-image: url('<?php the_sub_field('image'); ?>'); background-position: <?php tweek_bg_position(); ?>">
     <div class="overlay clearfix">
       <?php
         if(get_sub_field('text_align') === 'Left') {

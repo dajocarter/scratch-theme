@@ -1,7 +1,7 @@
 <?php
 
-add_action( 'after_switch_theme', 'scratch_setup' );
-function scratch_setup() {
+add_action( 'after_switch_theme', 'tweek_setup' );
+function tweek_setup() {
   // create Style Guide
   $postarr = array(
     'post_type' => 'page',
@@ -64,7 +64,7 @@ function scratch_setup() {
     {
       switch($locationId)
       {
-        case 'scratch-main-nav':
+        case 'tweek-main-nav':
         $menu = get_term_by('name', 'Main Nav', 'nav_menu');
         break;
       }

@@ -39,7 +39,7 @@ $overlay-color: rgba($black, 0.4);
       transition: color 0.25s ease-in-out 0s;
     }
 
-    &.scratch-bg {
+    &.tweek-bg {
       background-color: transparent;
     }
   }
@@ -47,7 +47,7 @@ $overlay-color: rgba($black, 0.4);
 
 /* Hero Unit */
 .hero-unit {
-  .scratch-bg {
+  .tweek-bg {
     height: auto;
   }
 
@@ -93,7 +93,7 @@ $overlay-color: rgba($black, 0.4);
         .circle {
           background-color: $button-hover-color;
 
-          &.scratch-bg {
+          &.tweek-bg {
             background-color: transparent;
             opacity: 0.8;
           }
