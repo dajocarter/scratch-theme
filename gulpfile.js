@@ -58,6 +58,13 @@ gulp.task('fonts', function() {
     .pipe(gulp.dest('assets/css/fonts/'));
 });
 
+gulp.task('ionicons', function() {
+  return gulp.src([
+      'node_modules/ionicons/dist/fonts/*'
+    ])
+    .pipe(gulp.dest('assets/fonts/'));
+});
+
 gulp.task('sass', function() {
   return gulp.src([
       'assets/scss/master.scss',
