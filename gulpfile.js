@@ -15,37 +15,45 @@ var AUTOPREFIXER_BROWSERS = [
 ];
 
 gulp.task('img', function() {
-  return gulp.src(['../../../../uploads/**/*.{png,PNG,jpg,JPG,jpeg,JPEG,gif,GIF}'], {
+  return gulp.src(['../../uploads/**/*.{png,PNG,jpg,JPG,jpeg,JPEG,gif,GIF}'], {
       base: '.'
     })
-    .pipe($.newer('../../../../uploads'))
+    .pipe($.newer('../../uploads'))
     .pipe($.imagemin())
-    .pipe(gulp.dest('../../../../uploads'))
+    .pipe(gulp.dest('../../uploads'))
     .pipe(browserSync.stream());
 });
 
 gulp.task('js', function() {
   return gulp.src([
-    '../../node_modules/magnific-popup/dist/jquery.magnific-popup.js',
-    '../../node_modules/velocity-animate/velocity.js',
-    '../../node_modules/waypoints/lib/jquery.waypoints.js',
-    '../js/plugins.js',
-    '../js/acf-google-maps.js',
-    '../js/main.js'
-    '../../node_modules/slick-carousel/slick/slick.js',
+    'node_modules/slick-carousel/slick/slick.js',
+    'node_modules/magnific-popup/dist/jquery.magnific-popup.js',
+    'node_modules/velocity-animate/velocity.js',
+    'node_modules/waypoints/lib/jquery.waypoints.js',
+    'assets/js/plugins.js',
+    'assets/js/acf-google-maps.js',
+    'assets/js/main.js'
   ])
     .pipe($.concat('main.js', {
       newLine: ';'
     }))
-    .pipe(gulp.dest('../js/concat/'))
+    .pipe(gulp.dest('assets/js/concat/'))
     .pipe($.uglify(false))
     .pipe($.rename('main.min.js'))
-    .pipe(gulp.dest('../js/compiled'))
+    .pipe(gulp.dest('assets/js/compiled'))
     .pipe(browserSync.stream());
 });
 
+gulp.task('assets', function() {
+  return gulp.src([
+      'node_modules/slick-carousel/ajax-loader.gif',
+      'node_modules/slick-carousel/fonts/*'
+    ])
+    .pipe(gulp.dest('assets/css'));
+});
+
 gulp.task('sass', function() {
-  return gulp.src(['../scss/master.scss', '../scss/login.scss'])
+  return gulp.src(['assets/scss/master.scss', 'assets/scss/login.scss'])
     .pipe($.sourcemaps.init())
     .pipe($.sass({
       outputStyle: 'compressed'
@@ -54,15 +62,15 @@ gulp.task('sass', function() {
       browsers: AUTOPREFIXER_BROWSERS
     }))
     .pipe($.sourcemaps.write())
-    .pipe(gulp.dest('../css'))
+    .pipe(gulp.dest('assets/css'))
     .pipe(browserSync.stream());
 });
 
 gulp.task('watch', function() {
-  gulp.watch(['../../**/*.html', '../../**/*.php']).on('change', browserSync.reload);
-  gulp.watch(['../../../../uploads/**/*'], ['img']);
-  gulp.watch(['../js/*.js', '../js/vendor/*.js'], ['js']);
-  gulp.watch(['../scss/**/*.scss', '../core/scss/**/*.scss'], ['sass']);
+  gulp.watch(['**/*.html', '**/*.php']).on('change', browserSync.reload);
+  gulp.watch(['../../uploads/**/*'], ['img']);
+  gulp.watch(['assets/js/*.js', 'assets/js/vendor/*.js'], ['js']);
+  gulp.watch(['assets/scss/**/*.scss', 'assets/core/scss/**/*.scss'], ['sass']);
 });
 
 gulp.task('browserSync', function() {
