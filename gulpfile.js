@@ -59,9 +59,18 @@ gulp.task('fonts', function() {
 });
 
 gulp.task('sass', function() {
-  return gulp.src(['assets/scss/master.scss', 'assets/scss/login.scss'])
+  return gulp.src([
+      'assets/scss/master.scss',
+      'assets/scss/login.scss'
+    ])
     .pipe($.sourcemaps.init())
     .pipe($.sass({
+      includePaths: [
+        'node_modules/slick-carousel/slick/',
+        'node_modules/ionicons/dist/css/',
+        'node_modules/magnific-popup/dist/',
+        'node_modules/normalize.css/'
+      ],
       outputStyle: 'compressed'
     }).on('error', $.sass.logError))
     .pipe($.autoprefixer({
