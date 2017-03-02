@@ -44,12 +44,18 @@ gulp.task('js', function() {
     .pipe(browserSync.stream());
 });
 
-gulp.task('assets', function() {
+gulp.task('css', function() {
   return gulp.src([
-      'node_modules/slick-carousel/ajax-loader.gif',
-      'node_modules/slick-carousel/fonts/*'
+      'node_modules/slick-carousel/slick/ajax-loader.gif'
     ])
     .pipe(gulp.dest('assets/css'));
+});
+
+gulp.task('fonts', function() {
+  return gulp.src([
+      'node_modules/slick-carousel/slick/fonts/*'
+    ])
+    .pipe(gulp.dest('assets/css/fonts/'));
 });
 
 gulp.task('sass', function() {
