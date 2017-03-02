@@ -3,12 +3,12 @@
  * Do not change the order of these imports.
  */
 
-@import "../core/scss/ionicons";
+@import 'ionicons';
 @import "../core/scss/default-variables";
 @import "config/mixins";
 @import "config/variables";
 @import "config/color-classes";
-@import "../core/scss/normalize";
+@import 'normalize';
 @import "../core/scss/main";
 @import "config/grid-always";
 
@@ -18,9 +18,10 @@
 
 @import "config/global";
 
-@import "../core/scss/slick/slick-core";
-@import "../core/scss/slick/slick-theme";
-@import "../core/scss/magnific";
+@import 'slick.scss';
+@import 'slick-theme.scss';
+@import 'config/slick';
+@import 'magnific-popup';
 
 /*
  * MIDDLE STUFF

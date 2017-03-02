@@ -67,7 +67,7 @@ gulp.task('sass', function() {
     .pipe($.sass({
       includePaths: [
         'node_modules/slick-carousel/slick/',
-        'node_modules/ionicons/dist/css/',
+        'node_modules/ionicons/dist/scss/',
         'node_modules/magnific-popup/dist/',
         'node_modules/normalize.css/'
       ],
