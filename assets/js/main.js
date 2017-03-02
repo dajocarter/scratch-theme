@@ -1,6 +1,10 @@
 jQuery(document).ready(function($) {
-  $('.glide').glide({
-    autoplay: false
+  $('.slick').slick({
+    autoplay: false,
+    dots: true,
+    arrows: true,
+    prevArrow: '<button type="button" data-role="none" class="slick-prev" aria-label="Previous" role="button"><i class="icon ion-ios-arrow-back"></i></button>',
+    nextArrow: '<button type="button" data-role="none" class="slick-next" aria-label="Next" role="button"><i class="icon ion-ios-arrow-forward"></i></button>'
   });
   $('.nav-toggle').click(function() {
     if ($(this).data('direction') === 'down') {

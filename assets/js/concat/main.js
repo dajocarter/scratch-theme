@@ -1,2259 +1,2896 @@
-/*!
- * glidejs
- * Version: 2.0.8
- * Glide is a responsive and touch-friendly jQuery slider. Based on CSS3 transitions with fallback to older broswers. It's simple, lightweight and fast.
- * Author: Jędrzej Chałubek <jedrzej.chalubek@gmail.com>
- * Site: http://http://glide.jedrzejchalubek.com/
- * Licensed under the MIT license
+/*
+     _ _      _       _
+ ___| (_) ___| | __  (_)___
+/ __| | |/ __| |/ /  | / __|
+\__ \ | | (__|   < _ | \__ \
+|___/_|_|\___|_|\_(_)/ |___/
+                   |__/
+
+ Version: 1.6.0
+  Author: Ken Wheeler
+ Website: http://kenwheeler.github.io
+    Docs: http://kenwheeler.github.io/slick
+    Repo: http://github.com/kenwheeler/slick
+  Issues: http://github.com/kenwheeler/slick/issues
+
  */
-
-;(function($, window, document, undefined){
-/**
- * Animation module.
- *
- * @param {Object} Glide
- * @param {Object} Core
- * @return {Animation}
- */
-var Animation = function(Glide, Core) {
-
-    /**
-     * Animation offset value.
-     *
-     * @var {Number}
-     */
-    var offset;
-
-    /**
-     * Animation constructor.
-     */
-    function Animation() {
-
+/* global window, document, define, jQuery, setInterval, clearInterval */
+(function(factory) {
+    'use strict';
+    if (typeof define === 'function' && define.amd) {
+        define(['jquery'], factory);
+    } else if (typeof exports !== 'undefined') {
+        module.exports = factory(require('jquery'));
+    } else {
+        factory(jQuery);
     }
 
-    /**
-     * Make configured animation type.
-     *
-     * @param  {Number} displacement
-     * @return {self}
-     */
-    Animation.prototype.make = function(displacement) {
-        // Do not run if we have only one slide.
-        if (! Core.Run.canProcess()) {
-            return Core.Arrows.disable();
+}(function($) {
+    'use strict';
+    var Slick = window.Slick || {};
+
+    Slick = (function() {
+
+        var instanceUid = 0;
+
+        function Slick(element, settings) {
+
+            var _ = this, dataSettings;
+
+            _.defaults = {
+                accessibility: true,
+                adaptiveHeight: false,
+                appendArrows: $(element),
+                appendDots: $(element),
+                arrows: true,
+                asNavFor: null,
+                prevArrow: '<button type="button" data-role="none" class="slick-prev" aria-label="Previous" tabindex="0" role="button">Previous</button>',
+                nextArrow: '<button type="button" data-role="none" class="slick-next" aria-label="Next" tabindex="0" role="button">Next</button>',
+                autoplay: false,
+                autoplaySpeed: 3000,
+                centerMode: false,
+                centerPadding: '50px',
+                cssEase: 'ease',
+                customPaging: function(slider, i) {
+                    return $('<button type="button" data-role="none" role="button" tabindex="0" />').text(i + 1);
+                },
+                dots: false,
+                dotsClass: 'slick-dots',
+                draggable: true,
+                easing: 'linear',
+                edgeFriction: 0.35,
+                fade: false,
+                focusOnSelect: false,
+                infinite: true,
+                initialSlide: 0,
+                lazyLoad: 'ondemand',
+                mobileFirst: false,
+                pauseOnHover: true,
+                pauseOnFocus: true,
+                pauseOnDotsHover: false,
+                respondTo: 'window',
+                responsive: null,
+                rows: 1,
+                rtl: false,
+                slide: '',
+                slidesPerRow: 1,
+                slidesToShow: 1,
+                slidesToScroll: 1,
+                speed: 500,
+                swipe: true,
+                swipeToSlide: false,
+                touchMove: true,
+                touchThreshold: 5,
+                useCSS: true,
+                useTransform: true,
+                variableWidth: false,
+                vertical: false,
+                verticalSwiping: false,
+                waitForAnimate: true,
+                zIndex: 1000
+            };
+
+            _.initials = {
+                animating: false,
+                dragging: false,
+                autoPlayTimer: null,
+                currentDirection: 0,
+                currentLeft: null,
+                currentSlide: 0,
+                direction: 1,
+                $dots: null,
+                listWidth: null,
+                listHeight: null,
+                loadIndex: 0,
+                $nextArrow: null,
+                $prevArrow: null,
+                slideCount: null,
+                slideWidth: null,
+                $slideTrack: null,
+                $slides: null,
+                sliding: false,
+                slideOffset: 0,
+                swipeLeft: null,
+                $list: null,
+                touchObject: {},
+                transformsEnabled: false,
+                unslicked: false
+            };
+
+            $.extend(_, _.initials);
+
+            _.activeBreakpoint = null;
+            _.animType = null;
+            _.animProp = null;
+            _.breakpoints = [];
+            _.breakpointSettings = [];
+            _.cssTransitions = false;
+            _.focussed = false;
+            _.interrupted = false;
+            _.hidden = 'hidden';
+            _.paused = true;
+            _.positionProp = null;
+            _.respondTo = null;
+            _.rowCount = 1;
+            _.shouldClick = true;
+            _.$slider = $(element);
+            _.$slidesCache = null;
+            _.transformType = null;
+            _.transitionType = null;
+            _.visibilityChange = 'visibilitychange';
+            _.windowWidth = 0;
+            _.windowTimer = null;
+
+            dataSettings = $(element).data('slick') || {};
+
+            _.options = $.extend({}, _.defaults, settings, dataSettings);
+
+            _.currentSlide = _.options.initialSlide;
+
+            _.originalSettings = _.options;
+
+            if (typeof document.mozHidden !== 'undefined') {
+                _.hidden = 'mozHidden';
+                _.visibilityChange = 'mozvisibilitychange';
+            } else if (typeof document.webkitHidden !== 'undefined') {
+                _.hidden = 'webkitHidden';
+                _.visibilityChange = 'webkitvisibilitychange';
+            }
+
+            _.autoPlay = $.proxy(_.autoPlay, _);
+            _.autoPlayClear = $.proxy(_.autoPlayClear, _);
+            _.autoPlayIterator = $.proxy(_.autoPlayIterator, _);
+            _.changeSlide = $.proxy(_.changeSlide, _);
+            _.clickHandler = $.proxy(_.clickHandler, _);
+            _.selectHandler = $.proxy(_.selectHandler, _);
+            _.setPosition = $.proxy(_.setPosition, _);
+            _.swipeHandler = $.proxy(_.swipeHandler, _);
+            _.dragHandler = $.proxy(_.dragHandler, _);
+            _.keyHandler = $.proxy(_.keyHandler, _);
+
+            _.instanceUid = instanceUid++;
+
+            // A simple way to check for HTML strings
+            // Strict HTML recognition (must start with <)
+            // Extracted from jQuery v1.11 source
+            _.htmlExpr = /^(?:\s*(<[\w\W]+>)[^>]*)$/;
+
+
+            _.registerBreakpoints();
+            _.init(true);
+
         }
 
-        // Parse displacement to integer before use.
-        offset = (typeof displacement !== 'undefined') ? parseInt(displacement) : 0;
+        return Slick;
 
-        // Animation actual translate animation
-        this[Glide.options.type]();
+    }());
 
-        return this;
-    };
+    Slick.prototype.activateADA = function() {
+        var _ = this;
 
-
-    /**
-     * After animation callback.
-     *
-     * @param  {Function} callback
-     * @return {Integer}
-     */
-    Animation.prototype.after = function(callback) {
-        return setTimeout(function() {
-            callback();
-        }, Glide.options.animationDuration + 20);
-    };
-
-
-    /**
-     * Slider animation type.
-     *
-     * @return {Void}
-     */
-    Animation.prototype.slider = function() {
-
-        var translate = Glide[Glide.size] * (Glide.current - 1);
-        var shift = Core.Clones.shift - Glide.paddings;
-
-        // If we are on the first slide.
-        if (Core.Run.isStart()) {
-            if (Glide.options.centered) {
-                shift = Math.abs(shift);
-            }
-            // Shift is zero.
-            else {
-                shift = 0;
-            }
-            // Hide previous arrow.
-            Core.Arrows.disable('prev');
-        }
-
-        // If we are on the last slide.
-        else if (Core.Run.isEnd()) {
-            if (Glide.options.centered) {
-                shift = Math.abs(shift);
-            }
-            // Double and absolute shift.
-            else {
-                shift = Math.abs(shift * 2);
-            }
-            // Hide next arrow.
-            Core.Arrows.disable('next');
-        }
-
-        // We are not on the edge cases.
-        else {
-            // Absolute shift
-            shift = Math.abs(shift);
-            // Show arrows.
-            Core.Arrows.enable();
-        }
-
-        // Apply translate to
-        // the slider track.
-        Glide.track.css({
-            'transition': Core.Transition.get('all'),
-            'transform': Core.Translate.set(Glide.axis, translate - shift - offset)
+        _.$slideTrack.find('.slick-active').attr({
+            'aria-hidden': 'false'
+        }).find('a, input, button, select').attr({
+            'tabindex': '0'
         });
 
     };
 
+    Slick.prototype.addSlide = Slick.prototype.slickAdd = function(markup, index, addBefore) {
 
-    /**
-     * Carousel animation type
-     *
-     * @return {Void}
-     */
-    Animation.prototype.carousel = function() {
+        var _ = this;
 
-        // Get translate value by multiplying two
-        // slider size and current slide number.
-        var translate = Glide[Glide.size] * Glide.current;
+        if (typeof(index) === 'boolean') {
+            addBefore = index;
+            index = null;
+        } else if (index < 0 || (index >= _.slideCount)) {
+            return false;
+        }
 
-        // Get animation shift.
-        var shift;
+        _.unload();
 
-        // Calculate animation shift.
-        if (Glide.options.centered) {
-            // Decrease clones shift with slider
-            // paddings, because slider is centered.
-            shift = Core.Clones.shift - Glide.paddings;
+        if (typeof(index) === 'number') {
+            if (index === 0 && _.$slides.length === 0) {
+                $(markup).appendTo(_.$slideTrack);
+            } else if (addBefore) {
+                $(markup).insertBefore(_.$slides.eq(index));
+            } else {
+                $(markup).insertAfter(_.$slides.eq(index));
+            }
         } else {
-            // Shif is only clones shift.
-            shift = Core.Clones.shift;
+            if (addBefore === true) {
+                $(markup).prependTo(_.$slideTrack);
+            } else {
+                $(markup).appendTo(_.$slideTrack);
+            }
         }
 
-        // The flag is set and direction is previous,
-        // so we are on the first slide and need
-        // to make offset translate.
-        if (Core.Run.isOffset('<')) {
+        _.$slides = _.$slideTrack.children(this.options.slide);
 
-            // Translate is 0 (left edge of the track).
-            translate = 0;
+        _.$slideTrack.children(this.options.slide).detach();
 
-            // Take off flag.
-            Core.Run.flag = false;
+        _.$slideTrack.append(_.$slides);
 
-            // Clear transition and jump to last slide,
-            // after offset animation is done.
-            this.after(function() {
-                Glide.track.css({
-                    'transition': Core.Transition.clear('all'),
-                    'transform': Core.Translate.set(Glide.axis, Glide[Glide.size] * Glide.length + shift)
+        _.$slides.each(function(index, element) {
+            $(element).attr('data-slick-index', index);
+        });
+
+        _.$slidesCache = _.$slides;
+
+        _.reinit();
+
+    };
+
+    Slick.prototype.animateHeight = function() {
+        var _ = this;
+        if (_.options.slidesToShow === 1 && _.options.adaptiveHeight === true && _.options.vertical === false) {
+            var targetHeight = _.$slides.eq(_.currentSlide).outerHeight(true);
+            _.$list.animate({
+                height: targetHeight
+            }, _.options.speed);
+        }
+    };
+
+    Slick.prototype.animateSlide = function(targetLeft, callback) {
+
+        var animProps = {},
+            _ = this;
+
+        _.animateHeight();
+
+        if (_.options.rtl === true && _.options.vertical === false) {
+            targetLeft = -targetLeft;
+        }
+        if (_.transformsEnabled === false) {
+            if (_.options.vertical === false) {
+                _.$slideTrack.animate({
+                    left: targetLeft
+                }, _.options.speed, _.options.easing, callback);
+            } else {
+                _.$slideTrack.animate({
+                    top: targetLeft
+                }, _.options.speed, _.options.easing, callback);
+            }
+
+        } else {
+
+            if (_.cssTransitions === false) {
+                if (_.options.rtl === true) {
+                    _.currentLeft = -(_.currentLeft);
+                }
+                $({
+                    animStart: _.currentLeft
+                }).animate({
+                    animStart: targetLeft
+                }, {
+                    duration: _.options.speed,
+                    easing: _.options.easing,
+                    step: function(now) {
+                        now = Math.ceil(now);
+                        if (_.options.vertical === false) {
+                            animProps[_.animType] = 'translate(' +
+                                now + 'px, 0px)';
+                            _.$slideTrack.css(animProps);
+                        } else {
+                            animProps[_.animType] = 'translate(0px,' +
+                                now + 'px)';
+                            _.$slideTrack.css(animProps);
+                        }
+                    },
+                    complete: function() {
+                        if (callback) {
+                            callback.call();
+                        }
+                    }
                 });
+
+            } else {
+
+                _.applyTransition();
+                targetLeft = Math.ceil(targetLeft);
+
+                if (_.options.vertical === false) {
+                    animProps[_.animType] = 'translate3d(' + targetLeft + 'px, 0px, 0px)';
+                } else {
+                    animProps[_.animType] = 'translate3d(0px,' + targetLeft + 'px, 0px)';
+                }
+                _.$slideTrack.css(animProps);
+
+                if (callback) {
+                    setTimeout(function() {
+
+                        _.disableTransition();
+
+                        callback.call();
+                    }, _.options.speed);
+                }
+
+            }
+
+        }
+
+    };
+
+    Slick.prototype.getNavTarget = function() {
+
+        var _ = this,
+            asNavFor = _.options.asNavFor;
+
+        if ( asNavFor && asNavFor !== null ) {
+            asNavFor = $(asNavFor).not(_.$slider);
+        }
+
+        return asNavFor;
+
+    };
+
+    Slick.prototype.asNavFor = function(index) {
+
+        var _ = this,
+            asNavFor = _.getNavTarget();
+
+        if ( asNavFor !== null && typeof asNavFor === 'object' ) {
+            asNavFor.each(function() {
+                var target = $(this).slick('getSlick');
+                if(!target.unslicked) {
+                    target.slideHandler(index, true);
+                }
+            });
+        }
+
+    };
+
+    Slick.prototype.applyTransition = function(slide) {
+
+        var _ = this,
+            transition = {};
+
+        if (_.options.fade === false) {
+            transition[_.transitionType] = _.transformType + ' ' + _.options.speed + 'ms ' + _.options.cssEase;
+        } else {
+            transition[_.transitionType] = 'opacity ' + _.options.speed + 'ms ' + _.options.cssEase;
+        }
+
+        if (_.options.fade === false) {
+            _.$slideTrack.css(transition);
+        } else {
+            _.$slides.eq(slide).css(transition);
+        }
+
+    };
+
+    Slick.prototype.autoPlay = function() {
+
+        var _ = this;
+
+        _.autoPlayClear();
+
+        if ( _.slideCount > _.options.slidesToShow ) {
+            _.autoPlayTimer = setInterval( _.autoPlayIterator, _.options.autoplaySpeed );
+        }
+
+    };
+
+    Slick.prototype.autoPlayClear = function() {
+
+        var _ = this;
+
+        if (_.autoPlayTimer) {
+            clearInterval(_.autoPlayTimer);
+        }
+
+    };
+
+    Slick.prototype.autoPlayIterator = function() {
+
+        var _ = this,
+            slideTo = _.currentSlide + _.options.slidesToScroll;
+
+        if ( !_.paused && !_.interrupted && !_.focussed ) {
+
+            if ( _.options.infinite === false ) {
+
+                if ( _.direction === 1 && ( _.currentSlide + 1 ) === ( _.slideCount - 1 )) {
+                    _.direction = 0;
+                }
+
+                else if ( _.direction === 0 ) {
+
+                    slideTo = _.currentSlide - _.options.slidesToScroll;
+
+                    if ( _.currentSlide - 1 === 0 ) {
+                        _.direction = 1;
+                    }
+
+                }
+
+            }
+
+            _.slideHandler( slideTo );
+
+        }
+
+    };
+
+    Slick.prototype.buildArrows = function() {
+
+        var _ = this;
+
+        if (_.options.arrows === true ) {
+
+            _.$prevArrow = $(_.options.prevArrow).addClass('slick-arrow');
+            _.$nextArrow = $(_.options.nextArrow).addClass('slick-arrow');
+
+            if( _.slideCount > _.options.slidesToShow ) {
+
+                _.$prevArrow.removeClass('slick-hidden').removeAttr('aria-hidden tabindex');
+                _.$nextArrow.removeClass('slick-hidden').removeAttr('aria-hidden tabindex');
+
+                if (_.htmlExpr.test(_.options.prevArrow)) {
+                    _.$prevArrow.prependTo(_.options.appendArrows);
+                }
+
+                if (_.htmlExpr.test(_.options.nextArrow)) {
+                    _.$nextArrow.appendTo(_.options.appendArrows);
+                }
+
+                if (_.options.infinite !== true) {
+                    _.$prevArrow
+                        .addClass('slick-disabled')
+                        .attr('aria-disabled', 'true');
+                }
+
+            } else {
+
+                _.$prevArrow.add( _.$nextArrow )
+
+                    .addClass('slick-hidden')
+                    .attr({
+                        'aria-disabled': 'true',
+                        'tabindex': '-1'
+                    });
+
+            }
+
+        }
+
+    };
+
+    Slick.prototype.buildDots = function() {
+
+        var _ = this,
+            i, dot;
+
+        if (_.options.dots === true && _.slideCount > _.options.slidesToShow) {
+
+            _.$slider.addClass('slick-dotted');
+
+            dot = $('<ul />').addClass(_.options.dotsClass);
+
+            for (i = 0; i <= _.getDotCount(); i += 1) {
+                dot.append($('<li />').append(_.options.customPaging.call(this, _, i)));
+            }
+
+            _.$dots = dot.appendTo(_.options.appendDots);
+
+            _.$dots.find('li').first().addClass('slick-active').attr('aria-hidden', 'false');
+
+        }
+
+    };
+
+    Slick.prototype.buildOut = function() {
+
+        var _ = this;
+
+        _.$slides =
+            _.$slider
+                .children( _.options.slide + ':not(.slick-cloned)')
+                .addClass('slick-slide');
+
+        _.slideCount = _.$slides.length;
+
+        _.$slides.each(function(index, element) {
+            $(element)
+                .attr('data-slick-index', index)
+                .data('originalStyling', $(element).attr('style') || '');
+        });
+
+        _.$slider.addClass('slick-slider');
+
+        _.$slideTrack = (_.slideCount === 0) ?
+            $('<div class="slick-track"/>').appendTo(_.$slider) :
+            _.$slides.wrapAll('<div class="slick-track"/>').parent();
+
+        _.$list = _.$slideTrack.wrap(
+            '<div aria-live="polite" class="slick-list"/>').parent();
+        _.$slideTrack.css('opacity', 0);
+
+        if (_.options.centerMode === true || _.options.swipeToSlide === true) {
+            _.options.slidesToScroll = 1;
+        }
+
+        $('img[data-lazy]', _.$slider).not('[src]').addClass('slick-loading');
+
+        _.setupInfinite();
+
+        _.buildArrows();
+
+        _.buildDots();
+
+        _.updateDots();
+
+
+        _.setSlideClasses(typeof _.currentSlide === 'number' ? _.currentSlide : 0);
+
+        if (_.options.draggable === true) {
+            _.$list.addClass('draggable');
+        }
+
+    };
+
+    Slick.prototype.buildRows = function() {
+
+        var _ = this, a, b, c, newSlides, numOfSlides, originalSlides,slidesPerSection;
+
+        newSlides = document.createDocumentFragment();
+        originalSlides = _.$slider.children();
+
+        if(_.options.rows > 1) {
+
+            slidesPerSection = _.options.slidesPerRow * _.options.rows;
+            numOfSlides = Math.ceil(
+                originalSlides.length / slidesPerSection
+            );
+
+            for(a = 0; a < numOfSlides; a++){
+                var slide = document.createElement('div');
+                for(b = 0; b < _.options.rows; b++) {
+                    var row = document.createElement('div');
+                    for(c = 0; c < _.options.slidesPerRow; c++) {
+                        var target = (a * slidesPerSection + ((b * _.options.slidesPerRow) + c));
+                        if (originalSlides.get(target)) {
+                            row.appendChild(originalSlides.get(target));
+                        }
+                    }
+                    slide.appendChild(row);
+                }
+                newSlides.appendChild(slide);
+            }
+
+            _.$slider.empty().append(newSlides);
+            _.$slider.children().children().children()
+                .css({
+                    'width':(100 / _.options.slidesPerRow) + '%',
+                    'display': 'inline-block'
+                });
+
+        }
+
+    };
+
+    Slick.prototype.checkResponsive = function(initial, forceUpdate) {
+
+        var _ = this,
+            breakpoint, targetBreakpoint, respondToWidth, triggerBreakpoint = false;
+        var sliderWidth = _.$slider.width();
+        var windowWidth = window.innerWidth || $(window).width();
+
+        if (_.respondTo === 'window') {
+            respondToWidth = windowWidth;
+        } else if (_.respondTo === 'slider') {
+            respondToWidth = sliderWidth;
+        } else if (_.respondTo === 'min') {
+            respondToWidth = Math.min(windowWidth, sliderWidth);
+        }
+
+        if ( _.options.responsive &&
+            _.options.responsive.length &&
+            _.options.responsive !== null) {
+
+            targetBreakpoint = null;
+
+            for (breakpoint in _.breakpoints) {
+                if (_.breakpoints.hasOwnProperty(breakpoint)) {
+                    if (_.originalSettings.mobileFirst === false) {
+                        if (respondToWidth < _.breakpoints[breakpoint]) {
+                            targetBreakpoint = _.breakpoints[breakpoint];
+                        }
+                    } else {
+                        if (respondToWidth > _.breakpoints[breakpoint]) {
+                            targetBreakpoint = _.breakpoints[breakpoint];
+                        }
+                    }
+                }
+            }
+
+            if (targetBreakpoint !== null) {
+                if (_.activeBreakpoint !== null) {
+                    if (targetBreakpoint !== _.activeBreakpoint || forceUpdate) {
+                        _.activeBreakpoint =
+                            targetBreakpoint;
+                        if (_.breakpointSettings[targetBreakpoint] === 'unslick') {
+                            _.unslick(targetBreakpoint);
+                        } else {
+                            _.options = $.extend({}, _.originalSettings,
+                                _.breakpointSettings[
+                                    targetBreakpoint]);
+                            if (initial === true) {
+                                _.currentSlide = _.options.initialSlide;
+                            }
+                            _.refresh(initial);
+                        }
+                        triggerBreakpoint = targetBreakpoint;
+                    }
+                } else {
+                    _.activeBreakpoint = targetBreakpoint;
+                    if (_.breakpointSettings[targetBreakpoint] === 'unslick') {
+                        _.unslick(targetBreakpoint);
+                    } else {
+                        _.options = $.extend({}, _.originalSettings,
+                            _.breakpointSettings[
+                                targetBreakpoint]);
+                        if (initial === true) {
+                            _.currentSlide = _.options.initialSlide;
+                        }
+                        _.refresh(initial);
+                    }
+                    triggerBreakpoint = targetBreakpoint;
+                }
+            } else {
+                if (_.activeBreakpoint !== null) {
+                    _.activeBreakpoint = null;
+                    _.options = _.originalSettings;
+                    if (initial === true) {
+                        _.currentSlide = _.options.initialSlide;
+                    }
+                    _.refresh(initial);
+                    triggerBreakpoint = targetBreakpoint;
+                }
+            }
+
+            // only trigger breakpoints during an actual break. not on initialize.
+            if( !initial && triggerBreakpoint !== false ) {
+                _.$slider.trigger('breakpoint', [_, triggerBreakpoint]);
+            }
+        }
+
+    };
+
+    Slick.prototype.changeSlide = function(event, dontAnimate) {
+
+        var _ = this,
+            $target = $(event.currentTarget),
+            indexOffset, slideOffset, unevenOffset;
+
+        // If target is a link, prevent default action.
+        if($target.is('a')) {
+            event.preventDefault();
+        }
+
+        // If target is not the <li> element (ie: a child), find the <li>.
+        if(!$target.is('li')) {
+            $target = $target.closest('li');
+        }
+
+        unevenOffset = (_.slideCount % _.options.slidesToScroll !== 0);
+        indexOffset = unevenOffset ? 0 : (_.slideCount - _.currentSlide) % _.options.slidesToScroll;
+
+        switch (event.data.message) {
+
+            case 'previous':
+                slideOffset = indexOffset === 0 ? _.options.slidesToScroll : _.options.slidesToShow - indexOffset;
+                if (_.slideCount > _.options.slidesToShow) {
+                    _.slideHandler(_.currentSlide - slideOffset, false, dontAnimate);
+                }
+                break;
+
+            case 'next':
+                slideOffset = indexOffset === 0 ? _.options.slidesToScroll : indexOffset;
+                if (_.slideCount > _.options.slidesToShow) {
+                    _.slideHandler(_.currentSlide + slideOffset, false, dontAnimate);
+                }
+                break;
+
+            case 'index':
+                var index = event.data.index === 0 ? 0 :
+                    event.data.index || $target.index() * _.options.slidesToScroll;
+
+                _.slideHandler(_.checkNavigable(index), false, dontAnimate);
+                $target.children().trigger('focus');
+                break;
+
+            default:
+                return;
+        }
+
+    };
+
+    Slick.prototype.checkNavigable = function(index) {
+
+        var _ = this,
+            navigables, prevNavigable;
+
+        navigables = _.getNavigableIndexes();
+        prevNavigable = 0;
+        if (index > navigables[navigables.length - 1]) {
+            index = navigables[navigables.length - 1];
+        } else {
+            for (var n in navigables) {
+                if (index < navigables[n]) {
+                    index = prevNavigable;
+                    break;
+                }
+                prevNavigable = navigables[n];
+            }
+        }
+
+        return index;
+    };
+
+    Slick.prototype.cleanUpEvents = function() {
+
+        var _ = this;
+
+        if (_.options.dots && _.$dots !== null) {
+
+            $('li', _.$dots)
+                .off('click.slick', _.changeSlide)
+                .off('mouseenter.slick', $.proxy(_.interrupt, _, true))
+                .off('mouseleave.slick', $.proxy(_.interrupt, _, false));
+
+        }
+
+        _.$slider.off('focus.slick blur.slick');
+
+        if (_.options.arrows === true && _.slideCount > _.options.slidesToShow) {
+            _.$prevArrow && _.$prevArrow.off('click.slick', _.changeSlide);
+            _.$nextArrow && _.$nextArrow.off('click.slick', _.changeSlide);
+        }
+
+        _.$list.off('touchstart.slick mousedown.slick', _.swipeHandler);
+        _.$list.off('touchmove.slick mousemove.slick', _.swipeHandler);
+        _.$list.off('touchend.slick mouseup.slick', _.swipeHandler);
+        _.$list.off('touchcancel.slick mouseleave.slick', _.swipeHandler);
+
+        _.$list.off('click.slick', _.clickHandler);
+
+        $(document).off(_.visibilityChange, _.visibility);
+
+        _.cleanUpSlideEvents();
+
+        if (_.options.accessibility === true) {
+            _.$list.off('keydown.slick', _.keyHandler);
+        }
+
+        if (_.options.focusOnSelect === true) {
+            $(_.$slideTrack).children().off('click.slick', _.selectHandler);
+        }
+
+        $(window).off('orientationchange.slick.slick-' + _.instanceUid, _.orientationChange);
+
+        $(window).off('resize.slick.slick-' + _.instanceUid, _.resize);
+
+        $('[draggable!=true]', _.$slideTrack).off('dragstart', _.preventDefault);
+
+        $(window).off('load.slick.slick-' + _.instanceUid, _.setPosition);
+        $(document).off('ready.slick.slick-' + _.instanceUid, _.setPosition);
+
+    };
+
+    Slick.prototype.cleanUpSlideEvents = function() {
+
+        var _ = this;
+
+        _.$list.off('mouseenter.slick', $.proxy(_.interrupt, _, true));
+        _.$list.off('mouseleave.slick', $.proxy(_.interrupt, _, false));
+
+    };
+
+    Slick.prototype.cleanUpRows = function() {
+
+        var _ = this, originalSlides;
+
+        if(_.options.rows > 1) {
+            originalSlides = _.$slides.children().children();
+            originalSlides.removeAttr('style');
+            _.$slider.empty().append(originalSlides);
+        }
+
+    };
+
+    Slick.prototype.clickHandler = function(event) {
+
+        var _ = this;
+
+        if (_.shouldClick === false) {
+            event.stopImmediatePropagation();
+            event.stopPropagation();
+            event.preventDefault();
+        }
+
+    };
+
+    Slick.prototype.destroy = function(refresh) {
+
+        var _ = this;
+
+        _.autoPlayClear();
+
+        _.touchObject = {};
+
+        _.cleanUpEvents();
+
+        $('.slick-cloned', _.$slider).detach();
+
+        if (_.$dots) {
+            _.$dots.remove();
+        }
+
+
+        if ( _.$prevArrow && _.$prevArrow.length ) {
+
+            _.$prevArrow
+                .removeClass('slick-disabled slick-arrow slick-hidden')
+                .removeAttr('aria-hidden aria-disabled tabindex')
+                .css('display','');
+
+            if ( _.htmlExpr.test( _.options.prevArrow )) {
+                _.$prevArrow.remove();
+            }
+        }
+
+        if ( _.$nextArrow && _.$nextArrow.length ) {
+
+            _.$nextArrow
+                .removeClass('slick-disabled slick-arrow slick-hidden')
+                .removeAttr('aria-hidden aria-disabled tabindex')
+                .css('display','');
+
+            if ( _.htmlExpr.test( _.options.nextArrow )) {
+                _.$nextArrow.remove();
+            }
+
+        }
+
+
+        if (_.$slides) {
+
+            _.$slides
+                .removeClass('slick-slide slick-active slick-center slick-visible slick-current')
+                .removeAttr('aria-hidden')
+                .removeAttr('data-slick-index')
+                .each(function(){
+                    $(this).attr('style', $(this).data('originalStyling'));
+                });
+
+            _.$slideTrack.children(this.options.slide).detach();
+
+            _.$slideTrack.detach();
+
+            _.$list.detach();
+
+            _.$slider.append(_.$slides);
+        }
+
+        _.cleanUpRows();
+
+        _.$slider.removeClass('slick-slider');
+        _.$slider.removeClass('slick-initialized');
+        _.$slider.removeClass('slick-dotted');
+
+        _.unslicked = true;
+
+        if(!refresh) {
+            _.$slider.trigger('destroy', [_]);
+        }
+
+    };
+
+    Slick.prototype.disableTransition = function(slide) {
+
+        var _ = this,
+            transition = {};
+
+        transition[_.transitionType] = '';
+
+        if (_.options.fade === false) {
+            _.$slideTrack.css(transition);
+        } else {
+            _.$slides.eq(slide).css(transition);
+        }
+
+    };
+
+    Slick.prototype.fadeSlide = function(slideIndex, callback) {
+
+        var _ = this;
+
+        if (_.cssTransitions === false) {
+
+            _.$slides.eq(slideIndex).css({
+                zIndex: _.options.zIndex
+            });
+
+            _.$slides.eq(slideIndex).animate({
+                opacity: 1
+            }, _.options.speed, _.options.easing, callback);
+
+        } else {
+
+            _.applyTransition(slideIndex);
+
+            _.$slides.eq(slideIndex).css({
+                opacity: 1,
+                zIndex: _.options.zIndex
+            });
+
+            if (callback) {
+                setTimeout(function() {
+
+                    _.disableTransition(slideIndex);
+
+                    callback.call();
+                }, _.options.speed);
+            }
+
+        }
+
+    };
+
+    Slick.prototype.fadeSlideOut = function(slideIndex) {
+
+        var _ = this;
+
+        if (_.cssTransitions === false) {
+
+            _.$slides.eq(slideIndex).animate({
+                opacity: 0,
+                zIndex: _.options.zIndex - 2
+            }, _.options.speed, _.options.easing);
+
+        } else {
+
+            _.applyTransition(slideIndex);
+
+            _.$slides.eq(slideIndex).css({
+                opacity: 0,
+                zIndex: _.options.zIndex - 2
             });
 
         }
 
+    };
 
-        // The flag is set and direction is next,
-        // so we're on the last slide and need
-        // to make offset translate.
-        if (Core.Run.isOffset('>')) {
+    Slick.prototype.filterSlides = Slick.prototype.slickFilter = function(filter) {
 
-            // Translate is slides width * length with addtional
-            // offset (right edge of the track).
-            translate = (Glide[Glide.size] * Glide.length) + Glide[Glide.size];
+        var _ = this;
 
-            // Reset flag
-            Core.Run.flag = false;
+        if (filter !== null) {
 
-            // Clear transition and jump to the first slide,
-            // after offset animation is done.
-            this.after(function() {
-                Glide.track.css({
-                    'transition': Core.Transition.clear('all'),
-                    'transform': Core.Translate.set(Glide.axis, Glide[Glide.size] + shift)
+            _.$slidesCache = _.$slides;
+
+            _.unload();
+
+            _.$slideTrack.children(this.options.slide).detach();
+
+            _.$slidesCache.filter(filter).appendTo(_.$slideTrack);
+
+            _.reinit();
+
+        }
+
+    };
+
+    Slick.prototype.focusHandler = function() {
+
+        var _ = this;
+
+        _.$slider
+            .off('focus.slick blur.slick')
+            .on('focus.slick blur.slick',
+                '*:not(.slick-arrow)', function(event) {
+
+            event.stopImmediatePropagation();
+            var $sf = $(this);
+
+            setTimeout(function() {
+
+                if( _.options.pauseOnFocus ) {
+                    _.focussed = $sf.is(':focus');
+                    _.autoPlay();
+                }
+
+            }, 0);
+
+        });
+    };
+
+    Slick.prototype.getCurrent = Slick.prototype.slickCurrentSlide = function() {
+
+        var _ = this;
+        return _.currentSlide;
+
+    };
+
+    Slick.prototype.getDotCount = function() {
+
+        var _ = this;
+
+        var breakPoint = 0;
+        var counter = 0;
+        var pagerQty = 0;
+
+        if (_.options.infinite === true) {
+            while (breakPoint < _.slideCount) {
+                ++pagerQty;
+                breakPoint = counter + _.options.slidesToScroll;
+                counter += _.options.slidesToScroll <= _.options.slidesToShow ? _.options.slidesToScroll : _.options.slidesToShow;
+            }
+        } else if (_.options.centerMode === true) {
+            pagerQty = _.slideCount;
+        } else if(!_.options.asNavFor) {
+            pagerQty = 1 + Math.ceil((_.slideCount - _.options.slidesToShow) / _.options.slidesToScroll);
+        }else {
+            while (breakPoint < _.slideCount) {
+                ++pagerQty;
+                breakPoint = counter + _.options.slidesToScroll;
+                counter += _.options.slidesToScroll <= _.options.slidesToShow ? _.options.slidesToScroll : _.options.slidesToShow;
+            }
+        }
+
+        return pagerQty - 1;
+
+    };
+
+    Slick.prototype.getLeft = function(slideIndex) {
+
+        var _ = this,
+            targetLeft,
+            verticalHeight,
+            verticalOffset = 0,
+            targetSlide;
+
+        _.slideOffset = 0;
+        verticalHeight = _.$slides.first().outerHeight(true);
+
+        if (_.options.infinite === true) {
+            if (_.slideCount > _.options.slidesToShow) {
+                _.slideOffset = (_.slideWidth * _.options.slidesToShow) * -1;
+                verticalOffset = (verticalHeight * _.options.slidesToShow) * -1;
+            }
+            if (_.slideCount % _.options.slidesToScroll !== 0) {
+                if (slideIndex + _.options.slidesToScroll > _.slideCount && _.slideCount > _.options.slidesToShow) {
+                    if (slideIndex > _.slideCount) {
+                        _.slideOffset = ((_.options.slidesToShow - (slideIndex - _.slideCount)) * _.slideWidth) * -1;
+                        verticalOffset = ((_.options.slidesToShow - (slideIndex - _.slideCount)) * verticalHeight) * -1;
+                    } else {
+                        _.slideOffset = ((_.slideCount % _.options.slidesToScroll) * _.slideWidth) * -1;
+                        verticalOffset = ((_.slideCount % _.options.slidesToScroll) * verticalHeight) * -1;
+                    }
+                }
+            }
+        } else {
+            if (slideIndex + _.options.slidesToShow > _.slideCount) {
+                _.slideOffset = ((slideIndex + _.options.slidesToShow) - _.slideCount) * _.slideWidth;
+                verticalOffset = ((slideIndex + _.options.slidesToShow) - _.slideCount) * verticalHeight;
+            }
+        }
+
+        if (_.slideCount <= _.options.slidesToShow) {
+            _.slideOffset = 0;
+            verticalOffset = 0;
+        }
+
+        if (_.options.centerMode === true && _.options.infinite === true) {
+            _.slideOffset += _.slideWidth * Math.floor(_.options.slidesToShow / 2) - _.slideWidth;
+        } else if (_.options.centerMode === true) {
+            _.slideOffset = 0;
+            _.slideOffset += _.slideWidth * Math.floor(_.options.slidesToShow / 2);
+        }
+
+        if (_.options.vertical === false) {
+            targetLeft = ((slideIndex * _.slideWidth) * -1) + _.slideOffset;
+        } else {
+            targetLeft = ((slideIndex * verticalHeight) * -1) + verticalOffset;
+        }
+
+        if (_.options.variableWidth === true) {
+
+            if (_.slideCount <= _.options.slidesToShow || _.options.infinite === false) {
+                targetSlide = _.$slideTrack.children('.slick-slide').eq(slideIndex);
+            } else {
+                targetSlide = _.$slideTrack.children('.slick-slide').eq(slideIndex + _.options.slidesToShow);
+            }
+
+            if (_.options.rtl === true) {
+                if (targetSlide[0]) {
+                    targetLeft = (_.$slideTrack.width() - targetSlide[0].offsetLeft - targetSlide.width()) * -1;
+                } else {
+                    targetLeft =  0;
+                }
+            } else {
+                targetLeft = targetSlide[0] ? targetSlide[0].offsetLeft * -1 : 0;
+            }
+
+            if (_.options.centerMode === true) {
+                if (_.slideCount <= _.options.slidesToShow || _.options.infinite === false) {
+                    targetSlide = _.$slideTrack.children('.slick-slide').eq(slideIndex);
+                } else {
+                    targetSlide = _.$slideTrack.children('.slick-slide').eq(slideIndex + _.options.slidesToShow + 1);
+                }
+
+                if (_.options.rtl === true) {
+                    if (targetSlide[0]) {
+                        targetLeft = (_.$slideTrack.width() - targetSlide[0].offsetLeft - targetSlide.width()) * -1;
+                    } else {
+                        targetLeft =  0;
+                    }
+                } else {
+                    targetLeft = targetSlide[0] ? targetSlide[0].offsetLeft * -1 : 0;
+                }
+
+                targetLeft += (_.$list.width() - targetSlide.outerWidth()) / 2;
+            }
+        }
+
+        return targetLeft;
+
+    };
+
+    Slick.prototype.getOption = Slick.prototype.slickGetOption = function(option) {
+
+        var _ = this;
+
+        return _.options[option];
+
+    };
+
+    Slick.prototype.getNavigableIndexes = function() {
+
+        var _ = this,
+            breakPoint = 0,
+            counter = 0,
+            indexes = [],
+            max;
+
+        if (_.options.infinite === false) {
+            max = _.slideCount;
+        } else {
+            breakPoint = _.options.slidesToScroll * -1;
+            counter = _.options.slidesToScroll * -1;
+            max = _.slideCount * 2;
+        }
+
+        while (breakPoint < max) {
+            indexes.push(breakPoint);
+            breakPoint = counter + _.options.slidesToScroll;
+            counter += _.options.slidesToScroll <= _.options.slidesToShow ? _.options.slidesToScroll : _.options.slidesToShow;
+        }
+
+        return indexes;
+
+    };
+
+    Slick.prototype.getSlick = function() {
+
+        return this;
+
+    };
+
+    Slick.prototype.getSlideCount = function() {
+
+        var _ = this,
+            slidesTraversed, swipedSlide, centerOffset;
+
+        centerOffset = _.options.centerMode === true ? _.slideWidth * Math.floor(_.options.slidesToShow / 2) : 0;
+
+        if (_.options.swipeToSlide === true) {
+            _.$slideTrack.find('.slick-slide').each(function(index, slide) {
+                if (slide.offsetLeft - centerOffset + ($(slide).outerWidth() / 2) > (_.swipeLeft * -1)) {
+                    swipedSlide = slide;
+                    return false;
+                }
+            });
+
+            slidesTraversed = Math.abs($(swipedSlide).attr('data-slick-index') - _.currentSlide) || 1;
+
+            return slidesTraversed;
+
+        } else {
+            return _.options.slidesToScroll;
+        }
+
+    };
+
+    Slick.prototype.goTo = Slick.prototype.slickGoTo = function(slide, dontAnimate) {
+
+        var _ = this;
+
+        _.changeSlide({
+            data: {
+                message: 'index',
+                index: parseInt(slide)
+            }
+        }, dontAnimate);
+
+    };
+
+    Slick.prototype.init = function(creation) {
+
+        var _ = this;
+
+        if (!$(_.$slider).hasClass('slick-initialized')) {
+
+            $(_.$slider).addClass('slick-initialized');
+
+            _.buildRows();
+            _.buildOut();
+            _.setProps();
+            _.startLoad();
+            _.loadSlider();
+            _.initializeEvents();
+            _.updateArrows();
+            _.updateDots();
+            _.checkResponsive(true);
+            _.focusHandler();
+
+        }
+
+        if (creation) {
+            _.$slider.trigger('init', [_]);
+        }
+
+        if (_.options.accessibility === true) {
+            _.initADA();
+        }
+
+        if ( _.options.autoplay ) {
+
+            _.paused = false;
+            _.autoPlay();
+
+        }
+
+    };
+
+    Slick.prototype.initADA = function() {
+        var _ = this;
+        _.$slides.add(_.$slideTrack.find('.slick-cloned')).attr({
+            'aria-hidden': 'true',
+            'tabindex': '-1'
+        }).find('a, input, button, select').attr({
+            'tabindex': '-1'
+        });
+
+        _.$slideTrack.attr('role', 'listbox');
+
+        _.$slides.not(_.$slideTrack.find('.slick-cloned')).each(function(i) {
+            $(this).attr({
+                'role': 'option',
+                'aria-describedby': 'slick-slide' + _.instanceUid + i + ''
+            });
+        });
+
+        if (_.$dots !== null) {
+            _.$dots.attr('role', 'tablist').find('li').each(function(i) {
+                $(this).attr({
+                    'role': 'presentation',
+                    'aria-selected': 'false',
+                    'aria-controls': 'navigation' + _.instanceUid + i + '',
+                    'id': 'slick-slide' + _.instanceUid + i + ''
                 });
+            })
+                .first().attr('aria-selected', 'true').end()
+                .find('button').attr('role', 'button').end()
+                .closest('div').attr('role', 'toolbar');
+        }
+        _.activateADA();
+
+    };
+
+    Slick.prototype.initArrowEvents = function() {
+
+        var _ = this;
+
+        if (_.options.arrows === true && _.slideCount > _.options.slidesToShow) {
+            _.$prevArrow
+               .off('click.slick')
+               .on('click.slick', {
+                    message: 'previous'
+               }, _.changeSlide);
+            _.$nextArrow
+               .off('click.slick')
+               .on('click.slick', {
+                    message: 'next'
+               }, _.changeSlide);
+        }
+
+    };
+
+    Slick.prototype.initDotEvents = function() {
+
+        var _ = this;
+
+        if (_.options.dots === true && _.slideCount > _.options.slidesToShow) {
+            $('li', _.$dots).on('click.slick', {
+                message: 'index'
+            }, _.changeSlide);
+        }
+
+        if ( _.options.dots === true && _.options.pauseOnDotsHover === true ) {
+
+            $('li', _.$dots)
+                .on('mouseenter.slick', $.proxy(_.interrupt, _, true))
+                .on('mouseleave.slick', $.proxy(_.interrupt, _, false));
+
+        }
+
+    };
+
+    Slick.prototype.initSlideEvents = function() {
+
+        var _ = this;
+
+        if ( _.options.pauseOnHover ) {
+
+            _.$list.on('mouseenter.slick', $.proxy(_.interrupt, _, true));
+            _.$list.on('mouseleave.slick', $.proxy(_.interrupt, _, false));
+
+        }
+
+    };
+
+    Slick.prototype.initializeEvents = function() {
+
+        var _ = this;
+
+        _.initArrowEvents();
+
+        _.initDotEvents();
+        _.initSlideEvents();
+
+        _.$list.on('touchstart.slick mousedown.slick', {
+            action: 'start'
+        }, _.swipeHandler);
+        _.$list.on('touchmove.slick mousemove.slick', {
+            action: 'move'
+        }, _.swipeHandler);
+        _.$list.on('touchend.slick mouseup.slick', {
+            action: 'end'
+        }, _.swipeHandler);
+        _.$list.on('touchcancel.slick mouseleave.slick', {
+            action: 'end'
+        }, _.swipeHandler);
+
+        _.$list.on('click.slick', _.clickHandler);
+
+        $(document).on(_.visibilityChange, $.proxy(_.visibility, _));
+
+        if (_.options.accessibility === true) {
+            _.$list.on('keydown.slick', _.keyHandler);
+        }
+
+        if (_.options.focusOnSelect === true) {
+            $(_.$slideTrack).children().on('click.slick', _.selectHandler);
+        }
+
+        $(window).on('orientationchange.slick.slick-' + _.instanceUid, $.proxy(_.orientationChange, _));
+
+        $(window).on('resize.slick.slick-' + _.instanceUid, $.proxy(_.resize, _));
+
+        $('[draggable!=true]', _.$slideTrack).on('dragstart', _.preventDefault);
+
+        $(window).on('load.slick.slick-' + _.instanceUid, _.setPosition);
+        $(document).on('ready.slick.slick-' + _.instanceUid, _.setPosition);
+
+    };
+
+    Slick.prototype.initUI = function() {
+
+        var _ = this;
+
+        if (_.options.arrows === true && _.slideCount > _.options.slidesToShow) {
+
+            _.$prevArrow.show();
+            _.$nextArrow.show();
+
+        }
+
+        if (_.options.dots === true && _.slideCount > _.options.slidesToShow) {
+
+            _.$dots.show();
+
+        }
+
+    };
+
+    Slick.prototype.keyHandler = function(event) {
+
+        var _ = this;
+         //Dont slide if the cursor is inside the form fields and arrow keys are pressed
+        if(!event.target.tagName.match('TEXTAREA|INPUT|SELECT')) {
+            if (event.keyCode === 37 && _.options.accessibility === true) {
+                _.changeSlide({
+                    data: {
+                        message: _.options.rtl === true ? 'next' :  'previous'
+                    }
+                });
+            } else if (event.keyCode === 39 && _.options.accessibility === true) {
+                _.changeSlide({
+                    data: {
+                        message: _.options.rtl === true ? 'previous' : 'next'
+                    }
+                });
+            }
+        }
+
+    };
+
+    Slick.prototype.lazyLoad = function() {
+
+        var _ = this,
+            loadRange, cloneRange, rangeStart, rangeEnd;
+
+        function loadImages(imagesScope) {
+
+            $('img[data-lazy]', imagesScope).each(function() {
+
+                var image = $(this),
+                    imageSource = $(this).attr('data-lazy'),
+                    imageToLoad = document.createElement('img');
+
+                imageToLoad.onload = function() {
+
+                    image
+                        .animate({ opacity: 0 }, 100, function() {
+                            image
+                                .attr('src', imageSource)
+                                .animate({ opacity: 1 }, 200, function() {
+                                    image
+                                        .removeAttr('data-lazy')
+                                        .removeClass('slick-loading');
+                                });
+                            _.$slider.trigger('lazyLoaded', [_, image, imageSource]);
+                        });
+
+                };
+
+                imageToLoad.onerror = function() {
+
+                    image
+                        .removeAttr( 'data-lazy' )
+                        .removeClass( 'slick-loading' )
+                        .addClass( 'slick-lazyload-error' );
+
+                    _.$slider.trigger('lazyLoadError', [ _, image, imageSource ]);
+
+                };
+
+                imageToLoad.src = imageSource;
+
             });
 
         }
+
+        if (_.options.centerMode === true) {
+            if (_.options.infinite === true) {
+                rangeStart = _.currentSlide + (_.options.slidesToShow / 2 + 1);
+                rangeEnd = rangeStart + _.options.slidesToShow + 2;
+            } else {
+                rangeStart = Math.max(0, _.currentSlide - (_.options.slidesToShow / 2 + 1));
+                rangeEnd = 2 + (_.options.slidesToShow / 2 + 1) + _.currentSlide;
+            }
+        } else {
+            rangeStart = _.options.infinite ? _.options.slidesToShow + _.currentSlide : _.currentSlide;
+            rangeEnd = Math.ceil(rangeStart + _.options.slidesToShow);
+            if (_.options.fade === true) {
+                if (rangeStart > 0) rangeStart--;
+                if (rangeEnd <= _.slideCount) rangeEnd++;
+            }
+        }
+
+        loadRange = _.$slider.find('.slick-slide').slice(rangeStart, rangeEnd);
+        loadImages(loadRange);
+
+        if (_.slideCount <= _.options.slidesToShow) {
+            cloneRange = _.$slider.find('.slick-slide');
+            loadImages(cloneRange);
+        } else
+        if (_.currentSlide >= _.slideCount - _.options.slidesToShow) {
+            cloneRange = _.$slider.find('.slick-cloned').slice(0, _.options.slidesToShow);
+            loadImages(cloneRange);
+        } else if (_.currentSlide === 0) {
+            cloneRange = _.$slider.find('.slick-cloned').slice(_.options.slidesToShow * -1);
+            loadImages(cloneRange);
+        }
+
+    };
+
+    Slick.prototype.loadSlider = function() {
+
+        var _ = this;
+
+        _.setPosition();
+
+        _.$slideTrack.css({
+            opacity: 1
+        });
+
+        _.$slider.removeClass('slick-loading');
+
+        _.initUI();
+
+        if (_.options.lazyLoad === 'progressive') {
+            _.progressiveLazyLoad();
+        }
+
+    };
+
+    Slick.prototype.next = Slick.prototype.slickNext = function() {
+
+        var _ = this;
+
+        _.changeSlide({
+            data: {
+                message: 'next'
+            }
+        });
+
+    };
+
+    Slick.prototype.orientationChange = function() {
+
+        var _ = this;
+
+        _.checkResponsive();
+        _.setPosition();
+
+    };
+
+    Slick.prototype.pause = Slick.prototype.slickPause = function() {
+
+        var _ = this;
+
+        _.autoPlayClear();
+        _.paused = true;
+
+    };
+
+    Slick.prototype.play = Slick.prototype.slickPlay = function() {
+
+        var _ = this;
+
+        _.autoPlay();
+        _.options.autoplay = true;
+        _.paused = false;
+        _.focussed = false;
+        _.interrupted = false;
+
+    };
+
+    Slick.prototype.postSlide = function(index) {
+
+        var _ = this;
+
+        if( !_.unslicked ) {
+
+            _.$slider.trigger('afterChange', [_, index]);
+
+            _.animating = false;
+
+            _.setPosition();
+
+            _.swipeLeft = null;
+
+            if ( _.options.autoplay ) {
+                _.autoPlay();
+            }
+
+            if (_.options.accessibility === true) {
+                _.initADA();
+            }
+
+        }
+
+    };
+
+    Slick.prototype.prev = Slick.prototype.slickPrev = function() {
+
+        var _ = this;
+
+        _.changeSlide({
+            data: {
+                message: 'previous'
+            }
+        });
+
+    };
+
+    Slick.prototype.preventDefault = function(event) {
+
+        event.preventDefault();
+
+    };
+
+    Slick.prototype.progressiveLazyLoad = function( tryCount ) {
+
+        tryCount = tryCount || 1;
+
+        var _ = this,
+            $imgsToLoad = $( 'img[data-lazy]', _.$slider ),
+            image,
+            imageSource,
+            imageToLoad;
+
+        if ( $imgsToLoad.length ) {
+
+            image = $imgsToLoad.first();
+            imageSource = image.attr('data-lazy');
+            imageToLoad = document.createElement('img');
+
+            imageToLoad.onload = function() {
+
+                image
+                    .attr( 'src', imageSource )
+                    .removeAttr('data-lazy')
+                    .removeClass('slick-loading');
+
+                if ( _.options.adaptiveHeight === true ) {
+                    _.setPosition();
+                }
+
+                _.$slider.trigger('lazyLoaded', [ _, image, imageSource ]);
+                _.progressiveLazyLoad();
+
+            };
+
+            imageToLoad.onerror = function() {
+
+                if ( tryCount < 3 ) {
+
+                    /**
+                     * try to load the image 3 times,
+                     * leave a slight delay so we don't get
+                     * servers blocking the request.
+                     */
+                    setTimeout( function() {
+                        _.progressiveLazyLoad( tryCount + 1 );
+                    }, 500 );
+
+                } else {
+
+                    image
+                        .removeAttr( 'data-lazy' )
+                        .removeClass( 'slick-loading' )
+                        .addClass( 'slick-lazyload-error' );
+
+                    _.$slider.trigger('lazyLoadError', [ _, image, imageSource ]);
+
+                    _.progressiveLazyLoad();
+
+                }
+
+            };
+
+            imageToLoad.src = imageSource;
+
+        } else {
+
+            _.$slider.trigger('allImagesLoaded', [ _ ]);
+
+        }
+
+    };
+
+    Slick.prototype.refresh = function( initializing ) {
+
+        var _ = this, currentSlide, lastVisibleIndex;
+
+        lastVisibleIndex = _.slideCount - _.options.slidesToShow;
+
+        // in non-infinite sliders, we don't want to go past the
+        // last visible index.
+        if( !_.options.infinite && ( _.currentSlide > lastVisibleIndex )) {
+            _.currentSlide = lastVisibleIndex;
+        }
+
+        // if less slides than to show, go to start.
+        if ( _.slideCount <= _.options.slidesToShow ) {
+            _.currentSlide = 0;
+
+        }
+
+        currentSlide = _.currentSlide;
+
+        _.destroy(true);
+
+        $.extend(_, _.initials, { currentSlide: currentSlide });
+
+        _.init();
+
+        if( !initializing ) {
+
+            _.changeSlide({
+                data: {
+                    message: 'index',
+                    index: currentSlide
+                }
+            }, false);
+
+        }
+
+    };
+
+    Slick.prototype.registerBreakpoints = function() {
+
+        var _ = this, breakpoint, currentBreakpoint, l,
+            responsiveSettings = _.options.responsive || null;
+
+        if ( $.type(responsiveSettings) === 'array' && responsiveSettings.length ) {
+
+            _.respondTo = _.options.respondTo || 'window';
+
+            for ( breakpoint in responsiveSettings ) {
+
+                l = _.breakpoints.length-1;
+                currentBreakpoint = responsiveSettings[breakpoint].breakpoint;
+
+                if (responsiveSettings.hasOwnProperty(breakpoint)) {
+
+                    // loop through the breakpoints and cut out any existing
+                    // ones with the same breakpoint number, we don't want dupes.
+                    while( l >= 0 ) {
+                        if( _.breakpoints[l] && _.breakpoints[l] === currentBreakpoint ) {
+                            _.breakpoints.splice(l,1);
+                        }
+                        l--;
+                    }
+
+                    _.breakpoints.push(currentBreakpoint);
+                    _.breakpointSettings[currentBreakpoint] = responsiveSettings[breakpoint].settings;
+
+                }
+
+            }
+
+            _.breakpoints.sort(function(a, b) {
+                return ( _.options.mobileFirst ) ? a-b : b-a;
+            });
+
+        }
+
+    };
+
+    Slick.prototype.reinit = function() {
+
+        var _ = this;
+
+        _.$slides =
+            _.$slideTrack
+                .children(_.options.slide)
+                .addClass('slick-slide');
+
+        _.slideCount = _.$slides.length;
+
+        if (_.currentSlide >= _.slideCount && _.currentSlide !== 0) {
+            _.currentSlide = _.currentSlide - _.options.slidesToScroll;
+        }
+
+        if (_.slideCount <= _.options.slidesToShow) {
+            _.currentSlide = 0;
+        }
+
+        _.registerBreakpoints();
+
+        _.setProps();
+        _.setupInfinite();
+        _.buildArrows();
+        _.updateArrows();
+        _.initArrowEvents();
+        _.buildDots();
+        _.updateDots();
+        _.initDotEvents();
+        _.cleanUpSlideEvents();
+        _.initSlideEvents();
+
+        _.checkResponsive(false, true);
+
+        if (_.options.focusOnSelect === true) {
+            $(_.$slideTrack).children().on('click.slick', _.selectHandler);
+        }
+
+        _.setSlideClasses(typeof _.currentSlide === 'number' ? _.currentSlide : 0);
+
+        _.setPosition();
+        _.focusHandler();
+
+        _.paused = !_.options.autoplay;
+        _.autoPlay();
+
+        _.$slider.trigger('reInit', [_]);
+
+    };
+
+    Slick.prototype.resize = function() {
+
+        var _ = this;
+
+        if ($(window).width() !== _.windowWidth) {
+            clearTimeout(_.windowDelay);
+            _.windowDelay = window.setTimeout(function() {
+                _.windowWidth = $(window).width();
+                _.checkResponsive();
+                if( !_.unslicked ) { _.setPosition(); }
+            }, 50);
+        }
+    };
+
+    Slick.prototype.removeSlide = Slick.prototype.slickRemove = function(index, removeBefore, removeAll) {
+
+        var _ = this;
+
+        if (typeof(index) === 'boolean') {
+            removeBefore = index;
+            index = removeBefore === true ? 0 : _.slideCount - 1;
+        } else {
+            index = removeBefore === true ? --index : index;
+        }
+
+        if (_.slideCount < 1 || index < 0 || index > _.slideCount - 1) {
+            return false;
+        }
+
+        _.unload();
+
+        if (removeAll === true) {
+            _.$slideTrack.children().remove();
+        } else {
+            _.$slideTrack.children(this.options.slide).eq(index).remove();
+        }
+
+        _.$slides = _.$slideTrack.children(this.options.slide);
+
+        _.$slideTrack.children(this.options.slide).detach();
+
+        _.$slideTrack.append(_.$slides);
+
+        _.$slidesCache = _.$slides;
+
+        _.reinit();
+
+    };
+
+    Slick.prototype.setCSS = function(position) {
+
+        var _ = this,
+            positionProps = {},
+            x, y;
+
+        if (_.options.rtl === true) {
+            position = -position;
+        }
+        x = _.positionProp == 'left' ? Math.ceil(position) + 'px' : '0px';
+        y = _.positionProp == 'top' ? Math.ceil(position) + 'px' : '0px';
+
+        positionProps[_.positionProp] = position;
+
+        if (_.transformsEnabled === false) {
+            _.$slideTrack.css(positionProps);
+        } else {
+            positionProps = {};
+            if (_.cssTransitions === false) {
+                positionProps[_.animType] = 'translate(' + x + ', ' + y + ')';
+                _.$slideTrack.css(positionProps);
+            } else {
+                positionProps[_.animType] = 'translate3d(' + x + ', ' + y + ', 0px)';
+                _.$slideTrack.css(positionProps);
+            }
+        }
+
+    };
+
+    Slick.prototype.setDimensions = function() {
+
+        var _ = this;
+
+        if (_.options.vertical === false) {
+            if (_.options.centerMode === true) {
+                _.$list.css({
+                    padding: ('0px ' + _.options.centerPadding)
+                });
+            }
+        } else {
+            _.$list.height(_.$slides.first().outerHeight(true) * _.options.slidesToShow);
+            if (_.options.centerMode === true) {
+                _.$list.css({
+                    padding: (_.options.centerPadding + ' 0px')
+                });
+            }
+        }
+
+        _.listWidth = _.$list.width();
+        _.listHeight = _.$list.height();
+
+
+        if (_.options.vertical === false && _.options.variableWidth === false) {
+            _.slideWidth = Math.ceil(_.listWidth / _.options.slidesToShow);
+            _.$slideTrack.width(Math.ceil((_.slideWidth * _.$slideTrack.children('.slick-slide').length)));
+
+        } else if (_.options.variableWidth === true) {
+            _.$slideTrack.width(5000 * _.slideCount);
+        } else {
+            _.slideWidth = Math.ceil(_.listWidth);
+            _.$slideTrack.height(Math.ceil((_.$slides.first().outerHeight(true) * _.$slideTrack.children('.slick-slide').length)));
+        }
+
+        var offset = _.$slides.first().outerWidth(true) - _.$slides.first().width();
+        if (_.options.variableWidth === false) _.$slideTrack.children('.slick-slide').width(_.slideWidth - offset);
+
+    };
+
+    Slick.prototype.setFade = function() {
+
+        var _ = this,
+            targetLeft;
+
+        _.$slides.each(function(index, element) {
+            targetLeft = (_.slideWidth * index) * -1;
+            if (_.options.rtl === true) {
+                $(element).css({
+                    position: 'relative',
+                    right: targetLeft,
+                    top: 0,
+                    zIndex: _.options.zIndex - 2,
+                    opacity: 0
+                });
+            } else {
+                $(element).css({
+                    position: 'relative',
+                    left: targetLeft,
+                    top: 0,
+                    zIndex: _.options.zIndex - 2,
+                    opacity: 0
+                });
+            }
+        });
+
+        _.$slides.eq(_.currentSlide).css({
+            zIndex: _.options.zIndex - 1,
+            opacity: 1
+        });
+
+    };
+
+    Slick.prototype.setHeight = function() {
+
+        var _ = this;
+
+        if (_.options.slidesToShow === 1 && _.options.adaptiveHeight === true && _.options.vertical === false) {
+            var targetHeight = _.$slides.eq(_.currentSlide).outerHeight(true);
+            _.$list.css('height', targetHeight);
+        }
+
+    };
+
+    Slick.prototype.setOption =
+    Slick.prototype.slickSetOption = function() {
 
         /**
-         * Actual translate apply to wrapper
-         * overwrite transition (can be pre-cleared)
+         * accepts arguments in format of:
+         *
+         *  - for changing a single option's value:
+         *     .slick("setOption", option, value, refresh )
+         *
+         *  - for changing a set of responsive options:
+         *     .slick("setOption", 'responsive', [{}, ...], refresh )
+         *
+         *  - for updating multiple values at once (not responsive)
+         *     .slick("setOption", { 'option': value, ... }, refresh )
          */
-        Glide.track.css({
-            'transition': Core.Transition.get('all'),
-            'transform': Core.Translate.set(Glide.axis, translate + shift - offset)
-        });
 
-    };
+        var _ = this, l, item, option, value, refresh = false, type;
 
+        if( $.type( arguments[0] ) === 'object' ) {
 
-    /**
-     * Slideshow animation type.
-     *
-     * @return {Void}
-     */
-    Animation.prototype.slideshow = function() {
+            option =  arguments[0];
+            refresh = arguments[1];
+            type = 'multiple';
 
-        Glide.slides.css('transition', Core.Transition.get('opacity'))
-            .eq(Glide.current - 1).css('opacity', 1)
-            .siblings().css('opacity', 0);
+        } else if ( $.type( arguments[0] ) === 'string' ) {
 
-    };
+            option =  arguments[0];
+            value = arguments[1];
+            refresh = arguments[2];
 
-    // Return class.
-    return new Animation();
+            if ( arguments[0] === 'responsive' && $.type( arguments[1] ) === 'array' ) {
 
-};
-;/**
- * Api module.
- *
- * @param {Object} Glide
- * @param {Object} Core
- * @return {Api}
- */
-var Api = function(Glide, Core) {
+                type = 'responsive';
 
-    /**
-     * Api constructor.
-     */
-    function Api() {
+            } else if ( typeof arguments[1] !== 'undefined' ) {
 
-    }
+                type = 'single';
 
-    /**
-     * Api instance.
-     *
-     * @return {Object}
-     */
-    Api.prototype.instance = function() {
-
-        return {
-
-            /**
-             * Get current slide index.
-             *
-             * @return {Integer}
-             */
-            current: function() {
-                return Glide.current;
-            },
-
-
-            /**
-             * Go to specifed slide.
-             *
-             * @param  {String} distance
-             * @param  {Function} callback
-             * @return {Void}
-             */
-            go: function(distance, callback) {
-                Core.Run.pause();
-                Core.Run.make(distance, callback);
-                Core.Run.play();
-            },
-
-
-            /**
-             * Jump without animation to specifed slide
-             *
-             * @param  {String} distance
-             * @param  {Function} callback
-             * @return {Void}
-             */
-            jump: function(distance, callback) {
-
-                // Let know that we want jumping.
-                Core.Transition.jumping = true;
-
-                // Take off jumping flag,
-                // after animation.
-                Core.Animation.after(function() {
-
-                    Core.Transition.jumping = false;
-                });
-
-                // Move slider.
-                Core.Run.make(distance, callback);
-
-            },
-
-
-            /**
-             * Move slider by passed distance.
-             *
-             * @param  {Integer} distance
-             * @return {Void}
-             */
-            move: function(distance) {
-                Core.Transition.jumping = true;
-                Core.Animation.make(distance);
-                Core.Transition.jumping = false;
-            },
-
-
-            /**
-             * Start autoplay.
-             *
-             * @return {Void}
-             */
-            start: function(interval) {
-
-                // We want running, turn on flag.
-                Core.Run.running = true;
-
-                // Set autoplay duration.
-                Glide.options.autoplay = parseInt(interval);
-
-                // Run autoplay.
-                Core.Run.play();
-
-            },
-
-
-            /**
-             * Run autoplay.
-             *
-             * @return {Boolean}
-             */
-            play: function() {
-                return Core.Run.play();
-            },
-
-
-            /**
-             * Pause autoplay.
-             *
-             * @return {Integer}
-             */
-            pause: function() {
-                return Core.Run.pause();
-            },
-
-
-            /**
-             * Destroy slider.
-             *
-             * @return {Void}
-             */
-            destroy: function() {
-
-                Core.Run.pause();
-                Core.Clones.remove();
-                Core.Helper.removeStyles([Glide.track, Glide.slides]);
-                Core.Bullets.remove();
-                Glide.slider.removeData('glide_api');
-
-                Core.Events.unbind();
-                Core.Touch.unbind();
-                Core.Arrows.unbind();
-                Core.Bullets.unbind();
-
-                Glide.destroyed = true;
-
-                delete Glide.slider;
-                delete Glide.track;
-                delete Glide.slides;
-                delete Glide.width;
-                delete Glide.length;
-
-            },
-
-
-            /**
-             * Refresh slider.
-             *
-             * @return {Void}
-             */
-            refresh: function() {
-                Core.Run.pause();
-                Glide.collect();
-                Glide.setup();
-                Core.Clones.remove().init();
-                Core.Bullets.remove().init();
-                Core.Build.init();
-                Core.Run.make('=' + parseInt(Glide.options.startAt), Core.Run.play());
-            },
-
-        };
-
-    };
-
-
-    // Return class.
-    return new Api();
-
-
-};
-;/**
- * Arrows module.
- *
- * @param {Object} Glide
- * @param {Object} Core
- * @return {Arrows}
- */
-var Arrows = function(Glide, Core) {
-
-
-    /**
-     * Arrows constructor.
-     */
-    function Arrows() {
-        this.build();
-        this.bind();
-    }
-
-
-    /**
-     * Build arrows. Gets DOM elements.
-     *
-     * @return {Void}
-     */
-    Arrows.prototype.build = function() {
-        this.wrapper = Glide.slider.find('.' + Glide.options.classes.arrows);
-        this.items = this.wrapper.children();
-    };
-
-
-    /**
-     * Disable next/previous arrow and enable another.
-     *
-     * @param {String} type
-     * @return {Void}
-     */
-    Arrows.prototype.disable = function(type) {
-        var classes = Glide.options.classes;
-
-        if (!type) {
-            return this.disableBoth();
-        }
-
-        this.items.filter('.' + classes['arrow' + Core.Helper.capitalise(type)])
-            .unbind('click.glide touchstart.glide')
-            .addClass(classes.disabled)
-            .siblings()
-            .bind('click.glide touchstart.glide', this.click)
-            .bind('mouseenter.glide', this.hover)
-            .bind('mouseleave.glide', this.hover)
-            .removeClass(classes.disabled);
-    };
-
-    /**
-     * Disable both arrows.
-     *
-     * @return {Void}
-     */
-    Arrows.prototype.disableBoth = function() {
-        this.items
-            .unbind('click.glide touchstart.glide')
-            .addClass(Glide.options.classes.disabled);
-    };
-
-
-    /**
-     * Show both arrows.
-     *
-     * @return {Void}
-     */
-    Arrows.prototype.enable = function() {
-        this.bind();
-
-        this.items.removeClass(Glide.options.classes.disabled);
-    };
-
-    /**
-     * Arrow click event.
-     *
-     * @param {Object} event
-     * @return {Void}
-     */
-    Arrows.prototype.click = function(event) {
-        event.preventDefault();
-
-        if (!Core.Events.disabled) {
-            Core.Run.pause();
-            Core.Run.make($(this).data('glide-dir'));
-            Core.Animation.after(function() {
-                Core.Run.play();
-            });
-        }
-    };
-
-    /**
-     * Arrows hover event.
-     *
-     * @param {Object} event
-     * @return {Void}
-     */
-    Arrows.prototype.hover = function(event) {
-        if (!Core.Events.disabled) {
-
-            switch (event.type) {
-                // Start autoplay on mouse leave.
-                case 'mouseleave':
-                    Core.Run.play();
-                    break;
-                // Pause autoplay on mouse enter.
-                case 'mouseenter':
-                    Core.Run.pause();
-                    break;
             }
 
         }
-    };
 
-    /**
-     * Bind arrows events.
-     *
-     * @return {Void}
-     */
-    Arrows.prototype.bind = function() {
-        this.items
-            .on('click.glide touchstart.glide', this.click)
-            .on('mouseenter.glide', this.hover)
-            .on('mouseleave.glide', this.hover);
-    };
+        if ( type === 'single' ) {
+
+            _.options[option] = value;
 
 
-    /**
-     * Unbind arrows events.
-     *
-     * @return {Void}
-     */
-    Arrows.prototype.unbind = function() {
-        this.items
-            .off('click.glide touchstart.glide')
-            .off('mouseenter.glide')
-            .off('mouseleave.glide');
-    };
+        } else if ( type === 'multiple' ) {
 
+            $.each( option , function( opt, val ) {
 
-    // Return class.
-    return new Arrows();
+                _.options[opt] = val;
 
-};
-;/**
- * Build module.
- *
- * @param {[type]} Glide
- * @param {[type]} Core
- * @return {Build}
- */
-var Build = function(Glide, Core) {
-
-    // Build constructor.
-    function Build() {
-        this.init();
-    }
-
-    /**
-     * Init slider builder.
-     *
-     * @return {Void}
-     */
-    Build.prototype.init = function() {
-        // Build proper slider type
-        this[Glide.options.type]();
-
-        // Set slide active class
-        this.active();
-
-        // Set slides height
-        Core.Height.set();
-    };
-
-    /**
-     * Check slider type.
-     *
-     * @param  {String} name
-     * @return {Boolean}
-     */
-    Build.prototype.isType = function(name) {
-        return Glide.options.type === name;
-    };
-
-    /**
-     * Check slider mode.
-     *
-     * @param  {String} name
-     * @return {Boolean}
-     */
-    Build.prototype.isMode = function(name) {
-        return Glide.options.mode === name;
-    };
-
-    /**
-     * Build slider type.
-     *
-     * @return {Void}
-     */
-    Build.prototype.slider = function() {
-
-        // Turn on jumping flag.
-        Core.Transition.jumping = true;
-
-        // Apply slides width.
-        Glide.slides[Glide.size](Glide[Glide.size]);
-
-        // Apply translate.
-        Glide.track.css(Glide.size, Glide[Glide.size] * Glide.length);
-
-        // If mode is vertical apply height.
-        if (this.isMode('vertical')) {
-            Core.Height.set(true);
-        }
-
-        // Go to startup position.
-        Core.Animation.make();
-
-        // Turn off jumping flag.
-        Core.Transition.jumping = false;
-
-    };
-
-    /**
-     * Build carousel type.
-     *
-     * @return {Void}
-     */
-    Build.prototype.carousel = function() {
-
-        // Turn on jumping flag.
-        Core.Transition.jumping = true;
-
-        // Update shift for carusel type.
-        Core.Clones.shift = (Glide[Glide.size] * Core.Clones.items.length / 2) - Glide[Glide.size];
-
-        // Apply slides width.
-        Glide.slides[Glide.size](Glide[Glide.size]);
-
-        // Apply translate.
-        Glide.track.css(Glide.size, (Glide[Glide.size] * Glide.length) + Core.Clones.getGrowth());
-
-        // If mode is vertical apply height.
-        if (this.isMode('vertical')) {
-            Core.Height.set(true);
-        }
-
-        // Go to startup position.
-        Core.Animation.make();
-
-        // Append clones.
-        Core.Clones.append();
-
-        // Turn off jumping flag.
-        Core.Transition.jumping = false;
-
-    };
-
-    /**
-     * Build slideshow type.
-     *
-     * @return {Void}
-     */
-    Build.prototype.slideshow = function() {
-
-        // Turn on jumping flag
-        Core.Transition.jumping = true;
-
-        // Go to startup position
-        Core.Animation.make();
-
-        // Turn off jumping flag
-        Core.Transition.jumping = false;
-
-    };
-
-    /**
-     * Set active class to current slide.
-     *
-     * @return {Void}
-     */
-    Build.prototype.active = function() {
-
-        Glide.slides
-            .eq(Glide.current - 1).addClass(Glide.options.classes.active)
-            .siblings().removeClass(Glide.options.classes.active);
-
-    };
-
-    // Return class.
-    return new Build();
-
-};
-;/**
- * Bullets module.
- *
- * @param {Object} Glide
- * @param {Object} Core
- * @return {Bullets}
- */
-var Bullets = function(Glide, Core) {
-
-    /**
-     * Bullets constructor.
-     */
-    function Bullets() {
-        this.init();
-        this.bind();
-    }
-
-    /**
-     * Init bullets builder.
-     *
-     * @return {self}
-     */
-    Bullets.prototype.init = function() {
-        this.build();
-        this.active();
-
-        return this;
-    };
-
-    /**
-     * Get DOM and setup bullets.
-     *
-     * @return {Void}
-     */
-    Bullets.prototype.build = function() {
-
-        // Get bullets wrapper.
-        this.wrapper = Glide.slider.children('.' + Glide.options.classes.bullets);
-
-        // Set class and direction to each bullet.
-        for (var i = 1; i <= Glide.length; i++) {
-            $('<button>', {
-                'class': Glide.options.classes.bullet,
-                'data-glide-dir': '=' + i
-            }).appendTo(this.wrapper);
-        }
-
-        // Get all bullets.
-        this.items = this.wrapper.children();
-
-    };
-
-    /**
-     * Handle active class. Adding and removing active class.
-     *
-     * @return {Void}
-     */
-    Bullets.prototype.active = function() {
-        this.items.eq(Glide.current - 1)
-            .addClass('active')
-            .siblings().removeClass('active');
-    };
-
-    /**
-     * Delete all bullets.
-     *
-     * @return {self}
-     */
-    Bullets.prototype.remove = function() {
-        this.items.remove();
-
-        return this;
-    };
-
-    /**
-     * Bullet click event.
-     *
-     * @param {Object} event
-     */
-    Bullets.prototype.click = function(event) {
-        event.preventDefault();
-
-        if (!Core.Events.disabled) {
-            Core.Run.pause();
-            Core.Run.make($(this).data('glide-dir'));
-            Core.Animation.after(function() {
-                Core.Run.play();
             });
-        }
-    };
 
-    /**
-     * Bullets hover event.
-     *
-     * @param {Object} event
-     * @return {Void}
-     */
-    Bullets.prototype.hover = function(event) {
-        if (!Core.Events.disabled) {
 
-            switch (event.type) {
-                // Start autoplay on mouse leave.
-                case 'mouseleave':
-                    Core.Run.play();
-                    break;
-                // Pause autoplay on mouse enter.
-                case 'mouseenter':
-                    Core.Run.pause();
-                    break;
+        } else if ( type === 'responsive' ) {
+
+            for ( item in value ) {
+
+                if( $.type( _.options.responsive ) !== 'array' ) {
+
+                    _.options.responsive = [ value[item] ];
+
+                } else {
+
+                    l = _.options.responsive.length-1;
+
+                    // loop through the responsive object and splice out duplicates.
+                    while( l >= 0 ) {
+
+                        if( _.options.responsive[l].breakpoint === value[item].breakpoint ) {
+
+                            _.options.responsive.splice(l,1);
+
+                        }
+
+                        l--;
+
+                    }
+
+                    _.options.responsive.push( value[item] );
+
+                }
+
             }
 
         }
-    };
 
-    /**
-     * Bind bullets events.
-     *
-     * @return {Void}
-     */
-    Bullets.prototype.bind = function() {
-        this.wrapper
-            .on('click.glide touchstart.glide', 'button', this.click)
-            .on('mouseenter.glide', 'button', this.hover)
-            .on('mouseleave.glide', 'button', this.hover);
-    };
+        if ( refresh ) {
 
-    /**
-     * Unbind bullets events.
-     *
-     * @return {Void}
-     */
-    Bullets.prototype.unbind = function() {
-        this.wrapper
-            .off('click.glide touchstart.glide', 'button')
-            .off('mouseenter.glide', 'button')
-            .off('mouseleave.glide', 'button');
-    };
+            _.unload();
+            _.reinit();
 
-    // Return class.
-    return new Bullets();
-
-};
-;/**
- * Clones module.
- *
- * @param {Object} Glide
- * @param {Object} Core
- * @return {Void}
- */
-var Clones = function(Glide, Core) {
-
-    /**
-     * Clones position map.
-     *
-     * @type {Array}
-     */
-    var map = [0, 1];
-
-    /**
-     * Clones order pattern.
-     *
-     * @type {Array}
-     */
-    var pattern;
-
-    /**
-     * Clones constructor.
-     */
-    function Clones() {
-        this.items = [];
-        this.shift = 0;
-
-        this.init();
-    }
-
-    /**
-     * Init clones builder.
-     *
-     * @return {self}
-     */
-    Clones.prototype.init = function() {
-
-        // Map clones order pattern.
-        this.map();
-
-        // Collect slides to clone
-        // with created pattern.
-        this.collect();
-
-        return this;
-
-    };
-
-    /**
-     * Generate clones pattern.
-     *
-     * @return {Void}
-     */
-    Clones.prototype.map = function() {
-        var i;
-        pattern = [];
-
-        for (i = 0; i < map.length; i++) {
-            pattern.push(-1 - i, i);
         }
+
     };
 
-    /**
-     * Collect clones with pattern.
-     *
-     * @return {Void}
-     */
-    Clones.prototype.collect = function() {
-        var item;
-        var i;
+    Slick.prototype.setPosition = function() {
 
-        for (i = 0; i < pattern.length; i++) {
-            item = Glide.slides.eq(pattern[i])
-                .clone().addClass(Glide.options.classes.clone);
+        var _ = this;
 
-            this.items.push(item);
+        _.setDimensions();
+
+        _.setHeight();
+
+        if (_.options.fade === false) {
+            _.setCSS(_.getLeft(_.currentSlide));
+        } else {
+            _.setFade();
         }
+
+        _.$slider.trigger('setPosition', [_]);
+
     };
 
-    /**
-     * Append cloned slides with generated pattern.
-     *
-     * @return {Void}
-     */
-    Clones.prototype.append = function() {
-        var i;
-        var item;
+    Slick.prototype.setProps = function() {
 
-        for (i = 0; i < this.items.length; i++) {
-            item = this.items[i][Glide.size](Glide[Glide.size]);
+        var _ = this,
+            bodyStyle = document.body.style;
 
-            // Append clone if pattern position is positive.
-            if (pattern[i] >= 0) {
-                item.appendTo(Glide.track);
-            // Prepend clone if pattern position is negative.
+        _.positionProp = _.options.vertical === true ? 'top' : 'left';
+
+        if (_.positionProp === 'top') {
+            _.$slider.addClass('slick-vertical');
+        } else {
+            _.$slider.removeClass('slick-vertical');
+        }
+
+        if (bodyStyle.WebkitTransition !== undefined ||
+            bodyStyle.MozTransition !== undefined ||
+            bodyStyle.msTransition !== undefined) {
+            if (_.options.useCSS === true) {
+                _.cssTransitions = true;
+            }
+        }
+
+        if ( _.options.fade ) {
+            if ( typeof _.options.zIndex === 'number' ) {
+                if( _.options.zIndex < 3 ) {
+                    _.options.zIndex = 3;
+                }
             } else {
-                item.prependTo(Glide.track);
+                _.options.zIndex = _.defaults.zIndex;
             }
         }
-    };
 
-    /**
-     * Remove all cloned slides.
-     *
-     * @return {self}
-     */
-    Clones.prototype.remove = function() {
-        var i;
-
-        for (i = 0; i < this.items.length; i++) {
-            this.items[i].remove();
+        if (bodyStyle.OTransform !== undefined) {
+            _.animType = 'OTransform';
+            _.transformType = '-o-transform';
+            _.transitionType = 'OTransition';
+            if (bodyStyle.perspectiveProperty === undefined && bodyStyle.webkitPerspective === undefined) _.animType = false;
         }
-
-        return this;
-    };
-
-    /**
-     * Get size grow caused by clones.
-     *
-     * @return {Number}
-     */
-    Clones.prototype.getGrowth = function() {
-        return Glide.width * this.items.length;
-    };
-
-    // Return class.
-    return new Clones();
-
-};
-;/**
- * Glide core.
- *
- * @param {Object} Glide
- * @param {Object} Modules
- * @return {Core}
- */
-var Core = function(Glide, Modules) {
-
-    /**
-     * Core constructor. Construct modules and
-     * inject Glide and Core as dependency.
-     *
-     * @return {Void}
-     */
-    function Core() {
-
-        for (var module in Modules) {
-            this[module] = new Modules[module](Glide, this);
+        if (bodyStyle.MozTransform !== undefined) {
+            _.animType = 'MozTransform';
+            _.transformType = '-moz-transform';
+            _.transitionType = 'MozTransition';
+            if (bodyStyle.perspectiveProperty === undefined && bodyStyle.MozPerspective === undefined) _.animType = false;
         }
+        if (bodyStyle.webkitTransform !== undefined) {
+            _.animType = 'webkitTransform';
+            _.transformType = '-webkit-transform';
+            _.transitionType = 'webkitTransition';
+            if (bodyStyle.perspectiveProperty === undefined && bodyStyle.webkitPerspective === undefined) _.animType = false;
+        }
+        if (bodyStyle.msTransform !== undefined) {
+            _.animType = 'msTransform';
+            _.transformType = '-ms-transform';
+            _.transitionType = 'msTransition';
+            if (bodyStyle.msTransform === undefined) _.animType = false;
+        }
+        if (bodyStyle.transform !== undefined && _.animType !== false) {
+            _.animType = 'transform';
+            _.transformType = 'transform';
+            _.transitionType = 'transition';
+        }
+        _.transformsEnabled = _.options.useTransform && (_.animType !== null && _.animType !== false);
+    };
 
-    }
 
-    // Return class.
-    return new Core();
+    Slick.prototype.setSlideClasses = function(index) {
 
-};
-;/**
- * Events module.
- *
- * @param {Object} Glide
- * @param {Object} Core
- * @return {Events}
- */
-var Events = function(Glide, Core) {
+        var _ = this,
+            centerOffset, allSlides, indexOffset, remainder;
 
-    /**
-     * Collection of triggers.
-     *
-     * @type {Object}
-     */
-    var triggers = $('[data-glide-trigger]');
+        allSlides = _.$slider
+            .find('.slick-slide')
+            .removeClass('slick-active slick-center slick-current')
+            .attr('aria-hidden', 'true');
 
-    /**
-     * Events constructor.
-     */
-    function Events() {
-        this.disabled = false;
+        _.$slides
+            .eq(index)
+            .addClass('slick-current');
 
-        this.keyboard();
-        this.hoverpause();
-        this.resize();
-        this.bindTriggers();
-    }
+        if (_.options.centerMode === true) {
 
-    /**
-     * Bind keyboard events.
-     *
-     * @return {Void}
-     */
-    Events.prototype.keyboard = function() {
-        if (Glide.options.keyboard) {
-            $(window).on('keyup.glide', function(event) {
-                if (event.keyCode === 39) {
-                    Core.Run.make('>');
+            centerOffset = Math.floor(_.options.slidesToShow / 2);
+
+            if (_.options.infinite === true) {
+
+                if (index >= centerOffset && index <= (_.slideCount - 1) - centerOffset) {
+
+                    _.$slides
+                        .slice(index - centerOffset, index + centerOffset + 1)
+                        .addClass('slick-active')
+                        .attr('aria-hidden', 'false');
+
+                } else {
+
+                    indexOffset = _.options.slidesToShow + index;
+                    allSlides
+                        .slice(indexOffset - centerOffset + 1, indexOffset + centerOffset + 2)
+                        .addClass('slick-active')
+                        .attr('aria-hidden', 'false');
+
                 }
-                if (event.keyCode === 37) {
-                    Core.Run.make('<');
+
+                if (index === 0) {
+
+                    allSlides
+                        .eq(allSlides.length - 1 - _.options.slidesToShow)
+                        .addClass('slick-center');
+
+                } else if (index === _.slideCount - 1) {
+
+                    allSlides
+                        .eq(_.options.slidesToShow)
+                        .addClass('slick-center');
+
                 }
-            });
+
+            }
+
+            _.$slides
+                .eq(index)
+                .addClass('slick-center');
+
+        } else {
+
+            if (index >= 0 && index <= (_.slideCount - _.options.slidesToShow)) {
+
+                _.$slides
+                    .slice(index, index + _.options.slidesToShow)
+                    .addClass('slick-active')
+                    .attr('aria-hidden', 'false');
+
+            } else if (allSlides.length <= _.options.slidesToShow) {
+
+                allSlides
+                    .addClass('slick-active')
+                    .attr('aria-hidden', 'false');
+
+            } else {
+
+                remainder = _.slideCount % _.options.slidesToShow;
+                indexOffset = _.options.infinite === true ? _.options.slidesToShow + index : index;
+
+                if (_.options.slidesToShow == _.options.slidesToScroll && (_.slideCount - index) < _.options.slidesToShow) {
+
+                    allSlides
+                        .slice(indexOffset - (_.options.slidesToShow - remainder), indexOffset + remainder)
+                        .addClass('slick-active')
+                        .attr('aria-hidden', 'false');
+
+                } else {
+
+                    allSlides
+                        .slice(indexOffset, indexOffset + _.options.slidesToShow)
+                        .addClass('slick-active')
+                        .attr('aria-hidden', 'false');
+
+                }
+
+            }
+
         }
+
+        if (_.options.lazyLoad === 'ondemand') {
+            _.lazyLoad();
+        }
+
     };
 
-    /**
-     * Bind hoverpause event.
-     *
-     * @return {Void}
-     */
-    Events.prototype.hoverpause = function() {
+    Slick.prototype.setupInfinite = function() {
 
-        if (Glide.options.hoverpause) {
+        var _ = this,
+            i, slideIndex, infiniteCount;
 
-            Glide.track
-                .on('mouseover.glide', function() {
-                    Core.Run.pause();
-                    Core.Events.trigger('mouseOver');
-                })
-                .on('mouseout.glide', function() {
-                    Core.Run.play();
-                    Core.Events.trigger('mouseOut');
+        if (_.options.fade === true) {
+            _.options.centerMode = false;
+        }
+
+        if (_.options.infinite === true && _.options.fade === false) {
+
+            slideIndex = null;
+
+            if (_.slideCount > _.options.slidesToShow) {
+
+                if (_.options.centerMode === true) {
+                    infiniteCount = _.options.slidesToShow + 1;
+                } else {
+                    infiniteCount = _.options.slidesToShow;
+                }
+
+                for (i = _.slideCount; i > (_.slideCount -
+                        infiniteCount); i -= 1) {
+                    slideIndex = i - 1;
+                    $(_.$slides[slideIndex]).clone(true).attr('id', '')
+                        .attr('data-slick-index', slideIndex - _.slideCount)
+                        .prependTo(_.$slideTrack).addClass('slick-cloned');
+                }
+                for (i = 0; i < infiniteCount; i += 1) {
+                    slideIndex = i;
+                    $(_.$slides[slideIndex]).clone(true).attr('id', '')
+                        .attr('data-slick-index', slideIndex + _.slideCount)
+                        .appendTo(_.$slideTrack).addClass('slick-cloned');
+                }
+                _.$slideTrack.find('.slick-cloned').find('[id]').each(function() {
+                    $(this).attr('id', '');
                 });
 
-        }
-
-    };
-
-    /**
-     * Bind resize window event.
-     *
-     * @return {Void}
-     */
-    Events.prototype.resize = function() {
-
-        $(window).on('resize.glide.' + Glide.uuid, Core.Helper.throttle(function() {
-            if(!Glide.destroyed) {
-                Core.Transition.jumping = true;
-                Glide.setup();
-                Core.Build.init();
-                Core.Run.make('=' + Glide.current, false);
-                Core.Run.play();
-                Core.Transition.jumping = false;
             }
-        }, Glide.options.throttle));
 
-    };
-
-    /**
-     * Bind triggers events.
-     *
-     * @return {Void}
-     */
-    Events.prototype.bindTriggers = function() {
-        if (triggers.length) {
-            triggers
-                .off('click.glide touchstart.glide')
-                .on('click.glide touchstart.glide', this.handleTrigger);
-        }
-    };
-
-    /**
-     * Hande trigger event.
-     *
-     * @param {Object} event
-     * @return {Void}
-     */
-    Events.prototype.handleTrigger = function(event) {
-        event.preventDefault();
-
-        var targets = $(this).data('glide-trigger').split(" ");
-
-        if (!this.disabled) {
-            for (var el in targets) {
-                var target = $(targets[el]).data('glide_api');
-                target.pause();
-                target.go($(this).data('glide-dir'), this.activeTrigger);
-                target.play();
-            }
-        }
-    };
-
-    /**
-     * Disable all events.
-     *
-     * @return {self}
-     */
-    Events.prototype.disable = function() {
-        this.disabled = true;
-
-        return this;
-    };
-
-    /**
-     * Enable all events.
-     *
-     * @return {self}
-     */
-    Events.prototype.enable = function() {
-        this.disabled = false;
-
-        return this;
-    };
-
-    /**
-     * Detach anchors clicks inside track.
-     *
-     * @return {self}
-     */
-    Events.prototype.detachClicks = function() {
-        Glide.track.find('a').each(function(i, a) {
-            $(a).attr('data-href', $(a).attr('href')).removeAttr('href');
-        });
-
-        return this;
-    };
-
-    /**
-     * Attach anchors clicks inside track.
-     *
-     * @return {self}
-     */
-    Events.prototype.attachClicks = function() {
-        Glide.track.find('a').each(function(i, a) {
-            $(a).attr('href', $(a).attr('data-href'));
-        });
-
-        return this;
-    };
-
-    /**
-     * Prevent anchors clicks inside track.
-     *
-     * @return {self}
-     */
-    Events.prototype.preventClicks = function(event) {
-        if (event.type === 'mousemove') {
-            Glide.track.one('click', 'a', function(e) {
-                e.preventDefault();
-            });
         }
 
-        return this;
     };
 
-    /*
-     * Call event function with parameters.
-     *
-     * @param {Function} func
-     * @return {self}
-     */
-    Events.prototype.call = function(func) {
-        if ((func !== 'undefined') && (typeof func === 'function')) {
-            func(this.getParams());
+    Slick.prototype.interrupt = function( toggle ) {
+
+        var _ = this;
+
+        if( !toggle ) {
+            _.autoPlay();
+        }
+        _.interrupted = toggle;
+
+    };
+
+    Slick.prototype.selectHandler = function(event) {
+
+        var _ = this;
+
+        var targetElement =
+            $(event.target).is('.slick-slide') ?
+                $(event.target) :
+                $(event.target).parents('.slick-slide');
+
+        var index = parseInt(targetElement.attr('data-slick-index'));
+
+        if (!index) index = 0;
+
+        if (_.slideCount <= _.options.slidesToShow) {
+
+            _.setSlideClasses(index);
+            _.asNavFor(index);
+            return;
+
         }
 
-        return this;
-    };
-
-    /**
-     * Trigger event.
-     *
-     * @param  {String} name
-     * @return {self}
-     */
-    Events.prototype.trigger = function(name) {
-        Glide.slider.trigger(name + ".glide", [this.getParams()]);
-
-        return this;
-    };
-
-    /**
-     * Get parameters for events callback.
-     *
-     * @return {Object}
-     */
-    Events.prototype.getParams = function() {
-        return {
-            index: Glide.current,
-            length: Glide.slides.length,
-            current: Glide.slides.eq(Glide.current - 1),
-            slider: Glide.slider,
-            swipe: {
-                distance: (Core.Touch.distance || 0)
-            }
-        };
-    };
-
-    /*
-     * Unbind all events.
-     *
-     * @return {Void}
-     */
-    Events.prototype.unbind = function() {
-
-        Glide.track
-            .off('keyup.glide')
-            .off('mouseover.glide')
-            .off('mouseout.glide');
-
-        triggers
-            .off('click.glide touchstart.glide');
-
-        $(window)
-            .off('keyup.glide')
-            .off('resize.glide.' + Glide.uuid);
+        _.slideHandler(index);
 
     };
 
-    // Return class.
-    return new Events();
+    Slick.prototype.slideHandler = function(index, sync, dontAnimate) {
 
-};
-;/**
- * Height module.
- *
- * @param {Object} Glide
- * @param {Object} Core
- * @return {Height}
- */
-var Height = function(Glide, Core) {
+        var targetSlide, animSlide, oldSlide, slideLeft, targetLeft = null,
+            _ = this, navTarget;
 
-    /**
-     * Height constructor.
-     */
-    function Height() {
-        if (Glide.options.autoheight) {
-            Glide.wrapper.css({
-                'transition': Core.Transition.get('height'),
-            });
-        }
-    }
+        sync = sync || false;
 
-    /**
-     * Get current slide height.
-     *
-     * @return {Number}
-     */
-    Height.prototype.get = function() {
-        var offset = (Glide.axis === 'y') ? Glide.paddings * 2 : 0;
-
-        return Glide.slides.eq(Glide.current - 1).height() + offset;
-    };
-
-    /**
-     * Set slider height.
-     *
-     * @param {Boolean} force Force height setting even if option is turn off.
-     * @return {Boolean}
-     */
-    Height.prototype.set = function(force) {
-        return (Glide.options.autoheight || force) ? Glide.wrapper.height(this.get()) : false;
-    };
-
-    // @return Height
-    return new Height();
-
-};
-;/**
- * helper module.
- *
- * @param {Object} Glide
- * @param {Object} Core
- * @return {Helper}
- */
-var Helper = function(Glide, Core) {
-
-    /**
-     * Helper constructor.
-     */
-    function Helper() {
-    }
-
-    /**
-     * If slider axis is vertical (y axis) return vertical value
-     * else axis is horizontal (x axis) so return horizontal value.
-     *
-     * @param  {Mixed} hValue
-     * @param  {Mixed} vValue
-     * @return {Mixed}
-     */
-    Helper.prototype.byAxis = function(hValue, vValue) {
-        if (Glide.axis === 'y') {
-            return vValue;
-        }
-
-        return hValue;
-    };
-
-    /**
-     * Capitalise string.
-     *
-     * @param  {String} s
-     * @return {String}
-     */
-    Helper.prototype.capitalise = function(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    };
-
-    /**
-     * Get time.
-     *
-     * @version Underscore.js 1.8.3
-     * @source http://underscorejs.org/
-     * @copyright (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors. Underscore may be freely distributed under the MIT license.
-     * @return {String}
-     */
-    Helper.prototype.now = Date.now || function() {
-        return new Date().getTime();
-    };
-
-    /**
-     * Throttle.
-     *
-     * @version Underscore.js 1.8.3
-     * @source http://underscorejs.org/
-     * @copyright (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors. Underscore may be freely distributed under the MIT license.
-     */
-    Helper.prototype.throttle = function(func, wait, options) {
-        var that = this;
-        var context;
-        var args;
-        var result;
-        var timeout = null;
-        var previous = 0;
-        if (!options) {
-            options = {};
-        }
-        var later = function() {
-            previous = options.leading === false ? 0 : that.now();
-            timeout = null;
-            result = func.apply(context, args);
-            if (!timeout) {
-                context = args = null;
-            }
-        };
-        return function() {
-            var now = that.now();
-            if (!previous && options.leading === false) {
-                previous = now;
-            }
-            var remaining = wait - (now - previous);
-            context = this;
-            args = arguments;
-            if (remaining <= 0 || remaining > wait) {
-                if (timeout) {
-                    clearTimeout(timeout);
-                    timeout = null;
-                }
-                previous = now;
-                result = func.apply(context, args);
-                if (!timeout) {
-                    context = args = null;
-                }
-            } else if (!timeout && options.trailing !== false) {
-                timeout = setTimeout(later, remaining);
-            }
-            return result;
-        };
-    };
-
-    /**
-     * Remove transition.
-     *
-     * @return {Void}
-     */
-    Helper.prototype.removeStyles = function(elements) {
-        for (var i = 0; i < elements.length; i++) {
-            elements[i].removeAttr('style');
-        }
-    };
-
-    // Return class.
-    return new Helper();
-
-};
-;/**
- * Run module.
- *
- * @param {Object} Glide
- * @param {Object} Core
- * @return {Run}
- */
-var Run = function(Glide, Core) {
-
-    /**
-     * Run constructor.
-     */
-    function Run() {
-
-        // Running flag. It's in use when autoplay is disabled
-        // via options, but we want start autoplay via api.
-        this.running = false;
-
-        // Flag for offcanvas animation to cloned slides
-        this.flag = false;
-
-        // Start running.
-        this.play();
-    }
-
-    /**
-     * Setup and start autoplay run.
-     *
-     * @return {Integer/Undefined}
-     */
-    Run.prototype.play = function() {
-
-        var that = this;
-
-        if (! this.canProcess()) {
+        if (_.animating === true && _.options.waitForAnimate === true) {
             return;
         }
 
-        if (Glide.options.autoplay || this.running) {
+        if (_.options.fade === true && _.currentSlide === index) {
+            return;
+        }
 
-            if (typeof this.interval === 'undefined') {
-                this.interval = setInterval(function() {
-                    that.pause();
-                    that.make('>');
-                    that.play();
-                }, this.getInterval());
+        if (_.slideCount <= _.options.slidesToShow) {
+            return;
+        }
+
+        if (sync === false) {
+            _.asNavFor(index);
+        }
+
+        targetSlide = index;
+        targetLeft = _.getLeft(targetSlide);
+        slideLeft = _.getLeft(_.currentSlide);
+
+        _.currentLeft = _.swipeLeft === null ? slideLeft : _.swipeLeft;
+
+        if (_.options.infinite === false && _.options.centerMode === false && (index < 0 || index > _.getDotCount() * _.options.slidesToScroll)) {
+            if (_.options.fade === false) {
+                targetSlide = _.currentSlide;
+                if (dontAnimate !== true) {
+                    _.animateSlide(slideLeft, function() {
+                        _.postSlide(targetSlide);
+                    });
+                } else {
+                    _.postSlide(targetSlide);
+                }
+            }
+            return;
+        } else if (_.options.infinite === false && _.options.centerMode === true && (index < 0 || index > (_.slideCount - _.options.slidesToScroll))) {
+            if (_.options.fade === false) {
+                targetSlide = _.currentSlide;
+                if (dontAnimate !== true) {
+                    _.animateSlide(slideLeft, function() {
+                        _.postSlide(targetSlide);
+                    });
+                } else {
+                    _.postSlide(targetSlide);
+                }
+            }
+            return;
+        }
+
+        if ( _.options.autoplay ) {
+            clearInterval(_.autoPlayTimer);
+        }
+
+        if (targetSlide < 0) {
+            if (_.slideCount % _.options.slidesToScroll !== 0) {
+                animSlide = _.slideCount - (_.slideCount % _.options.slidesToScroll);
+            } else {
+                animSlide = _.slideCount + targetSlide;
+            }
+        } else if (targetSlide >= _.slideCount) {
+            if (_.slideCount % _.options.slidesToScroll !== 0) {
+                animSlide = 0;
+            } else {
+                animSlide = targetSlide - _.slideCount;
+            }
+        } else {
+            animSlide = targetSlide;
+        }
+
+        _.animating = true;
+
+        _.$slider.trigger('beforeChange', [_, _.currentSlide, animSlide]);
+
+        oldSlide = _.currentSlide;
+        _.currentSlide = animSlide;
+
+        _.setSlideClasses(_.currentSlide);
+
+        if ( _.options.asNavFor ) {
+
+            navTarget = _.getNavTarget();
+            navTarget = navTarget.slick('getSlick');
+
+            if ( navTarget.slideCount <= navTarget.options.slidesToShow ) {
+                navTarget.setSlideClasses(_.currentSlide);
             }
 
         }
 
-        return this.interval;
+        _.updateDots();
+        _.updateArrows();
+
+        if (_.options.fade === true) {
+            if (dontAnimate !== true) {
+
+                _.fadeSlideOut(oldSlide);
+
+                _.fadeSlide(animSlide, function() {
+                    _.postSlide(animSlide);
+                });
+
+            } else {
+                _.postSlide(animSlide);
+            }
+            _.animateHeight();
+            return;
+        }
+
+        if (dontAnimate !== true) {
+            _.animateSlide(targetLeft, function() {
+                _.postSlide(animSlide);
+            });
+        } else {
+            _.postSlide(animSlide);
+        }
 
     };
 
-    /**
-     * Get autoplay interval cunfigured on each slide.
-     *
-     * @return {Number}
-     */
-    Run.prototype.getInterval = function() {
-        return parseInt(Glide.slides.eq(Glide.current - 1).data('glide-autoplay')) || Glide.options.autoplay;
+    Slick.prototype.startLoad = function() {
+
+        var _ = this;
+
+        if (_.options.arrows === true && _.slideCount > _.options.slidesToShow) {
+
+            _.$prevArrow.hide();
+            _.$nextArrow.hide();
+
+        }
+
+        if (_.options.dots === true && _.slideCount > _.options.slidesToShow) {
+
+            _.$dots.hide();
+
+        }
+
+        _.$slider.addClass('slick-loading');
+
     };
 
-    /**
-     * Pasue autoplay animation and clear interval.
-     *
-     * @return {Integer/Undefined}
-     */
-    Run.prototype.pause = function() {
+    Slick.prototype.swipeDirection = function() {
 
-        if (Glide.options.autoplay || this.running) {
-            if (this.interval >= 0) {
-                this.interval = clearInterval(this.interval);
+        var xDist, yDist, r, swipeAngle, _ = this;
+
+        xDist = _.touchObject.startX - _.touchObject.curX;
+        yDist = _.touchObject.startY - _.touchObject.curY;
+        r = Math.atan2(yDist, xDist);
+
+        swipeAngle = Math.round(r * 180 / Math.PI);
+        if (swipeAngle < 0) {
+            swipeAngle = 360 - Math.abs(swipeAngle);
+        }
+
+        if ((swipeAngle <= 45) && (swipeAngle >= 0)) {
+            return (_.options.rtl === false ? 'left' : 'right');
+        }
+        if ((swipeAngle <= 360) && (swipeAngle >= 315)) {
+            return (_.options.rtl === false ? 'left' : 'right');
+        }
+        if ((swipeAngle >= 135) && (swipeAngle <= 225)) {
+            return (_.options.rtl === false ? 'right' : 'left');
+        }
+        if (_.options.verticalSwiping === true) {
+            if ((swipeAngle >= 35) && (swipeAngle <= 135)) {
+                return 'down';
+            } else {
+                return 'up';
             }
         }
 
-        return this.interval;
+        return 'vertical';
 
     };
 
-    /**
-     * Check if we are on the first slide.
-     *
-     * @return {Boolean}
-     */
-    Run.prototype.isStart = function() {
-        return Glide.current === 1;
-    };
+    Slick.prototype.swipeEnd = function(event) {
 
-    /**
-     * Check if we are on the last slide.
-     *
-     * @return {Boolean}
-     */
-    Run.prototype.isEnd = function() {
-        return Glide.current === Glide.length;
-    };
+        var _ = this,
+            slideCount,
+            direction;
 
-    /**
-     * Check if we are making offset run.
-     *
-     * @return {Boolean}
-     */
-    Run.prototype.isOffset = function(direction) {
-        return this.flag && this.direction === direction;
-    };
+        _.dragging = false;
+        _.interrupted = false;
+        _.shouldClick = ( _.touchObject.swipeLength > 10 ) ? false : true;
 
-    /**
-     * Run move animation.
-     *
-     * @param {String} move Code in pattern {direction}{steps} eq. "=3"
-     * @param {Function} callback
-     * @return {Void}
-     */
-    Run.prototype.make = function(move, callback) {
-
-        // Store scope.
-        var that = this;
-
-        // Extract move direction.
-        this.direction = move.substr(0, 1);
-
-        // Extract move steps.
-        this.steps = (move.substr(1)) ? move.substr(1) : 0;
-
-        // Do not run if we have only one slide.
-        if (! this.canProcess()) {
-            return this.stop();
+        if ( _.touchObject.curX === undefined ) {
+            return false;
         }
 
-        // Stop autoplay until hoverpause is not set.
-        if (!Glide.options.hoverpause) {
-            this.pause();
+        if ( _.touchObject.edgeHit === true ) {
+            _.$slider.trigger('edge', [_, _.swipeDirection() ]);
         }
 
-        // Disable events and call before transition callback.
-        if (callback !== false) {
-            Core.Events.disable()
-                .call(Glide.options.beforeTransition)
-                .trigger('beforeTransition');
+        if ( _.touchObject.swipeLength >= _.touchObject.minSwipe ) {
+
+            direction = _.swipeDirection();
+
+            switch ( direction ) {
+
+                case 'left':
+                case 'down':
+
+                    slideCount =
+                        _.options.swipeToSlide ?
+                            _.checkNavigable( _.currentSlide + _.getSlideCount() ) :
+                            _.currentSlide + _.getSlideCount();
+
+                    _.currentDirection = 0;
+
+                    break;
+
+                case 'right':
+                case 'up':
+
+                    slideCount =
+                        _.options.swipeToSlide ?
+                            _.checkNavigable( _.currentSlide - _.getSlideCount() ) :
+                            _.currentSlide - _.getSlideCount();
+
+                    _.currentDirection = 1;
+
+                    break;
+
+                default:
+
+
+            }
+
+            if( direction != 'vertical' ) {
+
+                _.slideHandler( slideCount );
+                _.touchObject = {};
+                _.$slider.trigger('swipe', [_, direction ]);
+
+            }
+
+        } else {
+
+            if ( _.touchObject.startX !== _.touchObject.curX ) {
+
+                _.slideHandler( _.currentSlide );
+                _.touchObject = {};
+
+            }
+
         }
 
-        // Based on direction.
-        switch (this.direction) {
+    };
 
-            case '>':
-                // When we at last slide and move forward and steps are
-                // number, set flag and current slide to first.
-                if (this.isEnd()) {
-                    Glide.current = 1;
-                    this.flag = true;
-                }
-                // When steps is not number, but '>'
-                // scroll slider to end.
-                else if (this.steps === '>') {
-                    Glide.current = Glide.length;
-                }
-                // Otherwise change normally.
-                else {
-                    Glide.current = Glide.current + 1;
-                }
+    Slick.prototype.swipeHandler = function(event) {
+
+        var _ = this;
+
+        if ((_.options.swipe === false) || ('ontouchend' in document && _.options.swipe === false)) {
+            return;
+        } else if (_.options.draggable === false && event.type.indexOf('mouse') !== -1) {
+            return;
+        }
+
+        _.touchObject.fingerCount = event.originalEvent && event.originalEvent.touches !== undefined ?
+            event.originalEvent.touches.length : 1;
+
+        _.touchObject.minSwipe = _.listWidth / _.options
+            .touchThreshold;
+
+        if (_.options.verticalSwiping === true) {
+            _.touchObject.minSwipe = _.listHeight / _.options
+                .touchThreshold;
+        }
+
+        switch (event.data.action) {
+
+            case 'start':
+                _.swipeStart(event);
                 break;
 
-            case '<':
-                // When we at first slide and move backward and steps
-                // are number, set flag and current slide to last.
-                if (this.isStart()) {
-                    Glide.current = Glide.length;
-                    this.flag = true;
-                }
-                // When steps is not number, but '<'
-                // scroll slider to start.
-                else if (this.steps === '<') {
-                    Glide.current = 1;
-                }
-                // Otherwise change normally.
-                else {
-                    Glide.current = Glide.current - 1;
-                }
+            case 'move':
+                _.swipeMove(event);
                 break;
 
-            case '=':
-                // Jump to specifed slide.
-                Glide.current = parseInt(this.steps);
+            case 'end':
+                _.swipeEnd(event);
                 break;
 
         }
 
-        // Set slides height.
-        Core.Height.set();
-
-        // Set active bullet.
-        Core.Bullets.active();
-
-        // Run actual translate animation.
-        Core.Animation.make().after(function() {
-
-            // Set active flags.
-            Core.Build.active();
-
-            // Enable events and call callbacks.
-            if (callback !== false) {
-                Core.Events.enable()
-                    .call(callback)
-                    .call(Glide.options.afterTransition)
-                    .trigger('afterTransition');
-            }
-
-            // Start autoplay until hoverpause is not set.
-            if (!Glide.options.hoverpause) {
-                that.play();
-            }
-
-        });
-
-        // Trigger durning animation event.
-        Core.Events
-            .call(Glide.options.duringTransition)
-            .trigger('duringTransition');
-
     };
 
-    /**
-     * Stop slider from running.
-     *
-     * @return {void}
-     */
-    Run.prototype.stop = function() {
-        this.pause();
-    };
+    Slick.prototype.swipeMove = function(event) {
 
-    /**
-     * Stop slider from running.
-     *
-     * @return {void}
-     */
-    Run.prototype.canProcess = function() {
-        return Glide.slides.length > 1;
-    };
+        var _ = this,
+            edgeWasHit = false,
+            curLeft, swipeDirection, swipeLength, positionOffset, touches;
 
-    // Return class.
-    return new Run();
+        touches = event.originalEvent !== undefined ? event.originalEvent.touches : null;
 
-};
-;/**
- * Touch module.
- *
- * @param {Object} Glide
- * @param {Object} Core
- * @return {Touch}
- */
-var Touch = function(Glide, Core) {
-
-    /**
-     * Touch event object.
-     *
-     * @var {Object}
-     */
-    var touch;
-
-    /**
-     * Touch constructor.
-     */
-    function Touch() {
-
-        this.dragging = false;
-
-        // Bind touch event.
-        if (Glide.options.touchDistance) {
-            Glide.track.on({
-                'touchstart.glide': $.proxy(this.start, this)
-            });
+        if (!_.dragging || touches && touches.length !== 1) {
+            return false;
         }
 
-        // Bind mouse drag event.
-        if (Glide.options.dragDistance) {
-            Glide.track.on({
-                'mousedown.glide': $.proxy(this.start, this)
-            });
+        curLeft = _.getLeft(_.currentSlide);
+
+        _.touchObject.curX = touches !== undefined ? touches[0].pageX : event.clientX;
+        _.touchObject.curY = touches !== undefined ? touches[0].pageY : event.clientY;
+
+        _.touchObject.swipeLength = Math.round(Math.sqrt(
+            Math.pow(_.touchObject.curX - _.touchObject.startX, 2)));
+
+        if (_.options.verticalSwiping === true) {
+            _.touchObject.swipeLength = Math.round(Math.sqrt(
+                Math.pow(_.touchObject.curY - _.touchObject.startY, 2)));
         }
 
-    }
+        swipeDirection = _.swipeDirection();
 
-    /**
-     * Unbind touch events.
-     *
-     * @return {Void}
-     */
-    Touch.prototype.unbind = function() {
-        Glide.track
-            .off('touchstart.glide mousedown.glide')
-            .off('touchmove.glide mousemove.glide')
-            .off('touchend.glide touchcancel.glide mouseup.glide mouseleave.glide');
+        if (swipeDirection === 'vertical') {
+            return;
+        }
+
+        if (event.originalEvent !== undefined && _.touchObject.swipeLength > 4) {
+            event.preventDefault();
+        }
+
+        positionOffset = (_.options.rtl === false ? 1 : -1) * (_.touchObject.curX > _.touchObject.startX ? 1 : -1);
+        if (_.options.verticalSwiping === true) {
+            positionOffset = _.touchObject.curY > _.touchObject.startY ? 1 : -1;
+        }
+
+
+        swipeLength = _.touchObject.swipeLength;
+
+        _.touchObject.edgeHit = false;
+
+        if (_.options.infinite === false) {
+            if ((_.currentSlide === 0 && swipeDirection === 'right') || (_.currentSlide >= _.getDotCount() && swipeDirection === 'left')) {
+                swipeLength = _.touchObject.swipeLength * _.options.edgeFriction;
+                _.touchObject.edgeHit = true;
+            }
+        }
+
+        if (_.options.vertical === false) {
+            _.swipeLeft = curLeft + swipeLength * positionOffset;
+        } else {
+            _.swipeLeft = curLeft + (swipeLength * (_.$list.height() / _.listWidth)) * positionOffset;
+        }
+        if (_.options.verticalSwiping === true) {
+            _.swipeLeft = curLeft + swipeLength * positionOffset;
+        }
+
+        if (_.options.fade === true || _.options.touchMove === false) {
+            return false;
+        }
+
+        if (_.animating === true) {
+            _.swipeLeft = null;
+            return false;
+        }
+
+        _.setCSS(_.swipeLeft);
+
     };
 
-    /**
-     * Start touch event.
-     *
-     * @param {Object} event
-     * @return {Void}
-     */
-    Touch.prototype.start = function(event) {
+    Slick.prototype.swipeStart = function(event) {
 
-        // Escape if events disabled
-        // or already dragging.
-        if (!Core.Events.disabled && !this.dragging) {
+        var _ = this,
+            touches;
 
-            // Store event.
-            if (event.type === 'mousedown') {
-                touch = event.originalEvent;
+        _.interrupted = true;
+
+        if (_.touchObject.fingerCount !== 1 || _.slideCount <= _.options.slidesToShow) {
+            _.touchObject = {};
+            return false;
+        }
+
+        if (event.originalEvent !== undefined && event.originalEvent.touches !== undefined) {
+            touches = event.originalEvent.touches[0];
+        }
+
+        _.touchObject.startX = _.touchObject.curX = touches !== undefined ? touches.pageX : event.clientX;
+        _.touchObject.startY = _.touchObject.curY = touches !== undefined ? touches.pageY : event.clientY;
+
+        _.dragging = true;
+
+    };
+
+    Slick.prototype.unfilterSlides = Slick.prototype.slickUnfilter = function() {
+
+        var _ = this;
+
+        if (_.$slidesCache !== null) {
+
+            _.unload();
+
+            _.$slideTrack.children(this.options.slide).detach();
+
+            _.$slidesCache.appendTo(_.$slideTrack);
+
+            _.reinit();
+
+        }
+
+    };
+
+    Slick.prototype.unload = function() {
+
+        var _ = this;
+
+        $('.slick-cloned', _.$slider).remove();
+
+        if (_.$dots) {
+            _.$dots.remove();
+        }
+
+        if (_.$prevArrow && _.htmlExpr.test(_.options.prevArrow)) {
+            _.$prevArrow.remove();
+        }
+
+        if (_.$nextArrow && _.htmlExpr.test(_.options.nextArrow)) {
+            _.$nextArrow.remove();
+        }
+
+        _.$slides
+            .removeClass('slick-slide slick-active slick-visible slick-current')
+            .attr('aria-hidden', 'true')
+            .css('width', '');
+
+    };
+
+    Slick.prototype.unslick = function(fromBreakpoint) {
+
+        var _ = this;
+        _.$slider.trigger('unslick', [_, fromBreakpoint]);
+        _.destroy();
+
+    };
+
+    Slick.prototype.updateArrows = function() {
+
+        var _ = this,
+            centerOffset;
+
+        centerOffset = Math.floor(_.options.slidesToShow / 2);
+
+        if ( _.options.arrows === true &&
+            _.slideCount > _.options.slidesToShow &&
+            !_.options.infinite ) {
+
+            _.$prevArrow.removeClass('slick-disabled').attr('aria-disabled', 'false');
+            _.$nextArrow.removeClass('slick-disabled').attr('aria-disabled', 'false');
+
+            if (_.currentSlide === 0) {
+
+                _.$prevArrow.addClass('slick-disabled').attr('aria-disabled', 'true');
+                _.$nextArrow.removeClass('slick-disabled').attr('aria-disabled', 'false');
+
+            } else if (_.currentSlide >= _.slideCount - _.options.slidesToShow && _.options.centerMode === false) {
+
+                _.$nextArrow.addClass('slick-disabled').attr('aria-disabled', 'true');
+                _.$prevArrow.removeClass('slick-disabled').attr('aria-disabled', 'false');
+
+            } else if (_.currentSlide >= _.slideCount - 1 && _.options.centerMode === true) {
+
+                _.$nextArrow.addClass('slick-disabled').attr('aria-disabled', 'true');
+                _.$prevArrow.removeClass('slick-disabled').attr('aria-disabled', 'false');
+
+            }
+
+        }
+
+    };
+
+    Slick.prototype.updateDots = function() {
+
+        var _ = this;
+
+        if (_.$dots !== null) {
+
+            _.$dots
+                .find('li')
+                .removeClass('slick-active')
+                .attr('aria-hidden', 'true');
+
+            _.$dots
+                .find('li')
+                .eq(Math.floor(_.currentSlide / _.options.slidesToScroll))
+                .addClass('slick-active')
+                .attr('aria-hidden', 'false');
+
+        }
+
+    };
+
+    Slick.prototype.visibility = function() {
+
+        var _ = this;
+
+        if ( _.options.autoplay ) {
+
+            if ( document[_.hidden] ) {
+
+                _.interrupted = true;
+
             } else {
-                touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
-            }
 
-            // Turn off jumping flag.
-            Core.Transition.jumping = true;
+                _.interrupted = false;
 
-            // Get touch start points.
-            this.touchStartX = parseInt(touch.pageX);
-            this.touchStartY = parseInt(touch.pageY);
-            this.touchSin = null;
-            this.dragging = true;
-
-            Glide.track.on({
-                'touchmove.glide mousemove.glide': Core.Helper.throttle($.proxy(this.move, this), Glide.options.throttle),
-                'touchend.glide touchcancel.glide mouseup.glide mouseleave.glide': $.proxy(this.end, this)
-            });
-
-            // Detach clicks inside track.
-            Core.Events.detachClicks()
-                .call(Glide.options.swipeStart)
-                .trigger('swipeStart');
-            // Pause if autoplay.
-            Core.Run.pause();
-
-        }
-
-    };
-
-    /**
-     * Touch move event.
-     *
-     * @param  {Object} event
-     * @return {Void}
-     */
-    Touch.prototype.move = function(event) {
-
-        // Escape if events not disabled
-        // or not dragging.
-        if (!Core.Events.disabled && this.dragging) {
-
-            // Store event.
-            if (event.type === 'mousemove') {
-                touch = event.originalEvent;
-            } else {
-                touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
-            }
-
-            // Calculate start, end points.
-            var subExSx = parseInt(touch.pageX) - this.touchStartX;
-            var subEySy = parseInt(touch.pageY) - this.touchStartY;
-            // Bitwise subExSx pow.
-            var powEX = Math.abs(subExSx << 2);
-            // Bitwise subEySy pow.
-            var powEY = Math.abs(subEySy << 2);
-            // Calculate the length of the hypotenuse segment.
-            var touchHypotenuse = Math.sqrt(powEX + powEY);
-            // Calculate the length of the cathetus segment.
-            var touchCathetus = Math.sqrt(Core.Helper.byAxis(powEY, powEX));
-
-            // Calculate the sine of the angle.
-            this.touchSin = Math.asin(touchCathetus / touchHypotenuse);
-            // Save distance.
-            this.distance = Core.Helper.byAxis(
-                (touch.pageX - this.touchStartX),
-                (touch.pageY - this.touchStartY)
-            );
-
-            // Make offset animation.
-            // While angle is lower than 45 degree.
-            if ((this.touchSin * 180 / Math.PI) < 45) {
-                Core.Animation.make(Core.Helper.byAxis(subExSx, subEySy));
-            }
-
-            // Prevent clicks inside track.
-            Core.Events.preventClicks(event)
-                .call(Glide.options.swipeMove)
-                .trigger('swipeMove');
-
-            // While mode is vertical, we don't want to block scroll when we reach start or end of slider
-            // In that case we need to escape before preventing default event.
-            if (Core.Build.isMode('vertical')) {
-                if (Core.Run.isStart() && subEySy > 0) {
-                    return;
-                }
-                if (Core.Run.isEnd() && subEySy < 0) {
-                    return;
-                }
-            }
-
-            // While angle is lower than 45 degree.
-            if ((this.touchSin * 180 / Math.PI) < 45) {
-                // Prevent propagation.
-                event.stopPropagation();
-                // Prevent scrolling.
-                event.preventDefault();
-                // Add dragging class.
-                Glide.track.addClass(Glide.options.classes.dragging);
-            // Else escape from event, we don't want move slider.
-            } else {
-                return;
             }
 
         }
 
     };
 
-    /**
-     * Touch end event.
-     *
-     * @todo Check edge cases for slider type
-     * @param {Onject} event
-     */
-    Touch.prototype.end = function(event) {
-
-        // Escape if events not disabled
-        // or not dragging.
-        if (!Core.Events.disabled && this.dragging) {
-
-            // Set distance limiter.
-            var distanceLimiter;
-
-            // Store event.
-            if (event.type === 'mouseup' || event.type === 'mouseleave') {
-                touch = event.originalEvent;
-            } else {
-                touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
-            }
-
-            // Calculate touch distance.
-            var touchDistance = Core.Helper.byAxis(
-                (touch.pageX - this.touchStartX),
-                (touch.pageY - this.touchStartY)
-            );
-
-            // Calculate degree.
-            var touchDeg = this.touchSin * 180 / Math.PI;
-
-            // Turn off jumping flag.
-            Core.Transition.jumping = false;
-
-            // If slider type is slider.
-            if (Core.Build.isType('slider')) {
-
-                // Prevent slide to right on first item (prev).
-                if (Core.Run.isStart()) {
-                    if (touchDistance > 0) {
-                        touchDistance = 0;
-                    }
-                }
-
-                // Prevent slide to left on last item (next).
-                if (Core.Run.isEnd()) {
-                    if (touchDistance < 0) {
-                        touchDistance = 0;
-                    }
-                }
-
-            }
-
-            // Switch distance limit base on event type.
-            if (event.type === 'mouseup' || event.type === 'mouseleave') {
-                distanceLimiter = Glide.options.dragDistance;
-            } else {
-                distanceLimiter = Glide.options.touchDistance;
-            }
-
-            // While touch is positive and greater than
-            // distance set in options move backward.
-            if (touchDistance > distanceLimiter && touchDeg < 45) {
-                Core.Run.make('<');
-            }
-            // While touch is negative and lower than negative
-            // distance set in options move forward.
-            else if (touchDistance < -distanceLimiter && touchDeg < 45) {
-                Core.Run.make('>');
-            }
-            // While swipe don't reach distance apply previous transform.
-            else {
-                Core.Animation.make();
-            }
-
-            // After animation.
-            Core.Animation.after(function() {
-                // Enable events.
-                Core.Events.enable();
-                // If autoplay start auto run.
-                Core.Run.play();
-            });
-
-            // Unset dragging flag.
-            this.dragging = false;
-
-            // Disable other events.
-            Core.Events.attachClicks()
-                .disable()
-                .call(Glide.options.swipeEnd)
-                .trigger('swipeEnd');
-
-            // Remove dragging class and unbind events.
-            Glide.track
-                .removeClass(Glide.options.classes.dragging)
-                .off('touchmove.glide mousemove.glide')
-                .off('touchend.glide touchcancel.glide mouseup.glide mouseleave.glide');
-
+    $.fn.slick = function() {
+        var _ = this,
+            opt = arguments[0],
+            args = Array.prototype.slice.call(arguments, 1),
+            l = _.length,
+            i,
+            ret;
+        for (i = 0; i < l; i++) {
+            if (typeof opt == 'object' || typeof opt == 'undefined')
+                _[i].slick = new Slick(_[i], opt);
+            else
+                ret = _[i].slick[opt].apply(_[i].slick, args);
+            if (typeof ret != 'undefined') return ret;
         }
-
+        return _;
     };
 
-    // Return class.
-    return new Touch();
-
-};
-;/**
- * Transition module.
- *
- * @param {Object} Glide
- * @param {Object} Core
- * @return {Transition}
- */
-var Transition = function(Glide, Core) {
-
-    /**
-     * Transition constructor.
-     */
-    function Transition() {
-        this.jumping = false;
-    }
-
-    /**
-     * Get transition settings.
-     *
-     * @param {String} property
-     * @return {String}
-     */
-    Transition.prototype.get = function(property) {
-        if (!this.jumping) {
-            return property + ' ' + Glide.options.animationDuration + 'ms ' + Glide.options.animationTimingFunc;
-        }
-
-        return this.clear('all');
-    };
-
-    /**
-     * Clear transition settings.
-     *
-     * @param {String} property
-     * @return {String}
-     */
-    Transition.prototype.clear = function(property) {
-        return property + ' 0ms ' + Glide.options.animationTimingFunc;
-    };
-
-    // Return class.
-    return new Transition();
-
-};
-;/**
- * Translate module.
- *
- * @param {Object} Glide
- * @param {Object} Core
- * @return {Translate}
- */
-var Translate = function(Glide, Core) {
-
-    /**
-     * Translate axes map.
-     *
-     * @type {Object}
-     */
-    var axes = {
-        x: 0,
-        y: 0,
-        z: 0
-    };
-
-    /**
-     * Translate Translate Constructor
-     */
-    function Translate() {
-    }
-
-    /**
-     * Set translate.
-     *
-     * @param  {String} axis
-     * @param  {Integer} value
-     * @return {String}
-     */
-    Translate.prototype.set = function(axis, value) {
-        axes[axis] = parseInt(value);
-
-        return 'translate3d(' + (-1 * axes.x) + 'px, ' + (-1 * axes.y) + 'px, ' + (-1 * axes.z) + 'px)';
-    };
-
-    // Return class.
-    return new Translate();
-
-};
-;/**
- * Construct Glide. Initialize slider, extends
- * defaults and returning public api.
- *
- * @param {Object} element
- * @param {Object} options
- */
-var Glide = function(element, options) {
-
-    /**
-     * Default slider options.
-     *
-     * @type {Object}
-     */
-    var defaults = {
-        autoplay: 4000,
-        type: 'carousel',
-        mode: 'horizontal',
-        startAt: 1,
-        hoverpause: true,
-        keyboard: true,
-        touchDistance: 80,
-        dragDistance: 120,
-        animationDuration: 400,
-        animationTimingFunc: 'cubic-bezier(0.165, 0.840, 0.440, 1.000)',
-        throttle: 16,
-        autoheight: false,
-        paddings: 0,
-        centered: true,
-        classes: {
-            base: 'glide',
-            wrapper: 'glide__wrapper',
-            track: 'glide__track',
-            slide: 'glide__slide',
-            arrows: 'glide__arrows',
-            arrow: 'glide__arrow',
-            arrowNext: 'next',
-            arrowPrev: 'prev',
-            bullets: 'glide__bullets',
-            bullet: 'glide__bullet',
-            clone: 'clone',
-            active: 'active',
-            dragging: 'dragging',
-            disabled: 'disabled'
-        },
-        beforeInit: function(event) {},
-        afterInit: function(event) {},
-        beforeTransition: function(event) {},
-        duringTransition: function(event) {},
-        afterTransition: function(event) {},
-        swipeStart: function(event) {},
-        swipeEnd: function(event) {},
-        swipeMove: function(event) {},
-    };
-
-    // Extend defaults with
-    // the init options.
-    this.options = $.extend({}, defaults, options);
-
-    // Generate unique slider instance id.
-    this.uuid = Math.floor(Math.random() * 1000);
-
-    // Start at slide number specifed in options.
-    this.current = parseInt(this.options.startAt);
-
-    // Store main slider DOM element.
-    this.element = element;
-
-    // Collect slider DOM and
-    // init slider sizes.
-    this.collect();
-    this.setup();
-
-    // Mark the glide as not destroyed
-    this.destroyed = false;
-
-    // Call before init callback.
-    this.options.beforeInit({
-        index: this.current,
-        length: this.slides.length,
-        current: this.slides.eq(this.current - 1),
-        slider: this.slider
-    });
-
-    /**
-     * Construct core with modules.
-     *
-     * @type {Core}
-     */
-    var Engine = new Core(this, {
-        Helper: Helper,
-        Translate: Translate,
-        Transition: Transition,
-        Arrows: Arrows,
-        Bullets: Bullets,
-        Run: Run,
-        Animation: Animation,
-        Clones: Clones,
-        Height: Height,
-        Build: Build,
-        Events: Events,
-        Touch: Touch,
-        Api: Api
-    });
-
-    // Call after init callback.
-    Engine.Events.call(this.options.afterInit);
-
-    // Return slider Api.
-    return Engine.Api.instance();
-
-};
-
-
-/**
- * Collect DOM and set classes.
- *
- * @return {void}
- */
-Glide.prototype.collect = function() {
-    var options = this.options;
-    var classes = options.classes;
-
-    this.slider = this.element.addClass(classes.base + '--' + options.type).addClass(classes.base + '--' + options.mode);
-    this.track = this.slider.find('.' + classes.track);
-    this.wrapper = this.slider.find('.' + classes.wrapper);
-    this.slides = this.track.find('.' + classes.slide).not('.' + classes.clone);
-};
-
-
-/**
- * Setup slider dementions.
- *
- * @return {Void}
- */
-Glide.prototype.setup = function() {
-
-    /**
-     * Mode to dimentions (size and axis) mapper.
-     *
-     * @type {Object}
-     */
-    var modeToDimensionsMap = {
-        horizontal: ['width', 'x'],
-        vertical: ['height', 'y'],
-    };
-
-    // Get slider size by active mode.
-    this.size = modeToDimensionsMap[this.options.mode][0];
-
-    // Get slider axis by active mode.
-    this.axis = modeToDimensionsMap[this.options.mode][1];
-
-    // Get slider items length.
-    this.length = this.slides.length;
-
-    // Get slider configured paddings.
-    this.paddings = this.getPaddings();
-
-    // Set slider size.
-    this[this.size] = this.getSize();
-};
-
-
-/**
- * Normalize paddings option value. Parsing
- * strings procents, pixels and numbers.
- *
- * @return {string} Normalized value
- */
-Glide.prototype.getPaddings = function() {
-
-    var option = this.options.paddings;
-
-    // If we have a string, we need
-    // to parse it to real number.
-    if (typeof option === 'string') {
-
-        // Parse string to int.
-        var normalized = parseInt(option, 10);
-
-        // Check if string is procentage number.
-        var isPercentage = option.indexOf('%') >= 0;
-
-        // If paddings value is procentage. Calculate
-        // real number value from slider element.
-        if (isPercentage) {
-            return parseInt(this.slider[this.size]() * (normalized / 100));
-        }
-
-        // Value is number as string, so
-        // just return normalized.
-        return normalized;
-    }
-
-    // Value is number, we don't need
-    // to do anything, return.
-    return option;
-
-};
-
-
-/**
- * Get slider size width updated
- * by addtional paddings.
- *
- * @return {number}
- */
-Glide.prototype.getSize = function() {
-    return this.slider[this.size]() - (this.paddings * 2);
-};
-;/**
- * Wire Glide to the jQuery.
- *
- * @param  {object} options
- * @return {object}
- */
-
-$.fn.glide = function(options) {
-
-    return this.each(function() {
-        if (!$.data(this, 'glide_api')) {
-            $.data(this, 'glide_api',
-                new Glide($(this), options)
-            );
-        }
-    });
-
-};
-
-})(jQuery, window, document);;/*! Magnific Popup - v1.1.0 - 2016-02-20
+}));
+;/*! Magnific Popup - v1.1.0 - 2016-02-20
 * http://dimsemenov.com/plugins/magnific-popup/
 * Copyright (c) 2016 Dmitry Semenov; */
 ;(function (factory) { 
@@ -4112,7 +4749,7 @@ $.magnificPopup.registerModule(RETINA_NS, {
 });
 
 /*>>retina*/
- _checkInstance(); }));;/*! VelocityJS.org (1.3.1). (C) 2014 Julian Shapiro. MIT @license: en.wikipedia.org/wiki/MIT_License */
+ _checkInstance(); }));;/*! VelocityJS.org (1.4.3). (C) 2014 Julian Shapiro. MIT @license: en.wikipedia.org/wiki/MIT_License */
 
 /*************************
  Velocity jQuery Shim
@@ -4474,9 +5111,9 @@ $.magnificPopup.registerModule(RETINA_NS, {
 		position: function() {
 			/* jQuery */
 			function offsetParentFn(elem) {
-				var offsetParent = elem.offsetParent || document;
+				var offsetParent = elem.offsetParent;
 
-				while (offsetParent && (offsetParent.nodeType.toLowerCase !== "html" && offsetParent.style.position === "static")) {
+				while (offsetParent && offsetParent.nodeName.toLowerCase() !== "html" && offsetParent.style && offsetParent.style.position === "static") {
 					offsetParent = offsetParent.offsetParent;
 				}
 
@@ -4609,6 +5246,19 @@ $.magnificPopup.registerModule(RETINA_NS, {
 			};
 		})();
 
+		var performance = (function() {
+			var perf = window.performance || {};
+
+			if (!Object.prototype.hasOwnProperty.call(perf, "now")) {
+				var nowOffset = perf.timing && perf.timing.domComplete ? perf.timing.domComplete : (new Date()).getTime();
+
+				perf.now = function() {
+					return (new Date()).getTime() - nowOffset;
+				};
+			}
+			return perf;
+		})();
+
 		/* Array compacting. Copyright Lo-Dash. MIT License: https://github.com/lodash/lodash/blob/master/LICENSE.txt */
 		function compactSparseArray(array) {
 			var index = -1,
@@ -4626,10 +5276,34 @@ $.magnificPopup.registerModule(RETINA_NS, {
 			return result;
 		}
 
+		var _slice = (function() {
+			var slice = Array.prototype.slice;
+
+			try {
+				// Can't be used with DOM elements in IE < 9
+				slice.call(document.documentElement);
+			} catch (e) { // Fails in IE < 9
+				// This will work for genuine arrays, array-like objects, 
+				// NamedNodeMap (attributes, entities, notations),
+				// NodeList (e.g., getElementsByTagName), HTMLCollection (e.g., childNodes),
+				// and will not fail on other DOM objects (as do DOM elements in IE < 9)
+				slice = function() {
+					var i = this.length,
+							clone = [];
+
+					while (--i > 0) {
+						clone[i] = this[i];
+					}
+					return clone;
+				};
+			}
+			return slice;
+		})(); // TODO: IE8, Cache of Array.prototype.slice that works on IE8
+
 		function sanitizeElements(elements) {
 			/* Unwrap jQuery/Zepto objects. */
 			if (Type.isWrapped(elements)) {
-				elements = [].slice.call(elements);
+				elements = _slice.call(elements);
 				/* Wrap a single element in an array so that $.each() can iterate with the element instead of its node's children. */
 			} else if (Type.isNode(elements)) {
 				elements = [elements];
@@ -4639,6 +5313,9 @@ $.magnificPopup.registerModule(RETINA_NS, {
 		}
 
 		var Type = {
+			isNumber: function(variable) {
+				return (typeof variable === "number");
+			},
 			isString: function(variable) {
 				return (typeof variable === "string");
 			},
@@ -4651,16 +5328,15 @@ $.magnificPopup.registerModule(RETINA_NS, {
 			isNode: function(variable) {
 				return variable && variable.nodeType;
 			},
-			/* Copyright Martin Bohm. MIT License: https://gist.github.com/Tomalak/818a78a226a0738eaade */
-			isNodeList: function(variable) {
-				return typeof variable === "object" &&
-						/^\[object (HTMLCollection|NodeList|Object)\]$/.test(Object.prototype.toString.call(variable)) &&
-						variable.length !== undefined &&
-						(variable.length === 0 || (typeof variable[0] === "object" && variable[0].nodeType > 0));
-			},
-			/* Determine if variable is a wrapped jQuery or Zepto element. */
+			/* Determine if variable is an array-like wrapped jQuery, Zepto or similar element, or even a NodeList etc. */
+			/* NOTE: HTMLFormElements also have a length. */
 			isWrapped: function(variable) {
-				return variable && (variable.jquery || (window.Zepto && window.Zepto.zepto.isZ(variable)));
+				return variable
+						&& Type.isNumber(variable.length)
+						&& !Type.isString(variable)
+						&& !Type.isFunction(variable)
+						&& !Type.isNode(variable)
+						&& (variable.length === 0 || Type.isNode(variable[0]));
 			},
 			isSVG: function(variable) {
 				return window.SVGElement && (variable instanceof window.SVGElement);
@@ -4733,15 +5409,18 @@ $.magnificPopup.registerModule(RETINA_NS, {
 				/* Keep track of whether our RAF tick is running. */
 				isTicking: false,
 				/* Container for every in-progress call to Velocity. */
-				calls: []
+				calls: [],
+				delayedElements: {
+					count: 0
+				}
 			},
 			/* Velocity's custom CSS stack. Made global for unit testing. */
-			CSS: { /* Defined below. */},
+			CSS: {/* Defined below. */},
 			/* A shim of the jQuery utility functions used by Velocity -- provided by Velocity's optional jQuery shim. */
 			Utilities: $,
 			/* Container for the user's custom animation redirects that are referenced by name in place of the properties map argument. */
-			Redirects: { /* Manually registered by the user. */},
-			Easings: { /* Defined below. */},
+			Redirects: {/* Manually registered by the user. */},
+			Easings: {/* Defined below. */},
 			/* Attempt to use ES6 Promises by default. Users can override this with a third-party promises library. */
 			Promise: window.Promise,
 			/* Velocity option defaults, which can be overriden by the user. */
@@ -4758,7 +5437,9 @@ $.magnificPopup.registerModule(RETINA_NS, {
 				delay: false,
 				mobileHA: true,
 				/* Advanced: Set to false to prevent property values from being cached between consecutive Velocity-initiated chain calls. */
-				_cacheValues: true
+				_cacheValues: true,
+				/* Advanced: Set to false if the promise should always resolve on empty element lists. */
+				promiseRejectEmpty: true
 			},
 			/* A design goal of Velocity is to cache data wherever possible in order to avoid DOM requerying. Accordingly, each element has a data cache. */
 			init: function(element) {
@@ -4785,9 +5466,66 @@ $.magnificPopup.registerModule(RETINA_NS, {
 			hook: null, /* Defined below. */
 			/* Velocity-wide animation time remapping for testing purposes. */
 			mock: false,
-			version: {major: 1, minor: 3, patch: 1},
+			version: {major: 1, minor: 4, patch: 3},
 			/* Set to 1 or 2 (most verbose) to output debug info to console. */
-			debug: false
+			debug: false,
+			/* Use rAF high resolution timestamp when available */
+			timestamp: true,
+			/* Pause all animations */
+			pauseAll: function(queueName) {
+				var currentTime = (new Date()).getTime();
+
+				$.each(Velocity.State.calls, function(i, activeCall) {
+
+					if (activeCall) {
+
+						/* If we have a queueName and this call is not on that queue, skip */
+						if (queueName !== undefined && ((activeCall[2].queue !== queueName) || (activeCall[2].queue === false))) {
+							return true;
+						}
+
+						/* Set call to paused */
+						activeCall[5] = {
+							resume: false
+						};
+					}
+				});
+
+				/* Pause timers on any currently delayed calls */
+				$.each(Velocity.State.delayedElements, function(k, element) {
+					if (!element) {
+						return;
+					}
+					pauseDelayOnElement(element, currentTime);
+				});
+			},
+			/* Resume all animations */
+			resumeAll: function(queueName) {
+				var currentTime = (new Date()).getTime();
+
+				$.each(Velocity.State.calls, function(i, activeCall) {
+
+					if (activeCall) {
+
+						/* If we have a queueName and this call is not on that queue, skip */
+						if (queueName !== undefined && ((activeCall[2].queue !== queueName) || (activeCall[2].queue === false))) {
+							return true;
+						}
+
+						/* Set call to resumed if it was paused */
+						if (activeCall[5]) {
+							activeCall[5].resume = true;
+						}
+					}
+				});
+				/* Resume timers on any currently delayed calls */
+				$.each(Velocity.State.delayedElements, function(k, element) {
+					if (!element) {
+						return;
+					}
+					resumeDelayOnElement(element, currentTime);
+				});
+			}
 		};
 
 		/* Retrieve the appropriate scroll anchor and property name for the browser: https://developer.mozilla.org/en-US/docs/Web/API/Window.scrollY */
@@ -4809,6 +5547,33 @@ $.magnificPopup.registerModule(RETINA_NS, {
 			/* jQuery <=1.4.2 returns null instead of undefined when no match is found. We normalize this behavior. */
 			return response === null ? undefined : response;
 		}
+
+		/**************
+		 Delay Timer
+		 **************/
+
+		function pauseDelayOnElement(element, currentTime) {
+			/* Check for any delay timers, and pause the set timeouts (while preserving time data)
+			 to be resumed when the "resume" command is issued */
+			var data = Data(element);
+			if (data && data.delayTimer && !data.delayPaused) {
+				data.delayRemaining = data.delay - currentTime + data.delayBegin;
+				data.delayPaused = true;
+				clearTimeout(data.delayTimer.setTimeout);
+			}
+		}
+
+		function resumeDelayOnElement(element, currentTime) {
+			/* Check for any paused timers and resume */
+			var data = Data(element);
+			if (data && data.delayTimer && data.delayPaused) {
+				/* If the element was mid-delay, re initiate the timeout with the remaining delay */
+				data.delayPaused = false;
+				data.delayTimer.setTimeout = setTimeout(data.delayTimer.next, data.delayRemaining);
+			}
+		}
+
+
 
 		/**************
 		 Easing
@@ -4992,7 +5757,7 @@ $.magnificPopup.registerModule(RETINA_NS, {
 					dx: state.v,
 					dv: springAccelerationForState(state)
 				},
-				b = springEvaluateStateWithDerivative(state, dt * 0.5, a),
+						b = springEvaluateStateWithDerivative(state, dt * 0.5, a),
 						c = springEvaluateStateWithDerivative(state, dt * 0.5, b),
 						d = springEvaluateStateWithDerivative(state, dt, c),
 						dxdt = 1.0 / 6.0 * (a.dx + 2.0 * (b.dx + c.dx) + d.dx),
@@ -5012,7 +5777,7 @@ $.magnificPopup.registerModule(RETINA_NS, {
 					tension: null,
 					friction: null
 				},
-				path = [0],
+						path = [0],
 						time_lapsed = 0,
 						tolerance = 1 / 10000,
 						DT = 16 / 1000,
@@ -5168,7 +5933,161 @@ $.magnificPopup.registerModule(RETINA_NS, {
 			Lists: {
 				colors: ["fill", "stroke", "stopColor", "color", "backgroundColor", "borderColor", "borderTopColor", "borderRightColor", "borderBottomColor", "borderLeftColor", "outlineColor"],
 				transformsBase: ["translateX", "translateY", "scale", "scaleX", "scaleY", "skewX", "skewY", "rotateZ"],
-				transforms3D: ["transformPerspective", "translateZ", "scaleZ", "rotateX", "rotateY"]
+				transforms3D: ["transformPerspective", "translateZ", "scaleZ", "rotateX", "rotateY"],
+				units: [
+					"%", // relative
+					"em", "ex", "ch", "rem", // font relative
+					"vw", "vh", "vmin", "vmax", // viewport relative
+					"cm", "mm", "Q", "in", "pc", "pt", "px", // absolute lengths
+					"deg", "grad", "rad", "turn", // angles
+					"s", "ms" // time
+				],
+				colorNames: {
+					"aliceblue": "240,248,255",
+					"antiquewhite": "250,235,215",
+					"aquamarine": "127,255,212",
+					"aqua": "0,255,255",
+					"azure": "240,255,255",
+					"beige": "245,245,220",
+					"bisque": "255,228,196",
+					"black": "0,0,0",
+					"blanchedalmond": "255,235,205",
+					"blueviolet": "138,43,226",
+					"blue": "0,0,255",
+					"brown": "165,42,42",
+					"burlywood": "222,184,135",
+					"cadetblue": "95,158,160",
+					"chartreuse": "127,255,0",
+					"chocolate": "210,105,30",
+					"coral": "255,127,80",
+					"cornflowerblue": "100,149,237",
+					"cornsilk": "255,248,220",
+					"crimson": "220,20,60",
+					"cyan": "0,255,255",
+					"darkblue": "0,0,139",
+					"darkcyan": "0,139,139",
+					"darkgoldenrod": "184,134,11",
+					"darkgray": "169,169,169",
+					"darkgrey": "169,169,169",
+					"darkgreen": "0,100,0",
+					"darkkhaki": "189,183,107",
+					"darkmagenta": "139,0,139",
+					"darkolivegreen": "85,107,47",
+					"darkorange": "255,140,0",
+					"darkorchid": "153,50,204",
+					"darkred": "139,0,0",
+					"darksalmon": "233,150,122",
+					"darkseagreen": "143,188,143",
+					"darkslateblue": "72,61,139",
+					"darkslategray": "47,79,79",
+					"darkturquoise": "0,206,209",
+					"darkviolet": "148,0,211",
+					"deeppink": "255,20,147",
+					"deepskyblue": "0,191,255",
+					"dimgray": "105,105,105",
+					"dimgrey": "105,105,105",
+					"dodgerblue": "30,144,255",
+					"firebrick": "178,34,34",
+					"floralwhite": "255,250,240",
+					"forestgreen": "34,139,34",
+					"fuchsia": "255,0,255",
+					"gainsboro": "220,220,220",
+					"ghostwhite": "248,248,255",
+					"gold": "255,215,0",
+					"goldenrod": "218,165,32",
+					"gray": "128,128,128",
+					"grey": "128,128,128",
+					"greenyellow": "173,255,47",
+					"green": "0,128,0",
+					"honeydew": "240,255,240",
+					"hotpink": "255,105,180",
+					"indianred": "205,92,92",
+					"indigo": "75,0,130",
+					"ivory": "255,255,240",
+					"khaki": "240,230,140",
+					"lavenderblush": "255,240,245",
+					"lavender": "230,230,250",
+					"lawngreen": "124,252,0",
+					"lemonchiffon": "255,250,205",
+					"lightblue": "173,216,230",
+					"lightcoral": "240,128,128",
+					"lightcyan": "224,255,255",
+					"lightgoldenrodyellow": "250,250,210",
+					"lightgray": "211,211,211",
+					"lightgrey": "211,211,211",
+					"lightgreen": "144,238,144",
+					"lightpink": "255,182,193",
+					"lightsalmon": "255,160,122",
+					"lightseagreen": "32,178,170",
+					"lightskyblue": "135,206,250",
+					"lightslategray": "119,136,153",
+					"lightsteelblue": "176,196,222",
+					"lightyellow": "255,255,224",
+					"limegreen": "50,205,50",
+					"lime": "0,255,0",
+					"linen": "250,240,230",
+					"magenta": "255,0,255",
+					"maroon": "128,0,0",
+					"mediumaquamarine": "102,205,170",
+					"mediumblue": "0,0,205",
+					"mediumorchid": "186,85,211",
+					"mediumpurple": "147,112,219",
+					"mediumseagreen": "60,179,113",
+					"mediumslateblue": "123,104,238",
+					"mediumspringgreen": "0,250,154",
+					"mediumturquoise": "72,209,204",
+					"mediumvioletred": "199,21,133",
+					"midnightblue": "25,25,112",
+					"mintcream": "245,255,250",
+					"mistyrose": "255,228,225",
+					"moccasin": "255,228,181",
+					"navajowhite": "255,222,173",
+					"navy": "0,0,128",
+					"oldlace": "253,245,230",
+					"olivedrab": "107,142,35",
+					"olive": "128,128,0",
+					"orangered": "255,69,0",
+					"orange": "255,165,0",
+					"orchid": "218,112,214",
+					"palegoldenrod": "238,232,170",
+					"palegreen": "152,251,152",
+					"paleturquoise": "175,238,238",
+					"palevioletred": "219,112,147",
+					"papayawhip": "255,239,213",
+					"peachpuff": "255,218,185",
+					"peru": "205,133,63",
+					"pink": "255,192,203",
+					"plum": "221,160,221",
+					"powderblue": "176,224,230",
+					"purple": "128,0,128",
+					"red": "255,0,0",
+					"rosybrown": "188,143,143",
+					"royalblue": "65,105,225",
+					"saddlebrown": "139,69,19",
+					"salmon": "250,128,114",
+					"sandybrown": "244,164,96",
+					"seagreen": "46,139,87",
+					"seashell": "255,245,238",
+					"sienna": "160,82,45",
+					"silver": "192,192,192",
+					"skyblue": "135,206,235",
+					"slateblue": "106,90,205",
+					"slategray": "112,128,144",
+					"snow": "255,250,250",
+					"springgreen": "0,255,127",
+					"steelblue": "70,130,180",
+					"tan": "210,180,140",
+					"teal": "0,128,128",
+					"thistle": "216,191,216",
+					"tomato": "255,99,71",
+					"turquoise": "64,224,208",
+					"violet": "238,130,238",
+					"wheat": "245,222,179",
+					"whitesmoke": "245,245,245",
+					"white": "255,255,255",
+					"yellowgreen": "154,205,50",
+					"yellow": "255,255,0"
+				}
 			},
 			/************
 			 Hooks
@@ -5274,6 +6193,22 @@ $.magnificPopup.registerModule(RETINA_NS, {
 						/* If there was no hook match, return the property name untouched. */
 						return property;
 					}
+				},
+				getUnit: function(str, start) {
+					var unit = (str.substr(start || 0, 5).match(/^[a-z%]+/) || [])[0] || "";
+
+					if (unit && CSS.Lists.units.indexOf(unit) >= 0) {
+						return unit;
+					}
+					return "";
+				},
+				fixColors: function(str) {
+					return str.replace(/(rgba?\(\s*)?(\b[a-z]+\b)/g, function($0, $1, $2) {
+						if (CSS.Lists.colorNames.hasOwnProperty($2)) {
+							return ($1 ? $1 : "rgba(") + CSS.Lists.colorNames[$2] + ($1 ? "" : ",1)");
+						}
+						return $1 + $2;
+					});
 				},
 				/* Convert any rootPropertyValue, null or otherwise, into a space-delimited list of hook values so that
 				 the targeted hook can be injected or extracted at its standard position. */
@@ -5603,6 +6538,11 @@ $.magnificPopup.registerModule(RETINA_NS, {
 
 										return extracted;
 									case "inject":
+										/* If we have a pattern then it might already have the right values */
+										if (/^rgb/.test(propertyValue)) {
+											return propertyValue;
+										}
+
 										/* If this is IE<=8 and an alpha component exists, strip it off. */
 										if (IE <= 8) {
 											if (propertyValue.split(" ").length === 4) {
@@ -5620,6 +6560,47 @@ $.magnificPopup.registerModule(RETINA_NS, {
 							};
 						})();
 					}
+
+					/**************
+					 Dimensions
+					 **************/
+					function augmentDimension(name, element, wantInner) {
+						var isBorderBox = CSS.getPropertyValue(element, "boxSizing").toString().toLowerCase() === "border-box";
+
+						if (isBorderBox === (wantInner || false)) {
+							/* in box-sizing mode, the CSS width / height accessors already give the outerWidth / outerHeight. */
+							var i,
+									value,
+									augment = 0,
+									sides = name === "width" ? ["Left", "Right"] : ["Top", "Bottom"],
+									fields = ["padding" + sides[0], "padding" + sides[1], "border" + sides[0] + "Width", "border" + sides[1] + "Width"];
+
+							for (i = 0; i < fields.length; i++) {
+								value = parseFloat(CSS.getPropertyValue(element, fields[i]));
+								if (!isNaN(value)) {
+									augment += value;
+								}
+							}
+							return wantInner ? -augment : augment;
+						}
+						return 0;
+					}
+					function getDimension(name, wantInner) {
+						return function(type, element, propertyValue) {
+							switch (type) {
+								case "name":
+									return name;
+								case "extract":
+									return parseFloat(propertyValue) + augmentDimension(name, element, wantInner);
+								case "inject":
+									return (parseFloat(propertyValue) - augmentDimension(name, element, wantInner)) + "px";
+							}
+						};
+					}
+					CSS.Normalizations.registered.innerWidth = getDimension("width", true);
+					CSS.Normalizations.registered.innerHeight = getDimension("height", true);
+					CSS.Normalizations.registered.outerWidth = getDimension("width");
+					CSS.Normalizations.registered.outerHeight = getDimension("height");
 				}
 			},
 			/************************
@@ -5742,17 +6723,34 @@ $.magnificPopup.registerModule(RETINA_NS, {
 				},
 				/* The class add/remove functions are used to temporarily apply a "velocity-animating" class to elements while they're animating. */
 				addClass: function(element, className) {
-					if (element.classList) {
-						element.classList.add(className);
-					} else {
-						element.className += (element.className.length ? " " : "") + className;
+					if (element) {
+						if (element.classList) {
+							element.classList.add(className);
+						} else if (Type.isString(element.className)) {
+							// Element.className is around 15% faster then set/getAttribute
+							element.className += (element.className.length ? " " : "") + className;
+						} else {
+							// Work around for IE strict mode animating SVG - and anything else that doesn't behave correctly - the same way jQuery does it
+							var currentClass = element.getAttribute(IE <= 7 ? "className" : "class") || "";
+
+							element.setAttribute("class", currentClass + (currentClass ? " " : "") + className);
+						}
 					}
 				},
 				removeClass: function(element, className) {
-					if (element.classList) {
-						element.classList.remove(className);
-					} else {
-						element.className = element.className.toString().replace(new RegExp("(^|\\s)" + className.split(" ").join("|") + "(\\s|$)", "gi"), " ");
+					if (element) {
+						if (element.classList) {
+							element.classList.remove(className);
+						} else if (Type.isString(element.className)) {
+							// Element.className is around 15% faster then set/getAttribute
+							// TODO: Need some jsperf tests on performance - can we get rid of the regex and maybe use split / array manipulation?
+							element.className = element.className.toString().replace(new RegExp("(^|\\s)" + className.split(" ").join("|") + "(\\s|$)", "gi"), " ");
+						} else {
+							// Work around for IE strict mode animating SVG - and anything else that doesn't behave correctly - the same way jQuery does it
+							var currentClass = element.getAttribute(IE <= 7 ? "className" : "class") || "";
+
+							element.setAttribute("class", currentClass.replace(new RegExp("(^|\s)" + className.split(" ").join("|") + "(\s|$)", "gi"), " "));
+						}
 					}
 				}
 			},
@@ -6141,12 +7139,12 @@ $.magnificPopup.registerModule(RETINA_NS, {
 				/* Get property value. If an element set was passed in, only return the value for the first element. */
 				if (arg3 === undefined) {
 					if (value === undefined) {
-						value = Velocity.CSS.getPropertyValue(element, arg2);
+						value = CSS.getPropertyValue(element, arg2);
 					}
 					/* Set property value. */
 				} else {
 					/* sPV returns an array of the normalized propertyName/propertyValue pair used to update the DOM. */
-					var adjustedSet = Velocity.CSS.setPropertyValue(element, arg2, arg3);
+					var adjustedSet = CSS.setPropertyValue(element, arg2, arg3);
 
 					/* Transform properties don't automatically set. They have to be flushed to the DOM. */
 					if (adjustedSet[0] === "transform") {
@@ -6217,55 +7215,6 @@ $.magnificPopup.registerModule(RETINA_NS, {
 				elements = syntacticSugar ? (arguments[0].elements || arguments[0].e) : arguments[0];
 			}
 
-			elements = sanitizeElements(elements);
-
-			if (!elements) {
-				return;
-			}
-
-			if (syntacticSugar) {
-				propertiesMap = arguments[0].properties || arguments[0].p;
-				options = arguments[0].options || arguments[0].o;
-			} else {
-				propertiesMap = arguments[argumentIndex];
-				options = arguments[argumentIndex + 1];
-			}
-
-			/* The length of the element set (in the form of a nodeList or an array of elements) is defaulted to 1 in case a
-			 single raw DOM element is passed in (which doesn't contain a length property). */
-			var elementsLength = elements.length,
-					elementsIndex = 0;
-
-			/***************************
-			 Argument Overloading
-			 ***************************/
-
-			/* Support is included for jQuery's argument overloading: $.animate(propertyMap [, duration] [, easing] [, complete]).
-			 Overloading is detected by checking for the absence of an object being passed into options. */
-			/* Note: The stop and finish actions do not accept animation options, and are therefore excluded from this check. */
-			if (!/^(stop|finish|finishAll)$/i.test(propertiesMap) && !$.isPlainObject(options)) {
-				/* The utility function shifts all arguments one position to the right, so we adjust for that offset. */
-				var startingArgumentPosition = argumentIndex + 1;
-
-				options = {};
-
-				/* Iterate through all options arguments */
-				for (var i = startingArgumentPosition; i < arguments.length; i++) {
-					/* Treat a number as a duration. Parse it out. */
-					/* Note: The following RegEx will return true if passed an array with a number as its first item.
-					 Thus, arrays are skipped from this check. */
-					if (!Type.isArray(arguments[i]) && (/^(fast|normal|slow)$/i.test(arguments[i]) || /^\d/.test(arguments[i]))) {
-						options.duration = arguments[i];
-						/* Treat strings and arrays as easings. */
-					} else if (Type.isString(arguments[i]) || Type.isArray(arguments[i])) {
-						options.easing = arguments[i];
-						/* Treat a function as a complete callback. */
-					} else if (Type.isFunction(arguments[i])) {
-						options.complete = arguments[i];
-					}
-				}
-			}
-
 			/***************
 			 Promises
 			 ***************/
@@ -6290,13 +7239,70 @@ $.magnificPopup.registerModule(RETINA_NS, {
 				});
 			}
 
+			if (syntacticSugar) {
+				propertiesMap = arguments[0].properties || arguments[0].p;
+				options = arguments[0].options || arguments[0].o;
+			} else {
+				propertiesMap = arguments[argumentIndex];
+				options = arguments[argumentIndex + 1];
+			}
+
+			elements = sanitizeElements(elements);
+
+			if (!elements) {
+				if (promiseData.promise) {
+					if (!propertiesMap || !options || options.promiseRejectEmpty !== false) {
+						promiseData.rejecter();
+					} else {
+						promiseData.resolver();
+					}
+				}
+				return;
+			}
+
+			/* The length of the element set (in the form of a nodeList or an array of elements) is defaulted to 1 in case a
+			 single raw DOM element is passed in (which doesn't contain a length property). */
+			var elementsLength = elements.length,
+					elementsIndex = 0;
+
+			/***************************
+			 Argument Overloading
+			 ***************************/
+
+			/* Support is included for jQuery's argument overloading: $.animate(propertyMap [, duration] [, easing] [, complete]).
+			 Overloading is detected by checking for the absence of an object being passed into options. */
+			/* Note: The stop/finish/pause/resume actions do not accept animation options, and are therefore excluded from this check. */
+			if (!/^(stop|finish|finishAll|pause|resume)$/i.test(propertiesMap) && !$.isPlainObject(options)) {
+				/* The utility function shifts all arguments one position to the right, so we adjust for that offset. */
+				var startingArgumentPosition = argumentIndex + 1;
+
+				options = {};
+
+				/* Iterate through all options arguments */
+				for (var i = startingArgumentPosition; i < arguments.length; i++) {
+					/* Treat a number as a duration. Parse it out. */
+					/* Note: The following RegEx will return true if passed an array with a number as its first item.
+					 Thus, arrays are skipped from this check. */
+					if (!Type.isArray(arguments[i]) && (/^(fast|normal|slow)$/i.test(arguments[i]) || /^\d/.test(arguments[i]))) {
+						options.duration = arguments[i];
+						/* Treat strings and arrays as easings. */
+					} else if (Type.isString(arguments[i]) || Type.isArray(arguments[i])) {
+						options.easing = arguments[i];
+						/* Treat a function as a complete callback. */
+					} else if (Type.isFunction(arguments[i])) {
+						options.complete = arguments[i];
+					}
+				}
+			}
+
 			/*********************
 			 Action Detection
 			 *********************/
 
 			/* Velocity's behavior is categorized into "actions": Elements can either be specially scrolled into view,
-			 or they can be started, stopped, or reversed. If a literal or referenced properties map is passed in as Velocity's
-			 first argument, the associated action is "start". Alternatively, "scroll", "reverse", or "stop" can be passed in instead of a properties map. */
+			 or they can be started, stopped, paused, resumed, or reversed . If a literal or referenced properties map is passed in as Velocity's
+			 first argument, the associated action is "start". Alternatively, "scroll", "reverse", "pause", "resume" or "stop" can be passed in 
+			 instead of a properties map. */
 			var action;
 
 			switch (propertiesMap) {
@@ -6307,6 +7313,125 @@ $.magnificPopup.registerModule(RETINA_NS, {
 				case "reverse":
 					action = "reverse";
 					break;
+
+				case "pause":
+
+					/*******************
+					 Action: Pause
+					 *******************/
+
+					var currentTime = (new Date()).getTime();
+
+					/* Handle delay timers */
+					$.each(elements, function(i, element) {
+						pauseDelayOnElement(element, currentTime);
+					});
+
+					/* Pause and Resume are call-wide (not on a per element basis). Thus, calling pause or resume on a 
+					 single element will cause any calls that containt tweens for that element to be paused/resumed
+					 as well. */
+
+					/* Iterate through all calls and pause any that contain any of our elements */
+					$.each(Velocity.State.calls, function(i, activeCall) {
+
+						var found = false;
+						/* Inactive calls are set to false by the logic inside completeCall(). Skip them. */
+						if (activeCall) {
+							/* Iterate through the active call's targeted elements. */
+							$.each(activeCall[1], function(k, activeElement) {
+								var queueName = (options === undefined) ? "" : options;
+
+								if (queueName !== true && (activeCall[2].queue !== queueName) && !(options === undefined && activeCall[2].queue === false)) {
+									return true;
+								}
+
+								/* Iterate through the calls targeted by the stop command. */
+								$.each(elements, function(l, element) {
+									/* Check that this call was applied to the target element. */
+									if (element === activeElement) {
+
+										/* Set call to paused */
+										activeCall[5] = {
+											resume: false
+										};
+
+										/* Once we match an element, we can bounce out to the next call entirely */
+										found = true;
+										return false;
+									}
+								});
+
+								/* Proceed to check next call if we have already matched */
+								if (found) {
+									return false;
+								}
+							});
+						}
+
+					});
+
+					/* Since pause creates no new tweens, exit out of Velocity. */
+					return getChain();
+
+				case "resume":
+
+					/*******************
+					 Action: Resume
+					 *******************/
+
+					/* Handle delay timers */
+					$.each(elements, function(i, element) {
+						resumeDelayOnElement(element, currentTime);
+					});
+
+					/* Pause and Resume are call-wide (not on a per elemnt basis). Thus, calling pause or resume on a 
+					 single element will cause any calls that containt tweens for that element to be paused/resumed
+					 as well. */
+
+					/* Iterate through all calls and pause any that contain any of our elements */
+					$.each(Velocity.State.calls, function(i, activeCall) {
+						var found = false;
+						/* Inactive calls are set to false by the logic inside completeCall(). Skip them. */
+						if (activeCall) {
+							/* Iterate through the active call's targeted elements. */
+							$.each(activeCall[1], function(k, activeElement) {
+								var queueName = (options === undefined) ? "" : options;
+
+								if (queueName !== true && (activeCall[2].queue !== queueName) && !(options === undefined && activeCall[2].queue === false)) {
+									return true;
+								}
+
+								/* Skip any calls that have never been paused */
+								if (!activeCall[5]) {
+									return true;
+								}
+
+								/* Iterate through the calls targeted by the stop command. */
+								$.each(elements, function(l, element) {
+									/* Check that this call was applied to the target element. */
+									if (element === activeElement) {
+
+										/* Flag a pause object to be resumed, which will occur during the next tick. In
+										 addition, the pause object will at that time be deleted */
+										activeCall[5].resume = true;
+
+										/* Once we match an element, we can bounce out to the next call entirely */
+										found = true;
+										return false;
+									}
+								});
+
+								/* Proceed to check next call if we have already matched */
+								if (found) {
+									return false;
+								}
+							});
+						}
+
+					});
+
+					/* Since resume creates no new tweens, exit out of Velocity. */
+					return getChain();
 
 				case "finish":
 				case "finishAll":
@@ -6573,10 +7698,29 @@ $.magnificPopup.registerModule(RETINA_NS, {
 						Velocity.velocityQueueEntryFlag = true;
 
 						/* The ensuing queue item (which is assigned to the "next" argument that $.queue() automatically passes in) will be triggered after a setTimeout delay.
-						 The setTimeout is stored so that it can be subjected to clearTimeout() if this animation is prematurely stopped via Velocity's "stop" command. */
+						 The setTimeout is stored so that it can be subjected to clearTimeout() if this animation is prematurely stopped via Velocity's "stop" command, and
+						 delayBegin/delayTime is used to ensure we can "pause" and "resume" a tween that is still mid-delay. */
+
+						/* Temporarily store delayed elements to facilite access for global pause/resume */
+						var callIndex = Velocity.State.delayedElements.count++;
+						Velocity.State.delayedElements[callIndex] = element;
+
+						var delayComplete = (function(index) {
+							return function() {
+								/* Clear the temporary element */
+								Velocity.State.delayedElements[index] = false;
+
+								/* Finally, issue the call */
+								next();
+							};
+						})(callIndex);
+
+
+						Data(element).delayBegin = (new Date()).getTime();
+						Data(element).delay = parseFloat(opts.delay);
 						Data(element).delayTimer = {
 							setTimeout: setTimeout(next, parseFloat(opts.delay)),
-							next: next
+							next: delayComplete
 						};
 					});
 				}
@@ -6894,6 +8038,11 @@ $.magnificPopup.registerModule(RETINA_NS, {
 						var parsePropertyValue = function(valueData, skipResolvingEasing) {
 							var endValue, easing, startValue;
 
+							/* If we have a function as the main argument then resolve it first, in case it returns an array that needs to be split */
+							if (Type.isFunction(valueData)) {
+								valueData = valueData.call(element, elementArrayIndex, elementsLength);
+							}
+
 							/* Handle the array format, which can be structured as one of three potential overloads:
 							 A) [ endValue, easing, startValue ], B) [ endValue, easing ], or C) [ endValue, startValue ] */
 							if (Type.isArray(valueData)) {
@@ -6905,14 +8054,14 @@ $.magnificPopup.registerModule(RETINA_NS, {
 								 start value since easings can only be non-hex strings or arrays. */
 								if ((!Type.isArray(valueData[1]) && /^[\d-]/.test(valueData[1])) || Type.isFunction(valueData[1]) || CSS.RegEx.isHex.test(valueData[1])) {
 									startValue = valueData[1];
-									/* Two or three-item array: If the second item is a non-hex string or an array, treat it as an easing. */
-								} else if ((Type.isString(valueData[1]) && !CSS.RegEx.isHex.test(valueData[1])) || Type.isArray(valueData[1])) {
+									/* Two or three-item array: If the second item is a non-hex string easing name or an array, treat it as an easing. */
+								} else if ((Type.isString(valueData[1]) && !CSS.RegEx.isHex.test(valueData[1]) && Velocity.Easings[valueData[1]]) || Type.isArray(valueData[1])) {
 									easing = skipResolvingEasing ? valueData[1] : getEasing(valueData[1], opts.duration);
 
 									/* Don't bother validating startValue's value now since the ensuing property cycling logic inherently does that. */
-									if (valueData[2] !== undefined) {
-										startValue = valueData[2];
-									}
+									startValue = valueData[2];
+								} else {
+									startValue = valueData[1] || valueData[2];
 								}
 								/* Handle the single-value format. */
 							} else {
@@ -6938,67 +8087,19 @@ $.magnificPopup.registerModule(RETINA_NS, {
 							return [endValue || 0, easing, startValue];
 						};
 
-						/* Cycle through each property in the map, looking for shorthand color properties (e.g. "color" as opposed to "colorRed"). Inject the corresponding
-						 colorRed, colorGreen, and colorBlue RGB component tweens into the propertiesMap (which Velocity understands) and remove the shorthand property. */
-						$.each(propertiesMap, function(property, value) {
-							/* Find shorthand color properties that have been passed a hex string. */
-							if (RegExp("^" + CSS.Lists.colors.join("$|^") + "$").test(CSS.Names.camelCase(property))) {
-								/* Parse the value data for each shorthand. */
-								var valueData = parsePropertyValue(value, true),
-										endValue = valueData[0],
-										easing = valueData[1],
-										startValue = valueData[2];
+						var fixPropertyValue = function(property, valueData) {
+							/* In case this property is a hook, there are circumstances where we will intend to work on the hook's root property and not the hooked subproperty. */
+							var rootProperty = CSS.Hooks.getRoot(property),
+									rootPropertyValue = false,
+									/* Parse out endValue, easing, and startValue from the property's data. */
+									endValue = valueData[0],
+									easing = valueData[1],
+									startValue = valueData[2],
+									pattern;
 
-								if (CSS.RegEx.isHex.test(endValue)) {
-									/* Convert the hex strings into their RGB component arrays. */
-									var colorComponents = ["Red", "Green", "Blue"],
-											endValueRGB = CSS.Values.hexToRgb(endValue),
-											startValueRGB = startValue ? CSS.Values.hexToRgb(startValue) : undefined;
-
-									/* Inject the RGB component tweens into propertiesMap. */
-									for (var i = 0; i < colorComponents.length; i++) {
-										var dataArray = [endValueRGB[i]];
-
-										if (easing) {
-											dataArray.push(easing);
-										}
-
-										if (startValueRGB !== undefined) {
-											dataArray.push(startValueRGB[i]);
-										}
-
-										propertiesMap[CSS.Names.camelCase(property) + colorComponents[i]] = dataArray;
-									}
-
-									/* Remove the intermediary shorthand property entry now that we've processed it. */
-									delete propertiesMap[property];
-								}
-							}
-						});
-
-						/* Create a tween out of each property, and append its associated data to tweensContainer. */
-						for (var property in propertiesMap) {
-
-							if (!propertiesMap.hasOwnProperty(property)) {
-								continue;
-							}
 							/**************************
 							 Start Value Sourcing
 							 **************************/
-
-							/* Parse out endValue, easing, and startValue from the property's data. */
-							var valueData = parsePropertyValue(propertiesMap[property]),
-									endValue = valueData[0],
-									easing = valueData[1],
-									startValue = valueData[2];
-
-							/* Now that the original property name's format has been used for the parsePropertyValue() lookup above,
-							 we force the property to its camelCase styling to normalize it for manipulation. */
-							property = CSS.Names.camelCase(property);
-
-							/* In case this property is a hook, there are circumstances where we will intend to work on the hook's root property and not the hooked subproperty. */
-							var rootProperty = CSS.Hooks.getRoot(property),
-									rootPropertyValue = false;
 
 							/* Other than for the dummy tween property, properties that are not supported by the browser (and do not have an associated normalization) will
 							 inherently produce no style changes when set, so they are skipped in order to decrease animation tick overhead.
@@ -7009,7 +8110,7 @@ $.magnificPopup.registerModule(RETINA_NS, {
 								if (Velocity.debug) {
 									console.log("Skipping [" + rootProperty + "] due to a lack of browser support.");
 								}
-								continue;
+								return;
 							}
 
 							/* If the display option is being set to a non-"none" (e.g. "block") and opacity (filter on IE<=8) is being
@@ -7088,45 +8189,183 @@ $.magnificPopup.registerModule(RETINA_NS, {
 								return [numericValue, unitType];
 							};
 
-							/* Separate startValue. */
-							separatedValue = separateValue(property, startValue);
-							startValue = separatedValue[0];
-							startValueUnitType = separatedValue[1];
+							if (startValue !== endValue && Type.isString(startValue) && Type.isString(endValue)) {
+								pattern = "";
+								var iStart = 0, // index in startValue
+										iEnd = 0, // index in endValue
+										aStart = [], // array of startValue numbers
+										aEnd = [], // array of endValue numbers
+										inCalc = 0, // Keep track of being inside a "calc()" so we don't duplicate it
+										inRGB = 0, // Keep track of being inside an RGB as we can't use fractional values
+										inRGBA = 0; // Keep track of being inside an RGBA as we must pass fractional for the alpha channel
 
-							/* Separate endValue, and extract a value operator (e.g. "+=", "-=") if one exists. */
-							separatedValue = separateValue(property, endValue);
-							endValue = separatedValue[0].replace(/^([+-\/*])=/, function(match, subMatch) {
-								operator = subMatch;
+								startValue = CSS.Hooks.fixColors(startValue);
+								endValue = CSS.Hooks.fixColors(endValue);
+								while (iStart < startValue.length && iEnd < endValue.length) {
+									var cStart = startValue[iStart],
+											cEnd = endValue[iEnd];
 
-								/* Strip the operator off of the value. */
-								return "";
-							});
-							endValueUnitType = separatedValue[1];
+									if (/[\d\.-]/.test(cStart) && /[\d\.-]/.test(cEnd)) {
+										var tStart = cStart, // temporary character buffer
+												tEnd = cEnd, // temporary character buffer
+												dotStart = ".", // Make sure we can only ever match a single dot in a decimal
+												dotEnd = "."; // Make sure we can only ever match a single dot in a decimal
 
-							/* Parse float values from endValue and startValue. Default to 0 if NaN is returned. */
-							startValue = parseFloat(startValue) || 0;
-							endValue = parseFloat(endValue) || 0;
+										while (++iStart < startValue.length) {
+											cStart = startValue[iStart];
+											if (cStart === dotStart) {
+												dotStart = ".."; // Can never match two characters
+											} else if (!/\d/.test(cStart)) {
+												break;
+											}
+											tStart += cStart;
+										}
+										while (++iEnd < endValue.length) {
+											cEnd = endValue[iEnd];
+											if (cEnd === dotEnd) {
+												dotEnd = ".."; // Can never match two characters
+											} else if (!/\d/.test(cEnd)) {
+												break;
+											}
+											tEnd += cEnd;
+										}
+										var uStart = CSS.Hooks.getUnit(startValue, iStart), // temporary unit type
+												uEnd = CSS.Hooks.getUnit(endValue, iEnd); // temporary unit type
 
-							/***************************************
-							 Property-Specific Value Conversion
-							 ***************************************/
+										iStart += uStart.length;
+										iEnd += uEnd.length;
+										if (uStart === uEnd) {
+											// Same units
+											if (tStart === tEnd) {
+												// Same numbers, so just copy over
+												pattern += tStart + uStart;
+											} else {
+												// Different numbers, so store them
+												pattern += "{" + aStart.length + (inRGB ? "!" : "") + "}" + uStart;
+												aStart.push(parseFloat(tStart));
+												aEnd.push(parseFloat(tEnd));
+											}
+										} else {
+											// Different units, so put into a "calc(from + to)" and animate each side to/from zero
+											var nStart = parseFloat(tStart),
+													nEnd = parseFloat(tEnd);
 
-							/* Custom support for properties that don't actually accept the % unit type, but where pollyfilling is trivial and relatively foolproof. */
-							if (endValueUnitType === "%") {
-								/* A %-value fontSize/lineHeight is relative to the parent's fontSize (as opposed to the parent's dimensions),
-								 which is identical to the em unit's behavior, so we piggyback off of that. */
-								if (/^(fontSize|lineHeight)$/.test(property)) {
-									/* Convert % into an em decimal value. */
-									endValue = endValue / 100;
-									endValueUnitType = "em";
-									/* For scaleX and scaleY, convert the value into its decimal format and strip off the unit type. */
-								} else if (/^scale/.test(property)) {
-									endValue = endValue / 100;
-									endValueUnitType = "";
-									/* For RGB components, take the defined percentage of 255 and strip off the unit type. */
-								} else if (/(Red|Green|Blue)$/i.test(property)) {
-									endValue = (endValue / 100) * 255;
-									endValueUnitType = "";
+											pattern += (inCalc < 5 ? "calc" : "") + "("
+													+ (nStart ? "{" + aStart.length + (inRGB ? "!" : "") + "}" : "0") + uStart
+													+ " + "
+													+ (nEnd ? "{" + (aStart.length + (nStart ? 1 : 0)) + (inRGB ? "!" : "") + "}" : "0") + uEnd
+													+ ")";
+											if (nStart) {
+												aStart.push(nStart);
+												aEnd.push(0);
+											}
+											if (nEnd) {
+												aStart.push(0);
+												aEnd.push(nEnd);
+											}
+										}
+									} else if (cStart === cEnd) {
+										pattern += cStart;
+										iStart++;
+										iEnd++;
+										// Keep track of being inside a calc()
+										if (inCalc === 0 && cStart === "c"
+												|| inCalc === 1 && cStart === "a"
+												|| inCalc === 2 && cStart === "l"
+												|| inCalc === 3 && cStart === "c"
+												|| inCalc >= 4 && cStart === "("
+												) {
+											inCalc++;
+										} else if ((inCalc && inCalc < 5)
+												|| inCalc >= 4 && cStart === ")" && --inCalc < 5) {
+											inCalc = 0;
+										}
+										// Keep track of being inside an rgb() / rgba()
+										if (inRGB === 0 && cStart === "r"
+												|| inRGB === 1 && cStart === "g"
+												|| inRGB === 2 && cStart === "b"
+												|| inRGB === 3 && cStart === "a"
+												|| inRGB >= 3 && cStart === "("
+												) {
+											if (inRGB === 3 && cStart === "a") {
+												inRGBA = 1;
+											}
+											inRGB++;
+										} else if (inRGBA && cStart === ",") {
+											if (++inRGBA > 3) {
+												inRGB = inRGBA = 0;
+											}
+										} else if ((inRGBA && inRGB < (inRGBA ? 5 : 4))
+												|| inRGB >= (inRGBA ? 4 : 3) && cStart === ")" && --inRGB < (inRGBA ? 5 : 4)) {
+											inRGB = inRGBA = 0;
+										}
+									} else {
+										inCalc = 0;
+										// TODO: changing units, fixing colours
+										break;
+									}
+								}
+								if (iStart !== startValue.length || iEnd !== endValue.length) {
+									if (Velocity.debug) {
+										console.error("Trying to pattern match mis-matched strings [\"" + endValue + "\", \"" + startValue + "\"]");
+									}
+									pattern = undefined;
+								}
+								if (pattern) {
+									if (aStart.length) {
+										if (Velocity.debug) {
+											console.log("Pattern found \"" + pattern + "\" -> ", aStart, aEnd, "[" + startValue + "," + endValue + "]");
+										}
+										startValue = aStart;
+										endValue = aEnd;
+										endValueUnitType = startValueUnitType = "";
+									} else {
+										pattern = undefined;
+									}
+								}
+							}
+
+							if (!pattern) {
+								/* Separate startValue. */
+								separatedValue = separateValue(property, startValue);
+								startValue = separatedValue[0];
+								startValueUnitType = separatedValue[1];
+
+								/* Separate endValue, and extract a value operator (e.g. "+=", "-=") if one exists. */
+								separatedValue = separateValue(property, endValue);
+								endValue = separatedValue[0].replace(/^([+-\/*])=/, function(match, subMatch) {
+									operator = subMatch;
+
+									/* Strip the operator off of the value. */
+									return "";
+								});
+								endValueUnitType = separatedValue[1];
+
+								/* Parse float values from endValue and startValue. Default to 0 if NaN is returned. */
+								startValue = parseFloat(startValue) || 0;
+								endValue = parseFloat(endValue) || 0;
+
+								/***************************************
+								 Property-Specific Value Conversion
+								 ***************************************/
+
+								/* Custom support for properties that don't actually accept the % unit type, but where pollyfilling is trivial and relatively foolproof. */
+								if (endValueUnitType === "%") {
+									/* A %-value fontSize/lineHeight is relative to the parent's fontSize (as opposed to the parent's dimensions),
+									 which is identical to the em unit's behavior, so we piggyback off of that. */
+									if (/^(fontSize|lineHeight)$/.test(property)) {
+										/* Convert % into an em decimal value. */
+										endValue = endValue / 100;
+										endValueUnitType = "em";
+										/* For scaleX and scaleY, convert the value into its decimal format and strip off the unit type. */
+									} else if (/^scale/.test(property)) {
+										endValue = endValue / 100;
+										endValueUnitType = "";
+										/* For RGB components, take the defined percentage of 255 and strip off the unit type. */
+									} else if (/(Red|Green|Blue)$/i.test(property)) {
+										endValue = (endValue / 100) * 255;
+										endValueUnitType = "";
+									}
 								}
 							}
 
@@ -7161,8 +8400,8 @@ $.magnificPopup.registerModule(RETINA_NS, {
 									position: CSS.getPropertyValue(element, "position"), /* GET */
 									fontSize: CSS.getPropertyValue(element, "fontSize") /* GET */
 								},
-								/* Determine if the same % ratio can be used. % is based on the element's position value and its parent's width and height dimensions. */
-								samePercentRatio = ((sameRatioIndicators.position === callUnitConversionData.lastPosition) && (sameRatioIndicators.myParent === callUnitConversionData.lastParent)),
+										/* Determine if the same % ratio can be used. % is based on the element's position value and its parent's width and height dimensions. */
+										samePercentRatio = ((sameRatioIndicators.position === callUnitConversionData.lastPosition) && (sameRatioIndicators.myParent === callUnitConversionData.lastParent)),
 										/* Determine if the same em ratio can be used. em is relative to the element's fontSize. */
 										sameEmRatio = (sameRatioIndicators.fontSize === callUnitConversionData.lastFontSize);
 
@@ -7345,10 +8584,59 @@ $.magnificPopup.registerModule(RETINA_NS, {
 								unitType: endValueUnitType,
 								easing: easing
 							};
+							if (pattern) {
+								tweensContainer[property].pattern = pattern;
+							}
 
 							if (Velocity.debug) {
 								console.log("tweensContainer (" + property + "): " + JSON.stringify(tweensContainer[property]), element);
 							}
+						};
+
+						/* Create a tween out of each property, and append its associated data to tweensContainer. */
+						for (var property in propertiesMap) {
+
+							if (!propertiesMap.hasOwnProperty(property)) {
+								continue;
+							}
+							/* The original property name's format must be used for the parsePropertyValue() lookup,
+							 but we then use its camelCase styling to normalize it for manipulation. */
+							var propertyName = CSS.Names.camelCase(property),
+									valueData = parsePropertyValue(propertiesMap[property]);
+
+							/* Find shorthand color properties that have been passed a hex string. */
+							/* Would be quicker to use CSS.Lists.colors.includes() if possible */
+							if (CSS.Lists.colors.indexOf(propertyName) >= 0) {
+								/* Parse the value data for each shorthand. */
+								var endValue = valueData[0],
+										easing = valueData[1],
+										startValue = valueData[2];
+
+								if (CSS.RegEx.isHex.test(endValue)) {
+									/* Convert the hex strings into their RGB component arrays. */
+									var colorComponents = ["Red", "Green", "Blue"],
+											endValueRGB = CSS.Values.hexToRgb(endValue),
+											startValueRGB = startValue ? CSS.Values.hexToRgb(startValue) : undefined;
+
+									/* Inject the RGB component tweens into propertiesMap. */
+									for (var i = 0; i < colorComponents.length; i++) {
+										var dataArray = [endValueRGB[i]];
+
+										if (easing) {
+											dataArray.push(easing);
+										}
+
+										if (startValueRGB !== undefined) {
+											dataArray.push(startValueRGB[i]);
+										}
+
+										fixPropertyValue(propertyName + colorComponents[i], dataArray);
+									}
+									/* If we have replaced a shortcut color value then don't update the standard property name */
+									continue;
+								}
+							}
+							fixPropertyValue(propertyName, valueData);
 						}
 
 						/* Along with its property data, store a reference to the element itself onto tweensContainer. */
@@ -7387,7 +8675,7 @@ $.magnificPopup.registerModule(RETINA_NS, {
 						if (elementsIndex === elementsLength - 1) {
 							/* Add the current call plus its associated metadata (the element set and the call's options) onto the global call container.
 							 Anything on this call container is subjected to tick() processing. */
-							Velocity.State.calls.push([call, elements, opts, null, promiseData.resolver]);
+							Velocity.State.calls.push([call, elements, opts, null, promiseData.resolver, null, 0]);
 
 							/* If the animation tick isn't running, start it. (Velocity shuts it off when there are no active calls to process.) */
 							if (Velocity.State.isTicking === false) {
@@ -7407,7 +8695,27 @@ $.magnificPopup.registerModule(RETINA_NS, {
 					/* Since this buildQueue call doesn't respect the element's existing queue (which is where a delay option would have been appended),
 					 we manually inject the delay property here with an explicit setTimeout. */
 					if (opts.delay) {
-						setTimeout(buildQueue, opts.delay);
+
+						/* Temporarily store delayed elements to facilitate access for global pause/resume */
+						var callIndex = Velocity.State.delayedElements.count++;
+						Velocity.State.delayedElements[callIndex] = element;
+
+						var delayComplete = (function(index) {
+							return function() {
+								/* Clear the temporary element */
+								Velocity.State.delayedElements[index] = false;
+
+								/* Finally, issue the call */
+								buildQueue();
+							};
+						})(callIndex);
+
+						Data(element).delayBegin = (new Date()).getTime();
+						Data(element).delay = parseFloat(opts.delay);
+						Data(element).delayTimer = {
+							setTimeout: setTimeout(buildQueue, parseFloat(opts.delay)),
+							next: delayComplete
+						};
 					} else {
 						buildQueue();
 					}
@@ -7527,7 +8835,7 @@ $.magnificPopup.registerModule(RETINA_NS, {
 		 devices to avoid wasting battery power on inactive tabs. */
 		/* Note: Tab focus detection doesn't work on older versions of IE, but that's okay since they don't support rAF to begin with. */
 		if (!Velocity.State.isMobile && document.hidden !== undefined) {
-			document.addEventListener("visibilitychange", function() {
+			var updateTicker = function() {
 				/* Reassign the rAF function (which the global tick() function uses) based on the tab's focus state. */
 				if (document.hidden) {
 					ticker = function(callback) {
@@ -7542,7 +8850,13 @@ $.magnificPopup.registerModule(RETINA_NS, {
 				} else {
 					ticker = window.requestAnimationFrame || rAFShim;
 				}
-			});
+			};
+
+			/* Page could be sitting in the background at this time (i.e. opened as new tab) so making sure we use correct ticker from the start */
+			updateTicker();
+
+			/* And then run check again every time visibility changes */
+			document.addEventListener("visibilitychange", updateTicker);
 		}
 
 		/************
@@ -7558,9 +8872,10 @@ $.magnificPopup.registerModule(RETINA_NS, {
 			 the first RAF tick pass so that elements being immediately consecutively animated -- instead of simultaneously animated
 			 by the same Velocity call -- are properly batched into the same initial RAF tick and consequently remain in sync thereafter. */
 			if (timestamp) {
-				/* We ignore RAF's high resolution timestamp since it can be significantly offset when the browser is
-				 under high stress; we opt for choppiness over allowing the browser to drop huge chunks of frames. */
-				var timeCurrent = (new Date()).getTime();
+				/* We normally use RAF's high resolution timestamp but as it can be significantly offset when the browser is
+				 under high stress we give the option for choppiness over allowing the browser to drop huge chunks of frames.
+				 We use performance.now() and shim it if it doesn't exist for when the tab is hidden. */
+				var timeCurrent = Velocity.timestamp && timestamp !== true ? timestamp : performance.now();
 
 				/********************
 				 Call Iteration
@@ -7592,7 +8907,11 @@ $.magnificPopup.registerModule(RETINA_NS, {
 							opts = callContainer[2],
 							timeStart = callContainer[3],
 							firstTick = !!timeStart,
-							tweenDummyValue = null;
+							tweenDummyValue = null,
+							pauseObject = callContainer[5],
+							millisecondsEllapsed = callContainer[6];
+
+
 
 					/* If timeStart is undefined, then this is the first time that this call has been processed by tick().
 					 We assign timeStart now so that its value is as close to the real animation start time as possible.
@@ -7606,10 +8925,25 @@ $.magnificPopup.registerModule(RETINA_NS, {
 						timeStart = Velocity.State.calls[i][3] = timeCurrent - 16;
 					}
 
+					/* If a pause object is present, skip processing unless it has been set to resume */
+					if (pauseObject) {
+						if (pauseObject.resume === true) {
+							/* Update the time start to accomodate the paused completion amount */
+							timeStart = callContainer[3] = Math.round(timeCurrent - millisecondsEllapsed - 16);
+
+							/* Remove pause object after processing */
+							callContainer[5] = null;
+						} else {
+							continue;
+						}
+					}
+
+					millisecondsEllapsed = callContainer[6] = timeCurrent - timeStart;
+
 					/* The tween's completion percentage is relative to the tween's start time, not the tween's start value
 					 (which would result in unpredictable tween durations since JavaScript's timers are not particularly accurate).
 					 Accordingly, we ensure that percentComplete does not exceed 1. */
-					var percentComplete = Math.min((timeCurrent - timeStart) / opts.duration, 1);
+					var percentComplete = Math.min((millisecondsEllapsed) / opts.duration, 1);
 
 					/**********************
 					 Element Iteration
@@ -7621,7 +8955,7 @@ $.magnificPopup.registerModule(RETINA_NS, {
 								element = tweensContainer.element;
 
 						/* Check to see if this element has been deleted midway through the animation by checking for the
-						 continued existence of its data cache. If it's gone, skip animating this element. */
+						 continued existence of its data cache. If it's gone, or the element is currently paused, skip animating this element. */
 						if (!Data(element)) {
 							continue;
 						}
@@ -7669,19 +9003,35 @@ $.magnificPopup.registerModule(RETINA_NS, {
 								 Current Value Calculation
 								 ******************************/
 
-								/* If this is the last tick pass (if we've reached 100% completion for this tween),
-								 ensure that currentValue is explicitly set to its target endValue so that it's not subjected to any rounding. */
-								if (percentComplete === 1) {
-									currentValue = tween.endValue;
-									/* Otherwise, calculate currentValue based on the current delta from startValue. */
-								} else {
-									var tweenDelta = tween.endValue - tween.startValue;
-									currentValue = tween.startValue + (tweenDelta * easing(percentComplete, opts, tweenDelta));
+								if (Type.isString(tween.pattern)) {
+									var patternReplace = percentComplete === 1 ?
+											function($0, index, round) {
+												var result = tween.endValue[index];
 
+												return round ? Math.round(result) : result;
+											} :
+											function($0, index, round) {
+												var startValue = tween.startValue[index],
+														tweenDelta = tween.endValue[index] - startValue,
+														result = startValue + (tweenDelta * easing(percentComplete, opts, tweenDelta));
+
+												return round ? Math.round(result) : result;
+											};
+
+									currentValue = tween.pattern.replace(/{(\d+)(!)?}/g, patternReplace);
+								} else if (percentComplete === 1) {
+									/* If this is the last tick pass (if we've reached 100% completion for this tween),
+									 ensure that currentValue is explicitly set to its target endValue so that it's not subjected to any rounding. */
+									currentValue = tween.endValue;
+								} else {
+									/* Otherwise, calculate currentValue based on the current delta from startValue. */
+									var tweenDelta = tween.endValue - tween.startValue;
+
+									currentValue = tween.startValue + (tweenDelta * easing(percentComplete, opts, tweenDelta));
 									/* If no value change is occurring, don't proceed with DOM updating. */
-									if (!firstTick && (currentValue === tween.currentValue)) {
-										continue;
-									}
+								}
+								if (!firstTick && (currentValue === tween.currentValue)) {
+									continue;
 								}
 
 								tween.currentValue = currentValue;
@@ -7719,7 +9069,7 @@ $.magnificPopup.registerModule(RETINA_NS, {
 									/* Note: To solve an IE<=8 positioning bug, the unit type is dropped when setting a property value of 0. */
 									var adjustedSetData = CSS.setPropertyValue(element, /* SET */
 											property,
-											tween.currentValue + (parseFloat(currentValue) === 0 ? "" : tween.unitType),
+											tween.currentValue + (IE < 9 && parseFloat(currentValue) === 0 ? "" : tween.unitType),
 											tween.rootPropertyValue,
 											tween.scrollData);
 
@@ -8003,8 +9353,8 @@ $.magnificPopup.registerModule(RETINA_NS, {
 				var opts = $.extend({}, options),
 						begin = opts.begin,
 						complete = opts.complete,
-						computedValues = {height: "", marginTop: "", marginBottom: "", paddingTop: "", paddingBottom: ""},
-				inlineValues = {};
+						inlineValues = {},
+						computedValues = {height: "", marginTop: "", marginBottom: "", paddingTop: "", paddingBottom: ""};
 
 				if (opts.display === undefined) {
 					/* Show the element before slideDown begins and hide the element after slideUp completes. */
@@ -8014,7 +9364,7 @@ $.magnificPopup.registerModule(RETINA_NS, {
 
 				opts.begin = function() {
 					/* If the user passed in a begin callback, fire it now. */
-					if (begin) {
+					if (elementsIndex === 0 && begin) {
 						begin.call(elements, elements);
 					}
 
@@ -8027,7 +9377,7 @@ $.magnificPopup.registerModule(RETINA_NS, {
 
 						/* For slideDown, use forcefeeding to animate all vertical properties from 0. For slideUp,
 						 use forcefeeding to start from computed values and animate down to 0. */
-						var propertyValue = Velocity.CSS.getPropertyValue(element, property);
+						var propertyValue = CSS.getPropertyValue(element, property);
 						computedValues[property] = (direction === "Down") ? [propertyValue, 0] : [0, propertyValue];
 					}
 
@@ -8045,11 +9395,13 @@ $.magnificPopup.registerModule(RETINA_NS, {
 					}
 
 					/* If the user passed in a complete callback, fire it now. */
-					if (complete) {
-						complete.call(elements, elements);
-					}
-					if (promiseData) {
-						promiseData.resolver(elements);
+					if (elementsIndex === elementsSize - 1) {
+						if (complete) {
+							complete.call(elements, elements);
+						}
+						if (promiseData) {
+							promiseData.resolver(elements);
+						}
 					}
 				};
 
@@ -8061,19 +9413,21 @@ $.magnificPopup.registerModule(RETINA_NS, {
 		$.each(["In", "Out"], function(i, direction) {
 			Velocity.Redirects["fade" + direction] = function(element, options, elementsIndex, elementsSize, elements, promiseData) {
 				var opts = $.extend({}, options),
-						originalComplete = opts.complete,
+						complete = opts.complete,
 						propertiesMap = {opacity: (direction === "In") ? 1 : 0};
 
 				/* Since redirects are triggered individually for each element in the animated set, avoid repeatedly triggering
 				 callbacks by firing them only when the final element has been reached. */
+				if (elementsIndex !== 0) {
+					opts.begin = null;
+				}
 				if (elementsIndex !== elementsSize - 1) {
-					opts.complete = opts.begin = null;
+					opts.complete = null;
 				} else {
 					opts.complete = function() {
-						if (originalComplete) {
-							originalComplete.call(elements, elements);
+						if (complete) {
+							complete.call(elements, elements);
 						}
-
 						if (promiseData) {
 							promiseData.resolver(elements);
 						}
@@ -8091,7 +9445,7 @@ $.magnificPopup.registerModule(RETINA_NS, {
 		});
 
 		return Velocity;
-	}((window.jQuery || window.Zepto || window), window, document);
+	}((window.jQuery || window.Zepto || window), window, (window ? window.document : undefined));
 }));
 
 /******************
@@ -8939,8 +10293,12 @@ https://github.com/imakewebthings/waypoints/blob/master/licenses.txt
     });
 
   })(jQuery);;jQuery(document).ready(function($) {
-  $('.glide').glide({
-    autoplay: false
+  $('.slick').slick({
+    autoplay: false,
+    dots: true,
+    arrows: true,
+    prevArrow: '<button type="button" data-role="none" class="slick-prev" aria-label="Previous" role="button"><i class="icon ion-ios-arrow-back"></i></button>',
+    nextArrow: '<button type="button" data-role="none" class="slick-next" aria-label="Next" role="button"><i class="icon ion-ios-arrow-forward"></i></button>'
   });
   $('.nav-toggle').click(function() {
     if ($(this).data('direction') === 'down') {

@@ -26,13 +26,13 @@ gulp.task('img', function() {
 
 gulp.task('js', function() {
   return gulp.src([
-    '../../node_modules/glidejs/dist/glide.js',
     '../../node_modules/magnific-popup/dist/jquery.magnific-popup.js',
     '../../node_modules/velocity-animate/velocity.js',
     '../../node_modules/waypoints/lib/jquery.waypoints.js',
     '../js/plugins.js',
     '../js/acf-google-maps.js',
     '../js/main.js'
+    '../../node_modules/slick-carousel/slick/slick.js',
   ])
     .pipe($.concat('main.js', {
       newLine: ';'
