@@ -1,62 +1,66 @@
 /********************MIXINS*********************/
 
 @mixin m {
-  @media (min-width: #{ $max-width + 5 + 'em' }) {
+  @media (min-width: 767px) {
     @content;
   }
 }
 
 // Line-height
 @mixin line-height($number) {
-  line-height: #{ $number * $leading-rem + 'rem'};
+  line-height: #{$number * $leading-rem + "rem"};
 }
 
 // Margin-top
 @mixin margin-top($number) {
-  margin-top: #{ $number * $leading-rem + 'rem'};
+  margin-top: #{$number * $leading-rem + "rem"};
 }
 
 // Margin-bottom
 @mixin margin-bottom($number) {
-  margin-bottom: #{ $number * $leading-rem + 'rem'};
+  margin-bottom: #{$number * $leading-rem + "rem"};
 }
 
 // Margin
-@mixin margin($top, $right, $bottom:null, $left:null) {
+@mixin margin($top, $right, $bottom: null, $left: null) {
   @if $left == null and $bottom == null {
-    margin: #{ $top * $leading-rem + 'rem'} #{ $right * $leading-rem + 'rem'};
-  } @else if $left == null or $left == $right {
-    margin: #{ $top * $leading-rem + 'rem'} #{ $right * $leading-rem + 'rem'} #{ $bottom * $leading-rem + 'rem'};
-  } @else {
-    margin: #{ $top * $leading-rem + 'rem'} #{ $right * $leading-rem + 'rem'} #{ $bottom * $leading-rem + 'rem'} #{ $left * $leading-rem + 'rem'};
+    margin: #{$top * $leading-rem + "rem"} #{$right * $leading-rem + "rem"};
+  }
+  @else if $left == null or $left == $right {
+    margin: #{$top * $leading-rem + "rem"} #{$right * $leading-rem + "rem"} #{$bottom * $leading-rem + "rem"};
+  }
+  @else {
+    margin: #{$top * $leading-rem + "rem"} #{$right * $leading-rem + "rem"} #{$bottom * $leading-rem + "rem"} #{$left * $leading-rem + "rem"};
   }
 }
 
 // padding
-@mixin padding($top, $right, $bottom:null, $left:null) {
+@mixin padding($top, $right, $bottom: null, $left: null) {
   @if $left == null and $bottom == null {
-    padding: #{ $top * $leading-rem + 'rem'} #{ $right * $leading-rem + 'rem'};
-  } @else if $left == null or $left == $right {
-    padding: #{ $top * $leading-rem + 'rem'} #{ $right * $leading-rem + 'rem'} #{ $bottom * $leading-rem + 'rem'};
-  } @else {
-    padding: #{ $top * $leading-rem + 'rem'} #{ $right * $leading-rem + 'rem'} #{ $bottom * $leading-rem + 'rem'} #{ $left * $leading-rem + 'rem'};
+    padding: #{$top * $leading-rem + "rem"} #{$right * $leading-rem + "rem"};
+  }
+  @else if $left == null or $left == $right {
+    padding: #{$top * $leading-rem + "rem"} #{$right * $leading-rem + "rem"} #{$bottom * $leading-rem + "rem"};
+  }
+  @else {
+    padding: #{$top * $leading-rem + "rem"} #{$right * $leading-rem + "rem"} #{$bottom * $leading-rem + "rem"} #{$left * $leading-rem + "rem"};
   }
 }
 
 @mixin padding-equal($number) {
-  padding: #{ $number * $leading-rem + 'rem'};
+  padding: #{$number * $leading-rem + "rem"};
 }
 
 /* CSS Horizontal Centering */
 @mixin halign {
-  position: relative;
+  position: absolute;
   left: 50%;
   transform: translateX(-50%);
 }
 
 /* CSS Vertical Centering */
 @mixin valign {
-  position: relative;
+  position: absolute;
   top: 50%;
   transform: translateY(-50%);
   margin-top: 0;
@@ -65,7 +69,7 @@
 
 /* CSS Horizontal & Vertical Centering */
 @mixin hvalign {
-  position: relative;
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -73,16 +77,12 @@
   margin-bottom: 0;
 }
 
-/* Ionicons */
+/* Font Awesome */
 @mixin icons {
-  font-family: 'Ionicons';
-  speak: none;
-  font-style: normal;
-  font-weight: normal;
-  font-variant: normal;
-  text-transform: none;
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
   text-rendering: auto;
-  line-height: 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

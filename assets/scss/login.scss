@@ -1,6 +1,5 @@
-@import "../core/scss/default-variables";
-@import "config/mixins";
 @import "config/variables";
+@import "config/mixins";
 @import "config/global";
 
 body.login {
@@ -37,8 +36,11 @@ body.login {
           }
         }
       }
+
       input {}
+
       input#user_login {}
+
       input#user_pass {}
     }
 

@@ -34,22 +34,23 @@ html {
 }
 
 body {
-  background-color: $white;
+  background-color: $body-bg-color;
   overflow-x: hidden;
 }
 
 /* Links */
 a, .a {
-  color: $olive;
+  color: $link-color;
   text-decoration: none;
 
   &:link, &:active, &:visited {
-    color: $olive;
+    color: $link-color;
     text-decoration: none;
     outline: none;
   }
 
   &:hover, &:focus {
+    color: $link-color-hover;
     text-decoration: underline;
   }
 }
@@ -64,7 +65,7 @@ button, .button, a.acf-button, input[type="button"], input[type="reset"], input[
   line-height: normal;
   font-size: 1rem;
   cursor: pointer;
-  background-color: $olive;
+  background-color: $btn-color;
   color: $white;
   padding: 0.5rem 1rem;
   font-family: $font-headings;
@@ -74,29 +75,29 @@ button, .button, a.acf-button, input[type="button"], input[type="reset"], input[
   transition-timing-function: ease-in-out;
 
   &:link, &:active, &:visited {
-    background-color: $olive;
+    background-color: $btn-color;
     color: $white;
     line-height: normal;
     outline: none;
   }
 
   &:hover, &:focus {
-    background-color: darken($olive, 5%);
+    background-color: $btn-color-hover;
     text-decoration: none;
   }
 
   /* Example alternate button color */
-  &.black {
-    background-color: $black;
+  &.alt {
+    background-color: $btn-color-alt;
     color: $white;
 
     &:link, &:active, &:visited {
-      background-color: $black;
+      background-color: $btn-color-alt;
       color: $white;
     }
 
     &:hover, &:focus {
-      background-color: lighten($black, 8%);
+      background-color: $btn-color-alt-hover;
     }
   }
 }
@@ -104,7 +105,7 @@ button, .button, a.acf-button, input[type="button"], input[type="reset"], input[
 a.acf-button {
   &.blue {
     &:hover, &:focus {
-      background-color: darken($olive, 5%);
+      background-color: $btn-color-hover;
     }
   }
 }
@@ -126,15 +127,8 @@ figure.alignright {
 
     max-width: #{0.5 * $max-width + 'rem'};
 
-    @if $paragraph-indent == true {
-      @include padding-equal(1);
-      @include margin-bottom(0);
-    } @else {
-      @include padding(0, 1);
-    }
-
+    @include padding(0, 1);
   }
-
 }
 
 blockquote {
@@ -191,38 +185,9 @@ ul, ol {
   }
 }
 
-@if $paragraph-indent == true {
-
-  p + p {
-    @include margin-top(-1);
-    text-indent: #{ $leading-rem + 'rem'};
-
-    .alignleft + p,
-    .alignright + p {
-
-      @include m {
-        $leading-rem: $leading-rem-desktop;
-        text-indent: #{ $leading-rem + 'rem'};
-      }
-
-    }
-  }
-}
-
 @include m {
   $leading-rem: $leading-rem-desktop;
   @import 'mixins';
-
-  @if $paragraph-indent == true {
-
-    p + p,
-    .alignleft + p,
-    .alignright + p {
-      @include margin-top(-1);
-    }
-
-  }
-
 }
 
 // Fix letter spacing for uppercase
@@ -497,16 +462,16 @@ iframe, object, embed {
   display: block;
   padding: 0.25rem 1.75rem 0.25rem 0.5rem;
   margin: 1.5rem auto 0;
-  color: $olive;
+  color: $toggle-color;
   cursor: pointer;
-  border: 1px solid $olive;
+  border: 1px solid $toggle-color;
   position: relative;
 
   &:after {
     @include icons;
 
-    content: "\f3d0";
-    color: $olive;
+    content: "\f078";
+    color: $toggle-color;
     position: absolute;
     display: block;
     bottom: 0.2rem;
@@ -516,7 +481,7 @@ iframe, object, embed {
 
   &.active {
     &:after {
-      content: "\f3d8";
+      content: "\f077";
     }
   }
 }
@@ -607,6 +572,46 @@ br {
 .hpad {
   padding-left: 1rem;
   padding-right: 1rem;
+}
+
+.vpad {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.hpad-2x {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.vpad-2x {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.hpad-3x {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.vpad-3x {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.pad {
+  @extend .hpad;
+  @extend .vpad;
+}
+
+.pad-2x {
+  @extend .hpad-2x;
+  @extend .vpad-2x;
+}
+
+.pad-3x {
+  @extend .hpad-3x;
+  @extend .vpad-3x;
 }
 
 .left {

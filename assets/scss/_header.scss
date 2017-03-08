@@ -6,11 +6,13 @@
  */
 
 #header {
-  background-color: $olive;
+  background-color: $header-color;
+
   .logo {
     display: block;
     float: left;
     margin: 11px auto;
+
     img {
       width: 245px;
       height: 58px;
@@ -19,8 +21,8 @@
 }
 
 /* Adds dropdown support, gives a good example of nesting
- * with SCSS. The classes are specific to the tweek
- * Theme for WordPress. If you are not using tweek, you
+ * with SCSS. The classes are specific to the Tweek
+ * Theme for WordPress. If you are not using Tweek, you
  * can simply get rid of them.
  */
 
@@ -35,34 +37,42 @@ nav {
     left: 0;
     margin: 0;
     padding: 0;
+
     @extend .clearfix;
+
     li {
       display: block;
       text-align: center;
+
       a {
-        background-color: $olive;
+        background-color: $header-color;
         color: $white;
         display: block;
         padding: 0.5rem 1rem;
         transition: background-color 0.25s ease-in-out 0s;
+
         &:link, &:active, &:visited {
-          background-color: $olive;
+          background-color: $header-color;
           color: $white;
         }
+
         &:hover, &:focus {
-          background-color: darken($olive, 5%);
+          background-color: darken($header-color, 5%);
           text-decoration: none;
         }
       }
+
       &.current_page_item {
         a {
-          background-color: darken($olive, 5%);
+          background-color: darken($header-color, 5%);
+
           &:link, &:active, &:visited {
-            background-color: darken($olive, 5%);
+            background-color: darken($header-color, 5%);
           }
         }
       }
     }
+
     ul.sub-menu {
       display: none;
     }
@@ -76,37 +86,47 @@ nav {
     top: 0;
     float: right;
     display: block !important;
+
     li {
       float: left;
+
       a {
         padding: 24px 1rem;
+
         &:link, &:active, &:visited {}
+
         &:hover, &:focus {}
       }
     }
+
     ul.sub-menu {
-      background-color: $olive;
+      background-color: $header-color;
       padding: 0;
       position: absolute;
       top: 100%;
+
       li {
         float: none;
         position: relative;
         text-align: left;
+
         a {
           padding: 0.5rem 1rem;
-          background-color: $olive;
+          background-color: $header-color;
           color: $white;
+
           &:link, &:active, &:visited {
-            background-color: $olive;
+            background-color: $header-color;
             color: $white;
           }
+
           &:hover, &:focus {
-            background-color: darken($olive, 5%);
+            background-color: darken($header-color, 5%);
             text-decoration: none;
           }
         }
       }
+
       ul {
         position: absolute;
         left: 100%;
@@ -114,6 +134,7 @@ nav {
       }
     }
   }
+
   nav ul.main-nav li:hover > ul.sub-menu {
     display: block;
   }
@@ -124,18 +145,25 @@ nav {
   top: 1.2rem;
   right: 1rem;
   font-size: 2rem;
+
   @include m {
     top: 1rem;
   }
+
+
   @media (min-width: 767px) {
     display: none;
   }
+
   color: $white;
   cursor: pointer;
+
   i {
     vertical-align: middle;
   }
+
   transition: transform 0.25s ease-in-out 0s;
+
   &.active {
     transform: rotate(-90deg);
   }

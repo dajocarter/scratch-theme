@@ -2,14 +2,12 @@
  * FOUNDATION
  * Do not change the order of these imports.
  */
-
-@import 'ionicons';
-@import "../core/scss/default-variables";
+@import "font-awesome";
 @import "config/mixins";
 @import "config/variables";
 @import "config/color-classes";
-@import 'normalize';
-@import "../core/scss/main";
+@import "normalize";
+@import "config/core";
 @import "config/grid-always";
 
 @media (min-width: 767px) {
@@ -18,10 +16,11 @@
 
 @import "config/global";
 
-@import 'slick.scss';
-@import 'slick-theme.scss';
-@import 'config/slick';
-@import 'magnific-popup';
+$slick-font-path: "../fonts/";
+
+@import "slick.scss";
+@import "slick-theme.scss";
+@import "magnific-popup";
 
 /*
  * MIDDLE STUFF
