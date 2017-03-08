@@ -7,6 +7,9 @@
 
 #header {
   background-color: $header-color;
+  position: fixed;
+  width: 100%;
+  z-index: 10;
 
   .logo {
     display: block;

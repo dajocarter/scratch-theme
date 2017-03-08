@@ -46,6 +46,8 @@ gulp.task('js', function() {
     'node_modules/magnific-popup/dist/jquery.magnific-popup.js',
     'node_modules/velocity-animate/velocity.js',
     'node_modules/waypoints/lib/jquery.waypoints.js',
+    'node_modules/headroom.js/dist/headroom.js',
+    'node_modules/headroom.js/dist/jQuery.headroom.js',
     'assets/js/plugins.js',
     'assets/js/acf-google-maps.js',
     'assets/js/main.js'
@@ -71,7 +73,8 @@ gulp.task('sass', function() {
         'node_modules/slick-carousel/slick/',
         'node_modules/font-awesome/scss',
         'node_modules/magnific-popup/dist/',
-        'node_modules/normalize.css/'
+        'node_modules/normalize.css/',
+        'node_modules/animate-sass/'
       ],
       outputStyle: 'compressed'
     }).on('error', $.sass.logError))

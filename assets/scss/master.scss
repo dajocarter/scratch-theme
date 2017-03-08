@@ -22,6 +22,10 @@ $slick-font-path: "../fonts/";
 @import "slick-theme.scss";
 @import "magnific-popup";
 
+$use-all: true; // Enable animations by overriding variables from node_modules/animate-sass/helpers/settings
+
+@import "animate";
+
 /*
  * MIDDLE STUFF
  * You're free to rearrange these how you like.

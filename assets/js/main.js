@@ -1,4 +1,11 @@
 jQuery(document).ready(function($) {
+  $('#header').headroom({
+    "classes": {
+      "initial": "animated",
+      "pinned": "slideInDown",
+      "unpinned": "slideOutUp"
+    }
+  });
   $('.slick').slick({
     autoplay: false,
     dots: true,
