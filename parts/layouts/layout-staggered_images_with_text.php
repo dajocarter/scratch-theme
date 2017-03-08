@@ -9,6 +9,16 @@
       <div class="wrap pad clearfix">
 
         <div class="fivecol first">
+          <?php if(get_sub_field('add_button')): ?>
+
+            <?php if(get_sub_field('internal_link')): ?>
+              <a href="<?php the_sub_field('button_internal_link'); ?>">
+            <?php else : ?>
+              <a target="_blank" href="<?php the_sub_field('button_external_link'); ?>">
+            <?php endif; ?>
+
+          <?php endif; ?>
+
           <?php if($icon_or_image === 'icon'): ?>
 
             <?php if(get_sub_field('icon')): ?>
@@ -26,13 +36,33 @@
             <?php endif; ?>
 
           <?php endif; ?>
+
+          <?php if(get_sub_field('add_button')): ?>
+            </a>
+          <?php endif; ?>
         </div>
 
         <div class="sevencol last">
           <div class="content valign">
 
             <?php if(get_sub_field('header')): ?>
-              <h3><?php the_sub_field('header'); ?></h3>
+              <h3>
+                <?php if(get_sub_field('add_button')): ?>
+
+                  <?php if(get_sub_field('internal_link')): ?>
+                    <a href="<?php the_sub_field('button_internal_link'); ?>">
+                  <?php else : ?>
+                    <a target="_blank" href="<?php the_sub_field('button_external_link'); ?>">
+                  <?php endif; ?>
+
+                <?php endif; ?>
+
+                  <?php the_sub_field('header'); ?>
+
+                <?php if(get_sub_field('add_button')): ?>
+                  </a>
+                <?php endif; ?>
+              </h3>
             <?php endif; ?>
 
             <?php the_sub_field('blurb'); ?>

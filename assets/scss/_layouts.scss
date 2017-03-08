@@ -125,6 +125,30 @@
       background-color: $gray;
     }
 
+    a {
+      &:hover, &:focus {
+        text-decoration: none;
+
+        .circle {
+          background-color: $btn-color-hover;
+
+          &.tweek-bg {
+            background-color: transparent;
+            opacity: 0.8;
+          }
+        }
+
+        i {
+          color: $staggered-icon-color;
+          font-size: $staggered-icon-size;
+        }
+      }
+    }
+
+    p.button-wrapper {
+      clear: both;
+    }
+
     @include m {
       height: $staggered-row-height;
 
