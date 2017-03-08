@@ -36,7 +36,7 @@
     <?php endif; ?>
 
     <?php
-      $columns = get_sub_field('use_custom_columns') ? 'custom' : 4;
+      $columns = get_sub_field('use_custom_columns') ? 'custom' : 3;
       tweek_layout_declare(get_sub_field('columns'), $columns);
 
       while(has_sub_field('columns')):
