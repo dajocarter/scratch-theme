@@ -37,42 +37,42 @@ get_template_part('parts/header'); ?>
   <section class="clearfix">
     <h2 class="center">Colors</h2>
     <div class="threecol first tweek-bg black-bg">
-      <div class="white center valign-always">Black</div>
+      <div class="white center hvalign">Black</div>
     </div>
     <div class="threecol tweek-bg red-bg">
-      <div class="white center valign-always">Red</div>
+      <div class="white center hvalign">Red</div>
     </div>
     <div class="threecol tweek-bg orange-bg">
-      <div class="white center valign-always">Orange</div>
+      <div class="white center hvalign">Orange</div>
     </div>
     <div class="threecol last tweek-bg yellow-bg">
-      <div class="center valign-always">Yellow</div>
+      <div class="center hvalign">Yellow</div>
     </div>
   </section>
   <section class="clearfix">
     <div class="threecol first tweek-bg green-bg">
-      <div class="white center valign-always">Green</div>
+      <div class="white center hvalign">Green</div>
     </div>
     <div class="threecol tweek-bg blue-bg">
-      <div class="white center valign-always">Blue</div>
+      <div class="white center hvalign">Blue</div>
     </div>
     <div class="threecol tweek-bg purple-bg">
-      <div class="white center valign-always">Purple</div>
+      <div class="white center hvalign">Purple</div>
     </div>
     <div class="threecol last tweek-bg gray-bg">
-      <div class="center valign-always">Gray</div>
+      <div class="center hvalign">Gray</div>
     </div>
   </section>
 
   <section class="clearfix">
     <h2 class="center">Links</h2>
     <div class="sixcol first tweek-bg gray-bg">
-      <div class="center valign-always"><a href="">Normal</a></div>
+      <div class="center hvalign"><a href="">Normal</a></div>
     </div>
     <div class="sixcol last tweek-bg gray-bg">
-      <div class="center valign-always">
+      <div class="center hvalign">
         <a href="" class="button">Button</a><br><br>
-        <a href="" class="button black">Button</a>
+        <a href="" class="button alt">Button</a>
       </div>
     </div>
   </section>
