@@ -5,7 +5,7 @@
 
     <?php $icon_or_image = get_sub_field('icon_or_image') ? 'image' : 'icon'; ?>
 
-    <div class="row">
+    <div class="hpad row">
       <div class="wrap pad clearfix">
 
         <div class="fivecol first">
