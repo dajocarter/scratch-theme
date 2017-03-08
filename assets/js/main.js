@@ -3,8 +3,8 @@ jQuery(document).ready(function($) {
     autoplay: false,
     dots: true,
     arrows: true,
-    prevArrow: '<button type="button" data-role="none" class="slick-prev" aria-label="Previous" role="button"><i class="icon ion-ios-arrow-back"></i></button>',
-    nextArrow: '<button type="button" data-role="none" class="slick-next" aria-label="Next" role="button"><i class="icon ion-ios-arrow-forward"></i></button>'
+    prevArrow: '<button type="button" data-role="none" class="slick-prev" aria-label="Previous" role="button"><i class="fa fa-chevron-left"></i></button>',
+    nextArrow: '<button type="button" data-role="none" class="slick-next" aria-label="Next" role="button"><i class="fa fa-chevron-right"></i></button>'
   });
   $('.nav-toggle').click(function() {
     if ($(this).data('direction') === 'down') {

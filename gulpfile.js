@@ -1,5 +1,6 @@
 var gulp = require('gulp'),
   $ = require('gulp-load-plugins')(),
+  merge = require('merge-stream'),
   browserSync = require('browser-sync').create();
 
 var AUTOPREFIXER_BROWSERS = [
@@ -20,8 +21,23 @@ gulp.task('img', function() {
     })
     .pipe($.newer('../../uploads'))
     .pipe($.imagemin())
-    .pipe(gulp.dest('../../uploads'))
+    .pipe(gulp.dest('../uploads'))
     .pipe(browserSync.stream());
+});
+
+gulp.task('assets', function() {
+  var css = gulp.src([
+      'node_modules/slick-carousel/slick/ajax-loader.gif'
+    ])
+    .pipe(gulp.dest('assets/css'));
+
+  var fonts = gulp.src([
+      'node_modules/slick-carousel/slick/fonts/*',
+      'node_modules/font-awesome/fonts/*'
+    ])
+    .pipe(gulp.dest('assets/fonts'));
+
+  return merge(css, fonts);
 });
 
 gulp.task('js', function() {
@@ -37,32 +53,11 @@ gulp.task('js', function() {
     .pipe($.concat('main.js', {
       newLine: ';'
     }))
-    .pipe(gulp.dest('assets/js/concat/'))
+    .pipe(gulp.dest('assets/js/concat'))
     .pipe($.uglify(false))
     .pipe($.rename('main.min.js'))
     .pipe(gulp.dest('assets/js/compiled'))
     .pipe(browserSync.stream());
-});
-
-gulp.task('css', function() {
-  return gulp.src([
-      'node_modules/slick-carousel/slick/ajax-loader.gif'
-    ])
-    .pipe(gulp.dest('assets/css'));
-});
-
-gulp.task('fonts', function() {
-  return gulp.src([
-      'node_modules/slick-carousel/slick/fonts/*'
-    ])
-    .pipe(gulp.dest('assets/css/fonts/'));
-});
-
-gulp.task('ionicons', function() {
-  return gulp.src([
-      'node_modules/ionicons/dist/fonts/*'
-    ])
-    .pipe(gulp.dest('assets/fonts/'));
 });
 
 gulp.task('sass', function() {
@@ -74,7 +69,7 @@ gulp.task('sass', function() {
     .pipe($.sass({
       includePaths: [
         'node_modules/slick-carousel/slick/',
-        'node_modules/ionicons/dist/scss/',
+        'node_modules/font-awesome/scss',
         'node_modules/magnific-popup/dist/',
         'node_modules/normalize.css/'
       ],
