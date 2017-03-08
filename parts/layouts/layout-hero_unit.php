@@ -39,17 +39,36 @@ if(!function_exists('tweek_bg_position')) {
       <div class="wrap <?php echo $text_align_class; ?> hpad clearfix white">
         <div class="content"
              style="margin: <?php the_sub_field('text_margin'); ?>em auto;">
+
           <?php if(get_sub_field('header')): ?>
             <h2><?php the_sub_field('header'); ?></h2>
           <?php endif; ?>
+
           <?php the_sub_field('blurb'); ?>
-          <?php if(get_sub_field('cta_link') && get_sub_field('cta_text')): ?>
+
+          <?php if(get_sub_field('add_button')): ?>
             <p>
+
+              <?php if (get_sub_field('internal_link')) : ?>
+
               <a class="button"
-                 href="<?php the_sub_field('cta_link'); ?>"
-                 title="<?php the_sub_field('cta_text'); ?>">
-                <?php the_sub_field('cta_text'); ?>
+                 href="<?php the_sub_field('button_internal_link'); ?>"
+                 title="<?php the_sub_field('button_text'); ?>">
+                <?php the_sub_field('button_text'); ?>
+
               </a>
+
+              <?php else : ?>
+
+              <a class="button"
+                 target="_blank"
+                 href="<?php the_sub_field('button_external_link'); ?>"
+                 title="<?php the_sub_field('button_text'); ?>">
+                <?php the_sub_field('button_text'); ?>
+              </a>
+
+              <?php endif; ?>
+
             </p>
           <?php endif; ?>
         </div>

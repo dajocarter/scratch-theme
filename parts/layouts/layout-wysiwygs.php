@@ -2,9 +2,11 @@
 <section id="tweek-layout-<?php echo $layout_count; ?>-id-<?php the_ID(); ?>"
          class="wysiwygs">
   <div class="wrap hpad clearfix">
+
     <?php if(get_sub_field('header')): ?>
       <h2><?php the_sub_field('header'); ?></h2>
     <?php endif; ?>
+
     <?php
     if(get_sub_field('offset') !== 'Flexible') {
         $flex = false;
@@ -17,12 +19,15 @@
         $flex = true;
         $offset = null;
       }
+
       tweek_layout_declare(get_sub_field('wysiwygs'), 2, $flex, $offset);
+
       while(has_sub_field('wysiwygs')) {
         tweek_layout_start();
           the_sub_field('wysiwyg');
         tweek_layout_end();
       }
+
     ?>
   </div>
 </section>
