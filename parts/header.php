@@ -24,7 +24,7 @@
 
     <span class="nav-toggle"
           data-direction="down">
-      <i class="icon ion-ios-menu"></i>
+      <i class="fa fa-bars"></i>
     </span>
 
     <nav id="nav">
