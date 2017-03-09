@@ -1,7 +1,5 @@
 # Tweek Theme for WordPress + ACF
 
-[ ![Codeship Status for dajocarter/tweek-theme](https://codeship.com/projects/e3e8c2e0-9db0-0132-4699-4ef4301ddd41/status?branch=master)](https://codeship.com/projects/64584)
-
 Powerful automated workflow for WordPress + [Advanced Custom Fields](http://advancedcustomfields.com) developers.
 
 - [Download](https://github.com/dajocarter/tweek-theme/archive/master.zip)
@@ -28,8 +26,17 @@ Powerful automated workflow for WordPress + [Advanced Custom Fields](http://adva
 
 ![WordPress Image Optimization](http://tweektheme.com/assets/img/image-optimization.gif)
 
+### Comes generously [pre-packaged](https://github.com/dajocarter/tweek-theme/blob/master/package.json) with 3rd-party front end development vendors
+
+* [Animate Sass](https://github.com/tgdev/animate-sass) for a Sassy version of animations
+* [Font Awesome](https://github.com/FortAwesome/Font-Awesome) for fonts
+* [Headroom](https://github.com/WickyNilliams/headroom.js) for hiding and revealing the header
+* [Magnific Popup](https://github.com/dimsemenov/Magnific-Popup) for modals
+* [Slick](https://github.com/kenwheeler/slick) for sliders/carousels
+* [Velocity](https://github.com/julianshapiro/velocity) for JS animations
+* [Waypoints](https://github.com/imakewebthings/waypoints) for scroll-based JS
+
 ---
 
 - Homepage: [http://tweektheme.com](http://tweektheme.com)
-- HTML5 Boilerplate Docs: [https://github.com/h5bp/html5-boilerplate/blob/master/dist/doc/TOC.md](https://github.com/h5bp/html5-boilerplate/blob/master/dist/doc/TOC.md)
 - Changelog: [https://github.com/dajocarter/tweek-theme/releases](https://github.com/dajocarter/tweek-theme/releases)
