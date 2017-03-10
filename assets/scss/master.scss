@@ -8,8 +8,11 @@
 @import "font-awesome";
 @import "config/mixins/bourbon";
 @import "config/mixins/tweek";
-@import "config/variables";
-@import "config/color-classes";
+@import "config/variables/calculations";
+@import "config/variables/colors";
+@import "config/variables/fonts";
+@import "config/variables/layouts";
+@import "config/variables/timing-functions";
 @import "normalize";
 @import "config/core";
 @import "config/grid-always";
