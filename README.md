@@ -28,6 +28,7 @@ Powerful automated workflow for WordPress + [Advanced Custom Fields](http://adva
 
 ### Comes generously [pre-packaged](https://github.com/dajocarter/tweek-theme/blob/master/package.json) with 3rd-party front end development vendors
 
+* [Neat](https://github.com/thoughtbot/neat) for a Sass-based grid framework
 * [Animate Sass](https://github.com/tgdev/animate-sass) for a Sassy version of animations
 * [Font Awesome](https://github.com/FortAwesome/Font-Awesome) for fonts
 * [Headroom](https://github.com/WickyNilliams/headroom.js) for hiding and revealing the header
@@ -35,6 +36,8 @@ Powerful automated workflow for WordPress + [Advanced Custom Fields](http://adva
 * [Slick](https://github.com/kenwheeler/slick) for sliders/carousels
 * [Velocity](https://github.com/julianshapiro/velocity) for JS animations
 * [Waypoints](https://github.com/imakewebthings/waypoints) for scroll-based JS
+* [Family.scss](https://github.com/LukyVj/family.scss) for `:nth-child` mixins
+* [Include-Media](https://github.com/eduardoboucas/include-media) for more natural media queries
 
 ---
 

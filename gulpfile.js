@@ -74,7 +74,10 @@ gulp.task('sass', function() {
         'node_modules/font-awesome/scss',
         'node_modules/magnific-popup/dist/',
         'node_modules/normalize.css/',
-        'node_modules/animate-sass/'
+        'node_modules/animate-sass/',
+        'node_modules/bourbon-neat/core/',
+        'node_modules/family.scss/source/src/',
+        'node_modules/include-media/dist/'
       ],
       outputStyle: 'compressed'
     }).on('error', $.sass.logError))
