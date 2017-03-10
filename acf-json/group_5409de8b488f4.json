@@ -2683,6 +2683,113 @@
                     "max": ""
                 },
                 {
+                    "key": "58c2d1139ad7b",
+                    "name": "toggles",
+                    "label": "Toggles",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_58c2d1a1cb08b",
+                            "label": "Header",
+                            "name": "header",
+                            "type": "text",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": "",
+                            "maxlength": ""
+                        },
+                        {
+                            "key": "field_58c2d1aacb08c",
+                            "label": "Blurb",
+                            "name": "blurb",
+                            "type": "wysiwyg",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "tabs": "all",
+                            "toolbar": "full",
+                            "media_upload": 1,
+                            "delay": 0
+                        },
+                        {
+                            "key": "field_58c2d1199ad7c",
+                            "label": "Toggles",
+                            "name": "toggles",
+                            "type": "repeater",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "collapsed": "",
+                            "min": 0,
+                            "max": 0,
+                            "layout": "table",
+                            "button_label": "Add Toggle",
+                            "sub_fields": [
+                                {
+                                    "key": "field_58c2d1319ad7d",
+                                    "label": "Toggle Header",
+                                    "name": "toggle_header",
+                                    "type": "text",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": "",
+                                    "maxlength": ""
+                                },
+                                {
+                                    "key": "field_58c2d13a9ad7e",
+                                    "label": "Toggle Content",
+                                    "name": "toggle_content",
+                                    "type": "wysiwyg",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "tabs": "all",
+                                    "toolbar": "full",
+                                    "media_upload": 1,
+                                    "delay": 0
+                                }
+                            ]
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                {
                     "key": "5412c2812a2f5",
                     "name": "wysiwygs",
                     "label": "WYSIWYGs",
@@ -2812,5 +2919,5 @@
     ],
     "active": 1,
     "description": "",
-    "modified": 1488554762
+    "modified": 1489162680
 }

@@ -24,6 +24,12 @@ if( have_rows('layout') ) {
       <?php get_template_part( 'parts/layouts/layout', 'slider' ); ?>
 
     <?php
+    } elseif( get_row_layout() === 'toggles' ) {
+    ?>
+
+      <?php get_template_part( 'parts/layouts/layout', 'toggles' ); ?>
+
+    <?php
     } elseif( get_row_layout() === 'wysiwygs' ) {
     ?>
 
