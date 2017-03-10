@@ -2,18 +2,16 @@
  * FOUNDATION
  * Do not change the order of these imports.
  */
-@import "neat";
-@import "family";
-@import "include-media";
-@import "font-awesome";
+@import "normalize";
 @import "config/mixins/bourbon";
 @import "config/mixins/tweek";
+@import "config/bitters/base";
 @import "config/variables/calculations";
 @import "config/variables/colors";
 @import "config/variables/fonts";
 @import "config/variables/layouts";
 @import "config/variables/timing-functions";
-@import "normalize";
+@import "neat";
 @import "config/core";
 @import "config/grid-always";
 
@@ -22,6 +20,10 @@
 }
 
 @import "config/global";
+
+@import "family";
+@import "include-media";
+@import "font-awesome";
 
 $slick-font-path: "../fonts/";
 
