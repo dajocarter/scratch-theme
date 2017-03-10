@@ -6,7 +6,8 @@
 @import "family";
 @import "include-media";
 @import "font-awesome";
-@import "config/mixins";
+@import "config/mixins/bourbon";
+@import "config/mixins/tweek";
 @import "config/variables";
 @import "config/color-classes";
 @import "normalize";

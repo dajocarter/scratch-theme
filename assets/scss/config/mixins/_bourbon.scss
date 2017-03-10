@@ -1,0 +1,180 @@
+/* Font-Face Mixin
+   ========================================================================== */
+@function font-source-declaration($font-family, $file-path, $file-formats) {
+  $src: ();
+
+  $formats-map: (eot: "#{$file-path}.eot?#iefix" format("embedded-opentype"), woff2: "#{$file-path}.woff2" format("woff2"), woff: "#{$file-path}.woff" format("woff"), ttf: "#{$file-path}.ttf" format("truetype"), svg: "#{$file-path}.svg##{$font-family}" format("svg"));
+
+  @each $key, $values in $formats-map {
+    @if contains($file-formats, $key) {
+      $file-path: nth($values, 1);
+      $font-format: nth($values, 2);
+
+      $src: append($src, url($file-path) $font-format, comma);
+    }
+  }
+
+  @return $src;
+}
+
+@mixin font-face($font-family, $file-path, $weight: normal, $style: normal, $file-formats: eot woff2 woff ttf svg) {
+  @font-face {
+    font-family: $font-family;
+    font-style: $style;
+    font-weight: $weight;
+    src: font-source-declaration($font-family, $file-path, $file-formats);
+  }
+}
+
+/* Size Mixin
+   ========================================================================== */
+
+@function is-length($value) {
+  @return type-of($value) != "null" and (str-slice($value + "", 1, 4) == "calc" or index(auto inherit initial 0, $value) or type-of($value) == "number" and not unitless($value));
+}
+
+@function is-size($value) {
+  @return is-length($value) or contains("fill" "fit-content" "min-content" "max-content", $value);
+}
+
+@mixin size($value) {
+  $width: nth($value, 1);
+  $height: $width;
+
+  @if length($value) > 1 {
+    $height: nth($value, 2);
+  }
+
+  @if is-size($height) {
+    height: $height;
+  }
+  @else {
+    @warn "`#{$height}` is not a valid length for the `$height` parameter in the `size` mixin.";
+  }
+
+  @if is-size($width) {
+    width: $width;
+  }
+  @else {
+    @warn "`#{$width}` is not a valid length for the `$width` parameter in the `size` mixin.";
+  }
+}
+
+/* Clearfix Mixin
+   ========================================================================== */
+
+@mixin clearfix {
+  &::after {
+    clear: both;
+    content: "";
+    display: table;
+  }
+}
+
+/* Triangle Mixin
+   ========================================================================== */
+
+@mixin triangle($size, $color, $direction) {
+  $width: nth($size, 1);
+  $height: nth($size, length($size));
+  $foreground-color: nth($color, 1);
+  $background-color: if(length($color) == 2, nth($color, 2), transparent);
+
+  height: 0;
+  width: 0;
+
+  @if $direction == up or $direction == down or $direction == right or $direction == left {
+    $width: $width / 2;
+    $height: if(length($size) > 1, $height, $height / 2);
+
+    @if $direction == up {
+      border-bottom: $height solid $foreground-color;
+      border-left: $width solid $background-color;
+      border-right: $width solid $background-color;
+    }
+    @else if $direction == right {
+      border-bottom: $width solid $background-color;
+      border-left: $height solid $foreground-color;
+      border-top: $width solid $background-color;
+    }
+    @else if $direction == down {
+      border-left: $width solid $background-color;
+      border-right: $width solid $background-color;
+      border-top: $height solid $foreground-color;
+    }
+    @else if $direction == left {
+      border-bottom: $width solid $background-color;
+      border-right: $height solid $foreground-color;
+      border-top: $width solid $background-color;
+    }
+  }
+  @else if $direction == up-right or $direction == up-left {
+    border-top: $height solid $foreground-color;
+
+    @if $direction == up-right {
+      border-left: $width solid $background-color;
+    }
+    @else if $direction == up-left {
+      border-right: $width solid $background-color;
+    }
+  }
+  @else if $direction == down-right or $direction == down-left {
+    border-bottom: $height solid $foreground-color;
+
+    @if $direction == down-right {
+      border-left: $width solid $background-color;
+    }
+    @else if $direction == down-left {
+      border-right: $width solid $background-color;
+    }
+  }
+  @else if $direction == inset-up {
+    border-color: $background-color $background-color $foreground-color;
+    border-style: solid;
+    border-width: $height $width;
+  }
+  @else if $direction == inset-down {
+    border-color: $foreground-color $background-color $background-color;
+    border-style: solid;
+    border-width: $height $width;
+  }
+  @else if $direction == inset-right {
+    border-color: $background-color $background-color $background-color $foreground-color;
+    border-style: solid;
+    border-width: $width $height;
+  }
+  @else if $direction == inset-left {
+    border-color: $background-color $foreground-color $background-color $background-color;
+    border-style: solid;
+    border-width: $width $height;
+  }
+}
+
+/* Button and Input Variables
+   ========================================================================== */
+
+@function assign-inputs($inputs, $pseudo: null) {
+  $list: ();
+
+  @each $input in $inputs {
+    $input: unquote($input);
+    $input: if($pseudo, $input + ":" + $pseudo, $input);
+    $list: append($list, $input, comma);
+  }
+
+  @return $list;
+}
+
+$buttons-list: "button", 'input[type="button"]', 'input[type="reset"]', 'input[type="submit"]';
+
+$all-buttons: assign-inputs($buttons-list);
+$all-buttons-active: assign-inputs($buttons-list, active);
+$all-buttons-focus: assign-inputs($buttons-list, focus);
+$all-buttons-hover: assign-inputs($buttons-list, hover);
+
+$text-inputs-list: 'input[type="color"]', 'input[type="date"]', 'input[type="datetime"]', 'input[type="datetime-local"]', 'input[type="email"]', 'input[type="month"]', 'input[type="number"]', 'input[type="password"]', 'input[type="search"]', 'input[type="tel"]', 'input[type="text"]', 'input[type="time"]', 'input[type="url"]', 'input[type="week"]', "input:not([type])", "textarea";
+
+$all-text-inputs: assign-inputs($text-inputs-list);
+$all-text-inputs-active: assign-inputs($text-inputs-list, active);
+$all-text-inputs-focus: assign-inputs($text-inputs-list, focus);
+$all-text-inputs-hover: assign-inputs($text-inputs-list, hover);
