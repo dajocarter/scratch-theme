@@ -1,5 +1,5 @@
 /********************HEADER********************/
-$header-color: $olive;
+$header-color: $action-font-color;
 
 /*
  * This file should house all of the styles for
@@ -15,7 +15,7 @@ $header-color: $olive;
   .logo {
     display: block;
     float: left;
-    margin: 11px auto;
+    margin: 7px auto;
 
     img {
       width: 245px;

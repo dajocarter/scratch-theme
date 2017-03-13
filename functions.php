@@ -8,7 +8,7 @@ require_once('includes/tweek.php');
 ** ACF GOOGLE MAPS API KEY SUPPORT
 */
 // You can move this to your wp-config.php
-define('GOOGLE_MAPS_API_KEY', 'XxXyourGoogleMapsAPIkeyhereXxX');
+define('GOOGLE_MAPS_API_KEY', 'AIzaSyABJeq7QMRB06lwoLf5XFB89WvfTngnZpA');
 
 function tweek_acf_google_map_api() {
   acf_update_setting('google_api_key', GOOGLE_MAPS_API_KEY);
