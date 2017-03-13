@@ -75,6 +75,7 @@ gulp.task('sass', function() {
         'node_modules/magnific-popup/dist/',
         'node_modules/normalize.css/',
         'node_modules/animate-sass/',
+        'node_modules/bourbon/app/assets/stylesheets/',
         'node_modules/bourbon-neat/core/',
         'node_modules/family.scss/source/src/',
         'node_modules/include-media/dist/'
