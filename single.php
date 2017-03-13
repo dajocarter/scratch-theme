@@ -1,4 +1,4 @@
-<?php get_template_part('parts/header'); the_post(); ?>
+<?php get_template_part('partials/header'); the_post(); ?>
 
 <main>
 
@@ -24,4 +24,4 @@
 
 </main>
 
-<?php get_template_part('parts/footer'); ?>
+<?php get_template_part('partials/footer'); ?>

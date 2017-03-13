@@ -4,7 +4,7 @@
  * Template Name: Style Guide
  */
 
-get_template_part('parts/header'); ?>
+get_template_part('partials/header'); ?>
 
 <header class="wrap hpad clearfix">
   <h1 class="center">Tweek Theme Style Guide</h1>
@@ -79,4 +79,4 @@ get_template_part('parts/header'); ?>
 
 </main>
 
-<?php get_template_part('parts/footer'); ?>
+<?php get_template_part('partials/footer'); ?>
