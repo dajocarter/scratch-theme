@@ -1,0 +1,24 @@
+/* Font themes
+   ========================================================================== */
+
+/*
+** Pick a font stack from /node_modules/bourbon/app/assets/stylesheets/addons/_font-stacks.scss
+** Options include: $georgia, $helvetica, $lucida-grande, $monospace, $verdana
+** Otherwise roll your own below
+*/
+
+@import url("https://fonts.googleapis.com/css?family=Alegreya:400,400i,700|Alegreya+Sans:300,300i,400,400i,700");
+
+$alegreya: "Alegreya", serif;
+$alegreya-sans: "Alegreya Sans", sans-serif;
+
+// Font family
+$base-font-family: $helvetica;
+$heading-font-family: $georgia;
+
+// Font sizes
+$base-font-size: 16px;
+
+// Line height
+$base-line-height: 1.5;
+$heading-line-height: 1.2;

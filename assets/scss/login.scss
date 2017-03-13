@@ -1,6 +1,22 @@
-@import "config/variables";
-@import "config/mixins";
-@import "config/global";
+// Foundation
+@import "normalize";
+@import "bourbon";
+@import "neat";
+
+// Variables
+@import "variables/colors";
+@import "variables/fonts";
+@import "variables/variables";
+
+// Mixins & Helpers
+@import "helpers/mixins";
+@import "family";
+@import "include-media";
+
+// Base
+@import "base/typography";
+@import "base/layout";
+@import "base/misc";
 
 body.login {
   #login_error, .message {}
@@ -22,7 +38,7 @@ body.login {
       p {
         label {
           color: $black;
-          font-family: $font-headings;
+          font-family: $heading-font-family;
           font-weight: 700;
         }
 
@@ -32,7 +48,7 @@ body.login {
 
         &.submit {
           input#wp-submit {
-            @extend .button;
+            @extend button;
           }
         }
       }
@@ -46,13 +62,13 @@ body.login {
 
     p#nav {
       a {
-        @extend .a;
+        @extend a;
       }
     }
 
     p#backtoblog {
       a {
-        @extend .a;
+        @extend a;
       }
     }
   }

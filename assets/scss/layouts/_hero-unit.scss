@@ -1,0 +1,30 @@
+.hero-unit {
+  .tweek-bg {
+    height: auto;
+  }
+
+  .content {
+    margin: 10rem auto;
+
+    // Background Colors
+    $base-background-color: $white;
+
+    @media (min-width: 768px) {
+      width: 65%;
+    }
+
+    color: $white;
+  }
+
+  .left {
+    .content {
+      float: left;
+    }
+  }
+
+  .right {
+    .content {
+      float: right;
+    }
+  }
+}

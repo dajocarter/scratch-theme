@@ -1,0 +1,45 @@
+$toggle-color: $action-font-color;
+
+.toggle-content {
+  display: none;
+  position: relative;
+  padding: 1rem 1rem 0;
+
+  p {
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.toggle-heading {
+  display: block;
+  padding: 0.25rem 1.75rem 0.25rem 0.5rem;
+  margin: 1.5rem auto 0;
+  color: $toggle-color;
+  cursor: pointer;
+  border: 1px solid $toggle-color;
+  position: relative;
+
+  &:after {
+    @include icons;
+
+    content: "\f078";
+    color: $toggle-color;
+    position: absolute;
+    display: block;
+    bottom: 0.2rem;
+    right: 0.5rem;
+    line-height: inherit;
+  }
+
+  &.active {
+    &:after {
+      content: "\f077";
+    }
+  }
+}

@@ -1,4 +1,5 @@
 /********************HEADER********************/
+$header-color: $olive;
 
 /*
  * This file should house all of the styles for
@@ -41,7 +42,7 @@ nav {
     margin: 0;
     padding: 0;
 
-    @extend .clearfix;
+    @include clearfix;
 
     li {
       display: block;
@@ -82,7 +83,10 @@ nav {
   }
 }
 
-@media (min-width: 767px) {
+// Background Colors
+$base-background-color: $white;
+
+@media (min-width: 768px) {
   nav ul.main-nav {
     position: relative;
     width: auto;
@@ -149,12 +153,10 @@ nav {
   right: 1rem;
   font-size: 2rem;
 
-  @include m {
-    top: 1rem;
-  }
+  // Background Colors
+  $base-background-color: $white;
 
-
-  @media (min-width: 767px) {
+  @media (min-width: 768px) {
     display: none;
   }
 

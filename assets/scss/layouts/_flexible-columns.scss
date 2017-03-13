@@ -1,0 +1,39 @@
+$column-circle-size: 160px;
+$column-icon-size: 3rem;
+$column-icon-color: $white;
+
+.flexible-columns {
+  [class^="row-"], [class*=" row-"] {
+    // row-specific styles here
+
+  }
+
+  [class^="column-"], [class*=" column-"] {
+    // column-specific styles here
+    padding: 1rem;
+
+    a {
+      &:hover, &:focus {
+        text-decoration: none;
+
+        .circle {
+          background-color: $base-btn-background-hover;
+
+          &.tweek-bg {
+            background-color: transparent;
+            opacity: 0.8;
+          }
+        }
+
+        i {
+          color: $column-icon-color;
+          font-size: $column-icon-size;
+        }
+      }
+    }
+  }
+
+  p.button-wrapper {
+    clear: both;
+  }
+}

@@ -1,66 +1,59 @@
-/*
- * FOUNDATION
- * Do not change the order of these imports.
- */
+// Foundation
 @import "normalize";
-@import "config/mixins/bourbon";
-@import "config/mixins/tweek";
-@import "config/bitters/base";
-@import "config/variables/calculations";
-@import "config/variables/colors";
-@import "config/variables/fonts";
-@import "config/variables/layouts";
-@import "config/variables/timing-functions";
+@import "bourbon";
 @import "neat";
-@import "config/core";
-@import "config/grid-always";
 
-@media (min-width: 767px) {
-  @import "config/grid";
-}
+// Variables
+@import "variables/colors";
+@import "variables/fonts";
+@import "variables/variables";
 
-@import "config/global";
-
+// Mixins & Helpers
+@import "helpers/mixins";
 @import "family";
 @import "include-media";
-@import "font-awesome";
 
+// Base
+@import "base/typography";
+@import "base/layout";
+@import "base/misc";
+
+// 3rd-Party
 $slick-font-path: "../fonts/";
 
 @import "slick.scss";
 @import "slick-theme.scss";
 @import "magnific-popup";
+@import "font-awesome";
 
 $use-all: true; // Enable animations by overriding variables from node_modules/animate-sass/helpers/settings
 
 @import "animate";
 
-/*
- * MIDDLE STUFF
- * You're free to rearrange these how you like.
- */
+// Components
+@import "components/links";
+@import "components/buttons";
+@import "components/forms";
+@import "components/lists";
+@import "components/media";
+@import "components/tables";
 
-@import "header";
-@import "page";
-@import "layouts";
-@import "archive";
-@import "single";
-@import "sidebar";
-@import "home";
-@import "footer";
+// Layouts
+@import "layouts/flexible-columns";
+@import "layouts/hero-unit";
+@import "layouts/slider";
+@import "layouts/staggered-rows";
+@import "layouts/toggles";
+@import "layouts/wysiwygs";
+@import "layouts/layouts";
 
-/*
- * RESPONSIVE
- * If you want a responsive stylesheet,
- * it's best to import it last. This allows
- * your @media queries to override other
- * styles.
- */
+// Partials
+@import "partials/footer";
+@import "partials/header";
+@import "partials/sidebar";
 
-@import "responsive";
-
-@media print {
-  @import "print";
-}
-
-/* Obviously if you`re renaming/creating the files the imports must match. :) */
+// Templates
+@import "templates/archive";
+@import "templates/home";
+@import "templates/page";
+@import "templates/single";

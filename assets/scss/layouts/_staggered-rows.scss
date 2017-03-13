@@ -1,0 +1,86 @@
+$staggered-row-height: 500px;
+$staggered-circle-size: 250px;
+$staggered-icon-size: 6rem;
+$staggered-icon-color: $white;
+
+.staggered {
+  .row {
+    .circle {
+      width: $staggered-circle-size;
+      height: $staggered-circle-size;
+
+      // Background Colors
+      $base-background-color: $white;
+
+      @media (min-width: 768px) {
+        @include valign;
+      }
+
+      i {
+        font-size: $staggered-icon-size;
+        color: $staggered-icon-color;
+      }
+    }
+
+    &:nth-child(odd) {
+      background-color: $gray;
+    }
+
+    a {
+      &:hover, &:focus {
+        text-decoration: none;
+
+        .circle {
+          background-color: $base-btn-background-hover;
+
+          &.tweek-bg {
+            background-color: transparent;
+            opacity: 0.8;
+          }
+        }
+
+        i {
+          color: $staggered-icon-color;
+          font-size: $staggered-icon-size;
+        }
+      }
+    }
+
+    p.button-wrapper {
+      clear: both;
+    }
+
+    // Background Colors
+    $base-background-color: $white;
+
+    @media (min-width: 768px) {
+      height: $staggered-row-height;
+
+      .first, .last, .wrap {
+        height: 100%;
+
+        h3 {
+          margin-top: 0;
+        }
+      }
+
+      &:nth-child(even) {
+        .first {
+          float: right;
+          margin-left: 2.762430939%;
+        }
+
+        .last {
+          float: left;
+          margin-left: 0;
+        }
+      }
+    }
+
+    @media (max-width: 766px) {
+      .content {
+        text-align: center;
+      }
+    }
+  }
+}

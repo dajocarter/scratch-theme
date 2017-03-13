@@ -1,0 +1,24 @@
+.hero-unit, .flexible-columns, .staggered, .wysiwygs {
+  .circle {
+    width: $column-circle-size;
+    height: $column-circle-size;
+    background-color: $base-btn-background;
+    margin: 0 auto;
+    transition-property: background-color, color, opacity;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-in-out;
+    transition-delay: 0s;
+    position: relative;
+
+    i {
+      display: block;
+      color: $column-icon-color;
+      font-size: $column-icon-size;
+      transition: color 0.25s ease-in-out 0s;
+    }
+
+    &.tweek-bg {
+      background-color: transparent;
+    }
+  }
+}

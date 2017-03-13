@@ -1,9 +1,17 @@
+$base-btn-background: $base-link-color;
+$base-btn-background-hover: shade($base-btn-background, 20%);
+
+$alt-btn-background: $black;
+$alt-btn-background-hover: shade($alt-btn-background, 20%);
+
+$base-btn-color: $white;
+
 #{$all-buttons} {
   appearance: none;
-  background-color: $action-color;
+  background-color: $base-btn-background;
   border: 0;
   border-radius: $base-border-radius;
-  color: #fff;
+  color: $base-btn-color;
   cursor: pointer;
   display: inline-block;
   font-family: $base-font-family;
@@ -21,8 +29,8 @@
 
   &:hover,
   &:focus {
-    background-color: shade($action-color, 20%);
-    color: #fff;
+    background-color: $base-btn-background-hover;
+    color: $base-btn-color;
   }
 
   &:disabled {
@@ -30,7 +38,16 @@
     opacity: 0.5;
 
     &:hover {
-      background-color: $action-color;
+      background-color: $base-btn-background;
+    }
+  }
+
+  &.alt {
+    background-color: $alt-btn-background;
+
+    &:hover,
+    &:focus {
+      background-color: $alt-btn-background-hover;
     }
   }
 }

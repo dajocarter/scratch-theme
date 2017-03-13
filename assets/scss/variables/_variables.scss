@@ -1,0 +1,12 @@
+// Breakpoints
+$breakpoints: (phone: 320px, tablet: 768px, desktop: 1024px);
+
+// Other Sizes
+$base-border-radius: 3px;
+$base-spacing: $base-line-height * 1em;
+$small-spacing: $base-spacing / 2;
+$base-z-index: 0;
+
+// Animations
+$base-duration: 150ms;
+$base-timing: ease;

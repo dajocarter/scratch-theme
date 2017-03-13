@@ -1,0 +1,124 @@
+$base-font-color: $black;
+$heading-font-color: $base-font-color;
+$action-font-color: $blue;
+$base-border-color: $base-font-color;
+$base-border: 1px solid $base-border-color;
+
+body {
+  color: $base-font-color;
+  font-family: $base-font-family;
+  font-size: $base-font-size;
+  line-height: $base-line-height;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: $heading-font-family;
+  font-size: modular-scale(1);
+  line-height: $heading-line-height;
+  margin: 0 0 $small-spacing;
+}
+
+p {
+  margin: 0 0 $small-spacing;
+}
+
+hr {
+  border-bottom: $base-border;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  margin: $base-spacing 0;
+  display: block;
+  height: 1px;
+  margin: 1em 0;
+  padding: 0;
+}
+
+blockquote {
+  background: $gray;
+  border-left: 0.25rem solid $silver;
+
+  @include margin(1.5, 0);
+  @include padding(1, 0.5);
+
+  quotes: "“" "”";
+  position: relative;
+
+  &:before {
+    color: $silver;
+    content: open-quote;
+    font-size: 4rem;
+    position: absolute;
+    top: 2px;
+  }
+
+  p {
+    display: inline;
+  }
+}
+
+cite {
+  display: block;
+  font-style: normal;
+}
+
+small, .small {
+  line-height: $base-line-height;
+  font-size: 70%;
+}
+
+/* Code */
+code, kbd, pre, samp, .code {
+  background-color: $gray;
+  color: $base-font-color;
+  padding: 1px 3px;
+  font-size: 16px;
+  line-height: 1.4;
+  border-radius: 4px;
+  border: 1px solid $silver;
+}
+
+code, kbd, samp, .code {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+pre, .pre {
+  display: block;
+  margin-top: $base-spacing;
+  margin-bottom: $base-spacing;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 8px 12px 10px;
+  overflow-x: auto;
+}
+
+br {
+  &.brm {
+    // Background Colors
+    $base-background-color: $white;
+
+    @media (min-width: 768px) {
+      display: none;
+      visibility: hidden;
+    }
+  }
+
+  &.mbr {
+    display: none;
+    visibility: hidden;
+
+    // Background Colors
+    $base-background-color: $white;
+
+    @media (min-width: 768px) {
+      display: block;
+      visibility: visible;
+    }
+  }
+}
