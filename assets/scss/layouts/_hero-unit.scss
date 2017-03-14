@@ -9,9 +9,10 @@
     // Background Colors
     $base-background-color: $white;
 
-    @media (min-width: 768px) {
+    @include media(">=tablet") {
       width: 65%;
     }
+
 
     color: $white;
   }

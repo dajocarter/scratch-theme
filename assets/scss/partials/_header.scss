@@ -86,7 +86,7 @@ nav {
 // Background Colors
 $base-background-color: $white;
 
-@media (min-width: 768px) {
+@include media(">=tablet") {
   nav ul.main-nav {
     position: relative;
     width: auto;
@@ -147,18 +147,17 @@ $base-background-color: $white;
   }
 }
 
+
 .nav-toggle {
   position: absolute;
   top: 1.2rem;
   right: 1rem;
   font-size: 2rem;
 
-  // Background Colors
-  $base-background-color: $white;
-
-  @media (min-width: 768px) {
+  @include media(">=tablet") {
     display: none;
   }
+
 
   color: $white;
   cursor: pointer;

@@ -7,7 +7,7 @@
     // Background Colors
     $base-background-color: $white;
 
-    @media (min-width: 768px) {
+    @include media(">=tablet") {
       padding: 1rem 6rem;
     }
   }

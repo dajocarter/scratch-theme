@@ -103,7 +103,7 @@ br {
     // Background Colors
     $base-background-color: $white;
 
-    @media (min-width: 768px) {
+    @include media(">=tablet") {
       display: none;
       visibility: hidden;
     }
@@ -116,7 +116,7 @@ br {
     // Background Colors
     $base-background-color: $white;
 
-    @media (min-width: 768px) {
+    @include media(">=tablet") {
       display: block;
       visibility: visible;
     }
