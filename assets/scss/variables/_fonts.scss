@@ -2,19 +2,37 @@
    ========================================================================== */
 
 /*
-** Pick a font stack from /node_modules/bourbon/app/assets/stylesheets/addons/_font-stacks.scss
-** Options include: $georgia, $helvetica, $lucida-grande, $monospace, $verdana
-** Otherwise roll your own below
+Pick a font stack from node_modules/bourbon/core/bourbon/library/_font-stacks.scss
+Options include:
+********************
+Sans Serif Fonts:
+* $font-stack-helvetica
+* $font-stack-lucida-grande
+* $font-stack-verdana
+* $font-stack-system
+
+Serif Fonts:
+* $font-stack-garamond
+* $font-stack-georgia
+* $font-stack-hoefler-text
+
+Monospace Fonts:
+* $font-stack-consolas
+* $font-stack-courier-new
+* $font-stack-monaco
 */
 
+/*
+Otherwise roll your own below
+*/
 @import url("https://fonts.googleapis.com/css?family=Alegreya:400,400i,700|Alegreya+Sans:300,300i,400,400i,700");
 
-$alegreya: "Alegreya", serif;
-$alegreya-sans: "Alegreya Sans", sans-serif;
+$font-stack-alegreya: "Alegreya", serif;
+$font-stack-alegreya-sans: "Alegreya Sans", sans-serif;
 
 // Font family
-$base-font-family: $helvetica;
-$heading-font-family: $georgia;
+$base-font-family: $font-stack-helvetica;
+$heading-font-family: $font-stack-georgia;
 
 // Font sizes
 $base-font-size: 16px;
