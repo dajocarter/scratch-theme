@@ -6,7 +6,7 @@ $alt-btn-background-hover: shade($alt-btn-background, 20%);
 
 $base-btn-color: $white;
 
-#{$all-buttons} {
+#{$all-buttons}, .button, .btn {
   appearance: none;
   background-color: $base-btn-background;
   border: 0;
