@@ -1,10 +1,3 @@
-var gulp = require('gulp'),
-  $ = require('gulp-load-plugins')(),
-  merge = require('merge-stream'),
-  bourbon = require('bourbon').includePaths,
-  neat = require('bourbon-neat').includePaths,
-  browserSync = require('browser-sync').create();
-
 var AUTOPREFIXER_BROWSERS = [
   'ie >= 10',
   'ie_mob >= 10',
@@ -26,6 +19,18 @@ gulp.task('img', function() {
     .pipe(gulp.dest('../uploads'))
     .pipe(browserSync.stream());
 });
+// Require our dependencies
+const $ = require('gulp-load-plugins')();
+const autoprefixer = require( 'autoprefixer' );
+const bourbon = require( 'bourbon' ).includePaths;
+const browserSync = require( 'browser-sync' );
+const del = require( 'del' );
+const gulp = require( 'gulp' );
+const merge = require( 'merge-stream' );
+const mqpacker = require( 'css-mqpacker' );
+const neat = require( 'bourbon-neat' ).includePaths;
+const reload = browserSync.reload;
+
 
 gulp.task('assets', function() {
   var css = gulp.src([
