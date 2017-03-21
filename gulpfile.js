@@ -44,7 +44,7 @@ function handleErrors () {
  * Delete css before we minify and optimize.
  */
 gulp.task( 'clean:styles', () =>
-  del( 'assets/css/*' )
+  del( [ 'assets/css/*', '!assets/css/ajax-loader.gif', '!assets/css/README.md' ] )
 );
 
 /**
@@ -55,7 +55,7 @@ gulp.task( 'clean:styles', () =>
  * https://www.npmjs.com/package/gulp-autoprefixer
  * https://www.npmjs.com/package/css-mqpacker
  */
-gulp.task( 'postcss', [ 'clean:styles', 'copy:fonts' ], () =>
+gulp.task( 'postcss', [ 'clean:styles' ], () =>
   gulp.src( paths.sass )
 
     // Deal with errors.
