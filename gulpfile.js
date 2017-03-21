@@ -1,24 +1,3 @@
-var AUTOPREFIXER_BROWSERS = [
-  'ie >= 10',
-  'ie_mob >= 10',
-  'ff >= 30',
-  'chrome >= 34',
-  'safari >= 7',
-  'opera >= 23',
-  'ios >= 7',
-  'android >= 4.4',
-  'bb >= 10'
-];
-
-gulp.task('img', function() {
-  return gulp.src(['../../uploads/**/*.{png,PNG,jpg,JPG,jpeg,JPEG,gif,GIF}'], {
-      base: '.'
-    })
-    .pipe($.newer('../../uploads'))
-    .pipe($.imagemin())
-    .pipe(gulp.dest('../uploads'))
-    .pipe(browserSync.stream());
-});
 // Require our dependencies
 const $ = require('gulp-load-plugins')();
 const autoprefixer = require( 'autoprefixer' );
@@ -155,7 +134,66 @@ gulp.task('copy:fonts', function() {
   return merge(toAssetsCss, toAssetsFonts);
 });
 
+/**
+ * Delete the svg-logos.svg before we minify, concat.
+ */
+gulp.task( 'clean:svg-logos', () =>
+  del( [ 'assets/img/svg-logos.svg' ] )
+);
 
+/**
+ * Minify, concatenate, and clean SVG logos.
+ *
+ * https://www.npmjs.com/package/gulp-svgmin
+ * https://www.npmjs.com/package/gulp-svgstore
+ * https://www.npmjs.com/package/gulp-cheerio
+ */
+gulp.task( 'svg-logos', [ 'clean:svg-logos' ], () =>
+  gulp.src( paths.logos )
+
+    // Deal with errors.
+    .pipe( $.plumber( { 'errorHandler': handleErrors } ) )
+
+    // Minify SVGs.
+    .pipe( $.svgmin() )
+
+    // Add a prefix to SVG IDs.
+    .pipe( $.rename( { 'prefix': 'logo-' } ) )
+
+    // Combine all SVGs into a single <symbol>
+    .pipe( $.svgstore( { 'inlineSvg': true } ) )
+
+    // Clean up the <symbol> by removing the following cruft...
+    .pipe( $.cheerio( {
+      'run': function ( $, file ) {
+        $( 'svg' ).attr( 'style', 'display:none' );
+        $( '[fill]' ).removeAttr( 'fill' );
+        $( 'path' ).removeAttr( 'class' );
+      },
+      'parserOptions': { 'xmlMode': true }
+    } ) )
+
+    // Save svg-logos.svg.
+    .pipe( gulp.dest( 'assets/img/' ) )
+    .pipe( browserSync.stream() )
+);
+
+
+/**
+ * Optimize images.
+ *
+ * https://www.npmjs.com/package/gulp-imagemin
+ */
+gulp.task( 'imagemin', () =>
+  gulp.src( paths.images )
+    .pipe( $.plumber( { 'errorHandler': handleErrors } ) )
+    .pipe( $.imagemin( {
+      'optimizationLevel': 5,
+      'progressive': true,
+      'interlaced': true
+    } ) )
+    .pipe( gulp.dest( 'assets/img' ) )
+);
 
 /**
  * Concatenate and transform JavaScript.
