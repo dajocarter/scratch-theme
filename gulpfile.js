@@ -213,21 +213,9 @@ gulp.task( 'concat', () =>
       paths.scripts
     ])
 
-gulp.task('watch', function() {
-  gulp.watch(['**/*.html', '**/*.php']).on('change', browserSync.reload);
-  gulp.watch(['../../uploads/**/*'], ['img']);
-  gulp.watch(['assets/js/*.js', 'assets/js/vendor/*.js'], ['js']);
-  gulp.watch(['assets/scss/**/*.scss', 'assets/core/scss/**/*.scss'], ['sass']);
-});
     // Deal with errors.
     .pipe( $.plumber( { 'errorHandler': handleErrors } ) )
 
-gulp.task('browserSync', function() {
-  browserSync.init({
-    proxy: 'tweek.dev', // change this to match your host
-    watchTask: true
-  });
-});
     // Start a sourcemap.
     .pipe( $.sourcemaps.init() )
 
@@ -274,7 +262,6 @@ gulp.task( 'lint:sass', () =>
     .pipe( $.sassLint.failOnError() )
 );
 
-gulp.task('default', ['browserSync', 'watch']);
 /**
  * JavaScript linting.
  *
@@ -294,3 +281,40 @@ gulp.task( 'lint:js', () =>
     .pipe( $.eslint.format() )
     .pipe( $.eslint.failAfterError() )
 );
+
+/**
+ * Process tasks and reload browsers on file changes.
+ *
+ * https://www.npmjs.com/package/browser-sync
+ */
+gulp.task( 'watch', function () {
+
+  // Kick off BrowserSync.
+  browserSync( {
+    'open': false,             // Open project in a new tab?
+    'injectChanges': true,     // Auto inject changes instead of full reload.
+    'proxy': 'tweek.dev',    // Use http://_s.com:3000 to use BrowserSync.
+    'watchOptions': {
+      'debounceDelay': 1000  // Wait 1 second before injecting.
+    }
+  } );
+
+  // Run tasks when files change.
+  gulp.watch( paths.logos, [ 'svg' ] );
+  gulp.watch( paths.fonts, [ 'copy:fonts' ] );
+  gulp.watch( paths.sass, [ 'sass' ] );
+  gulp.watch( paths.js, [ 'js' ] );
+  gulp.watch( paths.scripts, [ 'js' ] );
+  gulp.watch( paths.php, [ 'markup' ] );
+} );
+
+/**
+ * Create individual tasks.
+ */
+gulp.task( 'markup', browserSync.reload );
+gulp.task( 'svg', [ 'svg-logos' ] );
+gulp.task( 'copy', [ 'copy:fonts' ] );
+gulp.task( 'js', [ 'uglify' ] );
+gulp.task( 'sass', [ 'cssnano' ] );
+gulp.task( 'lint', [ 'lint:sass', 'lint:js' ] );
+gulp.task( 'default', [ 'svg', 'copy', 'sass', 'js', 'imagemin' ] );
