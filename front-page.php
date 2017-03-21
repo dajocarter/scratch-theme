@@ -2,7 +2,7 @@
 
 <main>
 
-  <?php get_template_part('content', 'layouts'); ?>
+  <?php get_template_part('partials/content', 'layouts'); ?>
 
 </main>
 
