@@ -61,6 +61,79 @@ function handleErrors () {
   this.emit( 'end' );
 }
 
+/**
+ * Delete css before we minify and optimize.
+ */
+gulp.task( 'clean:styles', () =>
+  del( 'assets/css/*' )
+);
+
+/**
+ * Compile Sass and run stylesheet through PostCSS.
+ *
+ * https://www.npmjs.com/package/gulp-sass
+ * https://www.npmjs.com/package/gulp-postcss
+ * https://www.npmjs.com/package/gulp-autoprefixer
+ * https://www.npmjs.com/package/css-mqpacker
+ */
+gulp.task( 'postcss', [ 'clean:styles', 'copy:fonts' ], () =>
+  gulp.src( paths.sass )
+
+    // Deal with errors.
+    .pipe( $.plumber( { 'errorHandler': handleErrors } ) )
+
+    // Wrap tasks in a sourcemap.
+    .pipe( $.sourcemaps.init() )
+
+      // Compile Sass using LibSass.
+      .pipe( $.sass( {
+        'includePaths': [
+          // Include paths for any npm package to use @import
+          'node_modules/slick-carousel/slick/',
+          'node_modules/font-awesome/scss',
+          'node_modules/magnific-popup/dist/',
+          'node_modules/normalize.css/',
+          'node_modules/animate-sass/',
+          'node_modules/family.scss/source/src/',
+          'node_modules/include-media/dist/'
+        ].concat( bourbon, neat ),
+        'errLogToConsole': true,
+        'outputStyle': 'expanded' // Options: nested, expanded, compact, compressed
+      } ) )
+
+      // Parse with PostCSS plugins.
+      .pipe( $.postcss( [
+        autoprefixer( {
+          'browsers': [ 'last 2 version' ]
+        } ),
+        mqpacker( {
+          'sort': true
+        } )
+      ] ) )
+
+    // Create sourcemap.
+    .pipe( $.sourcemaps.write() )
+
+    // Create style.css.
+    .pipe( gulp.dest( 'assets/css' ) )
+    .pipe( browserSync.stream() )
+);
+
+/**
+ * Minify and optimize style.css.
+ *
+ * https://www.npmjs.com/package/gulp-cssnano
+ */
+gulp.task( 'cssnano', [ 'postcss' ], () =>
+  gulp.src( paths.css )
+    .pipe( $.plumber( { 'errorHandler': handleErrors } ) )
+    .pipe( $.cssnano( {
+      'safe': true // Use safe optimizations.
+    } ) )
+    .pipe( $.rename( { 'suffix': '.min' } ) )
+    .pipe( gulp.dest( 'assets/css' ) )
+    .pipe( browserSync.stream() )
+);
 
 gulp.task('assets', function() {
   var css = gulp.src([
@@ -99,31 +172,7 @@ gulp.task('js', function() {
     .pipe(browserSync.stream());
 });
 
-gulp.task('sass', function() {
-  return gulp.src([
-      'assets/scss/master.scss',
-      'assets/scss/login.scss'
     ])
-    .pipe($.sourcemaps.init())
-    .pipe($.sass({
-      includePaths: [
-        'node_modules/slick-carousel/slick/',
-        'node_modules/font-awesome/scss',
-        'node_modules/magnific-popup/dist/',
-        'node_modules/normalize.css/',
-        'node_modules/animate-sass/',
-        'node_modules/family.scss/source/src/',
-        'node_modules/include-media/dist/'
-      ].concat(bourbon, neat),
-      outputStyle: 'compressed'
-    }).on('error', $.sass.logError))
-    .pipe($.autoprefixer({
-      browsers: AUTOPREFIXER_BROWSERS
-    }))
-    .pipe($.sourcemaps.write())
-    .pipe(gulp.dest('assets/css'))
-    .pipe(browserSync.stream());
-});
 
 gulp.task('watch', function() {
   gulp.watch(['**/*.html', '**/*.php']).on('change', browserSync.reload);
