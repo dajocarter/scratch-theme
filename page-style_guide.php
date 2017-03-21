@@ -6,12 +6,11 @@
 
 get_template_part('partials/header'); ?>
 
-<header class="wrap hpad clearfix">
-  <h1 class="center">Tweek Theme Style Guide</h1>
-  <p class="center">To make visible changes to the Style Guide, you'll need to edit <a href="https://github.com/dajocarter/tweek-theme/tree/master/assets/scss/config">the SCSS config files</a> and <a href="https://github.com/dajocarter/tweek-theme/blob/master/page-style_guide.php">page-style_guide.php</a>. View <a href="http://tweektheme.com">the Tweek Theme website</a> for further documentation.</p>
-</header>
-
 <main class="wrap hpad clearfix">
+  <header>
+    <h1 class="center">Tweek Theme Style Guide</h1>
+    <p class="center">To make visible changes to the Style Guide, you'll need to edit <a href="https://github.com/dajocarter/tweek-theme/tree/master/assets/scss/config">the SCSS config files</a> and <a href="https://github.com/dajocarter/tweek-theme/blob/master/page-style_guide.php">page-style_guide.php</a>. View <a href="http://tweektheme.com">the Tweek Theme website</a> for further documentation.</p>
+  </header>
 
   <section>
 
@@ -19,6 +18,8 @@ get_template_part('partials/header'); ?>
     <h2>Heading 2</h2>
     <h3>Heading 3</h3>
     <h4>Heading 4</h4>
+    <h5>Heading 5</h5>
+    <h6>Heading 6</h6>
 
     <p>I barely knew Philip, but as a clergyman I have no problem telling his most intimate friends all about him. Ok, we'll go deliver this crate like professionals, and then we'll go ride the bumper cars. Switzerland is small and neutral! We are more like Germany, ambitious and misunderstood! One hundred dollars. Say it in Russian! Who's brave enough to fly into something we all keep calling a death sphere?</p>
 
