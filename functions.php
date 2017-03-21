@@ -53,9 +53,6 @@ function theme_styles() {
   wp_register_style( 'tweek-main', get_template_directory_uri() . '/assets/css/master.css', false, filemtime(dirname(__FILE__) . '/assets/css/master.css') );
   wp_enqueue_style( 'tweek-main' );
 
-  wp_register_style( 'tweek-custom', get_template_directory_uri() . '/custom.css', false, filemtime(dirname(__FILE__) . '/custom.css') );
-  wp_enqueue_style( 'tweek-custom' );
-
 }
 
 add_action( 'wp_enqueue_scripts', 'theme_styles' );
