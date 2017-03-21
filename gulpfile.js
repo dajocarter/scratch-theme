@@ -259,5 +259,38 @@ gulp.task( 'uglify', [ 'concat' ], () =>
     .pipe( gulp.dest( 'assets/js' ) )
 );
 
+/**
+ * Sass linting.
+ *
+ * https://www.npmjs.com/package/sass-lint
+ */
+gulp.task( 'lint:sass', () =>
+  gulp.src( [
+    paths.sass,
+    '!node_modules/**'
+  ] )
+    .pipe( $.sassLint() )
+    .pipe( $.sassLint.format() )
+    .pipe( $.sassLint.failOnError() )
+);
 
 gulp.task('default', ['browserSync', 'watch']);
+/**
+ * JavaScript linting.
+ *
+ * https://www.npmjs.com/package/gulp-eslint
+ */
+gulp.task( 'lint:js', () =>
+  gulp.src( [
+    paths.scripts,
+    'assets/js/*.js',
+    '!assets/js/*.min.js',
+    '!assets/js/project.js',
+    '!Gruntfile.js',
+    '!Gulpfile.js',
+    '!node_modules/**'
+  ] )
+    .pipe( $.eslint() )
+    .pipe( $.eslint.format() )
+    .pipe( $.eslint.failAfterError() )
+);
