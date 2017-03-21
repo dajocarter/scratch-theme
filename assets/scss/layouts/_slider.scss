@@ -33,6 +33,7 @@
     width: auto;
     height: auto;
     z-index: 1;
+    background-color: transparent;
 
     &:before {
       content: '';
@@ -68,8 +69,6 @@
 
     &:hover, &:focus {
       outline: none;
-      background: transparent;
-      color: transparent;
 
       i {
         color: rgba($white, 1);
@@ -98,6 +97,7 @@
         height: 15px;
         width: 15px;
         padding: 0px;
+        background-color: transparent;
 
         &:before {
           width: 15px;
