@@ -14,8 +14,7 @@ const reload = browserSync.reload;
 const paths = {
   'css': [ 'assets/css/*.css', '!assets/css/*.min.css' ],
   'fonts': 'assets/fonts/*',
-  'images': [ 'assets/img/*', '!assets/img/**/*.svg'],
-  'logos': 'assets/img/svg-logos/*.svg',
+  'images': [ 'assets/img/*', '!assets/img/*.svg'],
   'php': [ './**/*.php', '!node_modules/**/*.php' ],
   'sass': 'assets/scss/**/*.scss',
   'scripts': 'assets/js/scripts/*.js',
@@ -133,51 +132,6 @@ gulp.task('copy:fonts', function() {
 
   return merge(toAssetsCss, toAssetsFonts);
 });
-
-/**
- * Delete the svg-logos.svg before we minify, concat.
- */
-gulp.task( 'clean:svg-logos', () =>
-  del( [ 'assets/img/svg-logos.svg' ] )
-);
-
-/**
- * Minify, concatenate, and clean SVG logos.
- *
- * https://www.npmjs.com/package/gulp-svgmin
- * https://www.npmjs.com/package/gulp-svgstore
- * https://www.npmjs.com/package/gulp-cheerio
- */
-gulp.task( 'svg-logos', [ 'clean:svg-logos' ], () =>
-  gulp.src( paths.logos )
-
-    // Deal with errors.
-    .pipe( $.plumber( { 'errorHandler': handleErrors } ) )
-
-    // Minify SVGs.
-    .pipe( $.svgmin() )
-
-    // Add a prefix to SVG IDs.
-    .pipe( $.rename( { 'prefix': 'logo-' } ) )
-
-    // Combine all SVGs into a single <symbol>
-    .pipe( $.svgstore( { 'inlineSvg': true } ) )
-
-    // Clean up the <symbol> by removing the following cruft...
-    .pipe( $.cheerio( {
-      'run': function ( $, file ) {
-        $( 'svg' ).attr( 'style', 'display:none' );
-        $( '[fill]' ).removeAttr( 'fill' );
-        $( 'path' ).removeAttr( 'class' );
-      },
-      'parserOptions': { 'xmlMode': true }
-    } ) )
-
-    // Save svg-logos.svg.
-    .pipe( gulp.dest( 'assets/img/' ) )
-    .pipe( browserSync.stream() )
-);
-
 
 /**
  * Optimize images.
@@ -300,7 +254,6 @@ gulp.task( 'watch', function () {
   } );
 
   // Run tasks when files change.
-  gulp.watch( paths.logos, [ 'svg' ] );
   gulp.watch( paths.fonts, [ 'copy:fonts' ] );
   gulp.watch( paths.sass, [ 'sass' ] );
   gulp.watch( paths.js, [ 'js' ] );
@@ -312,9 +265,8 @@ gulp.task( 'watch', function () {
  * Create individual tasks.
  */
 gulp.task( 'markup', browserSync.reload );
-gulp.task( 'svg', [ 'svg-logos' ] );
 gulp.task( 'copy', [ 'copy:fonts' ] );
 gulp.task( 'js', [ 'uglify' ] );
 gulp.task( 'sass', [ 'cssnano' ] );
 gulp.task( 'lint', [ 'lint:sass', 'lint:js' ] );
-gulp.task( 'default', [ 'svg', 'copy', 'sass', 'js', 'imagemin' ] );
+gulp.task( 'default', [ 'copy', 'sass', 'js', 'imagemin' ] );
