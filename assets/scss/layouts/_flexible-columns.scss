@@ -17,6 +17,15 @@ $column-icon-color: $white;
     // column-specific styles here
     padding: 1rem;
 
+    .circle {
+      @include size($column-circle-size);
+
+      i {
+        color: $column-icon-color;
+        font-size: $column-icon-size;
+      }
+    }
+
     a {
       &:hover,
       &:focus {

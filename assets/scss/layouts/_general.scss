@@ -7,19 +7,15 @@
 .wysiwygs {
   .circle {
     background-color: $base-btn-background;
-    height: $column-circle-size;
     margin: 0 auto;
     position: relative;
     transition-delay: 0s;
     transition-duration: 0.25s;
     transition-property: background-color, color, opacity;
     transition-timing-function: ease-in-out;
-    width: $column-circle-size;
 
     i {
-      color: $column-icon-color;
       display: block;
-      font-size: $column-icon-size;
       transition: color 0.25s ease-in-out 0s;
     }
 

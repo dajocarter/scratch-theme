@@ -13,8 +13,7 @@ $staggered-icon-color: $white;
     }
 
 
-    height: $staggered-circle-size;
-    width: $staggered-circle-size;
+    @include size($staggered-circle-size);
 
     i {
       color: $staggered-icon-color;
