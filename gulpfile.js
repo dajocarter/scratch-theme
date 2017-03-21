@@ -161,6 +161,7 @@ gulp.task( 'concat', () =>
       'node_modules/slick-carousel/slick/slick.js',
       'node_modules/magnific-popup/dist/jquery.magnific-popup.js',
       'node_modules/velocity-animate/velocity.js',
+      'node_modules/velocity-animate/velocity.ui.js',
       'node_modules/waypoints/lib/jquery.waypoints.js',
       'node_modules/headroom.js/dist/headroom.js',
       'node_modules/headroom.js/dist/jQuery.headroom.js',
