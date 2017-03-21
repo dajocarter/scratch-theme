@@ -5,6 +5,7 @@
   width: 100%;
   word-wrap: break-word;
 
+  @include clearfix;
   @include grid-container;
 }
 
