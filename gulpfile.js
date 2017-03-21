@@ -135,19 +135,24 @@ gulp.task( 'cssnano', [ 'postcss' ], () =>
     .pipe( browserSync.stream() )
 );
 
-gulp.task('assets', function() {
-  var css = gulp.src([
+/**
+ * Copy font assets.
+ *
+ * https://www.npmjs.com/package/merge-stream
+ */
+gulp.task('copy:fonts', function() {
+  var toAssetsCss = gulp.src([
       'node_modules/slick-carousel/slick/ajax-loader.gif'
     ])
     .pipe(gulp.dest('assets/css'));
 
-  var fonts = gulp.src([
+  var toAssetsFonts = gulp.src([
       'node_modules/slick-carousel/slick/fonts/*',
       'node_modules/font-awesome/fonts/*'
     ])
     .pipe(gulp.dest('assets/fonts'));
 
-  return merge(css, fonts);
+  return merge(toAssetsCss, toAssetsFonts);
 });
 
 gulp.task('js', function() {
