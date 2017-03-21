@@ -2,14 +2,16 @@
 // Do not change this file. Proceed with caution if you do.
 
 // Containers
-.wrap, .contain, .constrain {
+.wrap,
+.contain,
+.constrain {
+  @include clearfix;
+  @include grid-container;
+
   margin-left: auto;
   margin-right: auto;
   width: 100%;
   word-wrap: break-word;
-
-  @include clearfix;
-  @include grid-container;
 }
 
 .wrap {
@@ -24,7 +26,18 @@
   max-width: 450px;
 }
 
-.onecol, .twocol, .threecol, .fourcol, .fivecol, .sixcol, .sevencol, .eightcol, .ninecol, .tencol, .elevencol, .twelvecol {
+.onecol,
+.twocol,
+.threecol,
+.fourcol,
+.fivecol,
+.sixcol,
+.sevencol,
+.eightcol,
+.ninecol,
+.tencol,
+.elevencol,
+.twelvecol {
   position: relative;
 }
 

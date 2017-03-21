@@ -3,7 +3,7 @@
 
 $header-color: $action-font-color;
 
-#header {
+body > header {
   background-color: $header-color;
   position: fixed;
   width: 100%;
@@ -15,136 +15,130 @@ $header-color: $action-font-color;
     margin: 7px auto;
 
     img {
-      width: 245px;
       height: 58px;
+      width: 245px;
     }
   }
 }
 
-nav {
-  ul.main-nav {
+.main-nav {
+  @include clearfix;
+
+  display: none;
+  left: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 80px;
+  width: 100%;
+  z-index: 100;
+
+  li {
+    display: block;
+    text-align: center;
+  }
+
+  .current_page_item {
+    a {
+      background-color: darken($header-color, 5%);
+
+      &:link,
+      &:active,
+      &:visited {
+        background-color: darken($header-color, 5%);
+      }
+    }
+  }
+
+  a {
+    background-color: $header-color;
+    color: $white;
+    display: block;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.25s ease-in-out 0s;
+
+    &:link,
+    &:active,
+    &:visited {
+      background-color: $header-color;
+      color: $white;
+    }
+
+    &:hover,
+    &:focus {
+      background-color: darken($header-color, 5%);
+      text-decoration: none;
+    }
+  }
+
+  .sub-menu {
     display: none;
-    list-style: none;
-    position: absolute;
-    z-index: 100;
-    width: 100%;
-    top: 80px;
-    left: 0;
-    margin: 0;
-    padding: 0;
-
-    @include clearfix;
-
-    li {
-      display: block;
-      text-align: center;
-
-      a {
-        background-color: $header-color;
-        color: $white;
-        display: block;
-        padding: 0.5rem 1rem;
-        transition: background-color 0.25s ease-in-out 0s;
-
-        &:link, &:active, &:visited {
-          background-color: $header-color;
-          color: $white;
-        }
-
-        &:hover, &:focus {
-          background-color: darken($header-color, 5%);
-          text-decoration: none;
-        }
-      }
-
-      &.current_page_item {
-        a {
-          background-color: darken($header-color, 5%);
-
-          &:link, &:active, &:visited {
-            background-color: darken($header-color, 5%);
-          }
-        }
-      }
-    }
-
-    ul.sub-menu {
-      display: none;
-    }
   }
 }
-
-// Background Colors
-$base-background-color: $white;
 
 @include media(">=tablet") {
-  nav ul.main-nav {
-    position: relative;
-    width: auto;
-    top: 0;
-    float: right;
+  .main-nav {
     display: block !important;
+    float: right;
+    position: relative;
+    top: 0;
+    width: auto;
 
     li {
       float: left;
 
-      a {
-        padding: 24px 1rem;
-
-        &:link, &:active, &:visited {}
-
-        &:hover, &:focus {}
+      &:hover > .sub-menu {
+        display: block;
       }
     }
 
-    ul.sub-menu {
-      background-color: $header-color;
-      padding: 0;
-      position: absolute;
-      top: 100%;
-
-      li {
-        float: none;
-        position: relative;
-        text-align: left;
-
-        a {
-          padding: 0.5rem 1rem;
-          background-color: $header-color;
-          color: $white;
-
-          &:link, &:active, &:visited {
-            background-color: $header-color;
-            color: $white;
-          }
-
-          &:hover, &:focus {
-            background-color: darken($header-color, 5%);
-            text-decoration: none;
-          }
-        }
-      }
-
-      ul {
-        position: absolute;
-        left: 100%;
-        top: 0;
-      }
+    a {
+      padding: 24px 1rem;
     }
   }
 
-  nav ul.main-nav li:hover > ul.sub-menu {
-    display: block;
+  .sub-menu {
+    background-color: $header-color;
+    padding: 0;
+    position: absolute;
+    top: 100%;
+
+    li {
+      float: none;
+      position: relative;
+      text-align: left;
+    }
+
+    a {
+      background-color: $header-color;
+      color: $white;
+      padding: 0.5rem 1rem;
+
+      &:link,
+      &:active,
+      &:visited {
+        background-color: $header-color;
+        color: $white;
+      }
+
+      &:hover,
+      &:focus {
+        background-color: darken($header-color, 5%);
+        text-decoration: none;
+      }
+    }
+
+    ul {
+      left: 100%;
+      position: absolute;
+      top: 0;
+    }
   }
 }
 
 
 .nav-toggle {
-  position: absolute;
-  top: 1.2rem;
-  right: 1rem;
-  font-size: 2rem;
-
   @include media(">=tablet") {
     display: none;
   }
@@ -152,14 +146,17 @@ $base-background-color: $white;
 
   color: $white;
   cursor: pointer;
-
-  i {
-    vertical-align: middle;
-  }
-
+  font-size: 2rem;
+  position: absolute;
+  right: 1rem;
+  top: 1.2rem;
   transition: transform 0.25s ease-in-out 0s;
 
   &.active {
     transform: rotate(-90deg);
+  }
+
+  i {
+    vertical-align: middle;
   }
 }

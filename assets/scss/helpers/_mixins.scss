@@ -1,44 +1,44 @@
 // CSS Horizontal Centering
 @mixin halign {
-  position: absolute;
   left: 50%;
+  position: absolute;
   transform: translateX(-50%);
 }
 
 // CSS Vertical Centering
 @mixin valign {
+  margin-bottom: 0;
+  margin-top: 0;
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  margin-top: 0;
-  margin-bottom: 0;
 }
 
 // CSS Horizontal & Vertical Centering
 @mixin hvalign {
+  left: 50%;
+  margin-bottom: 0;
+  margin-top: 0;
   position: absolute;
   top: 50%;
-  left: 50%;
   transform: translate(-50%, -50%);
-  margin-top: 0;
-  margin-bottom: 0;
 }
 
 // Font Awesome
 @mixin icons {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;
   font-size: inherit;
   text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 // WebKit-proof
 @mixin webkit-proof {
   -webkit-backface-visibility: hidden;
-  -webkit-transform-style: preserve-3d;
   -webkit-transform: rotateY(0deg);
-  position: relative;
+  -webkit-transform-style: preserve-3d;
   overflow: hidden;
+  position: relative;
 }

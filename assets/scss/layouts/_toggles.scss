@@ -5,8 +5,8 @@ $toggle-color: $action-font-color;
 
 .toggle-content {
   display: none;
-  position: relative;
   padding: 1rem 1rem 0;
+  position: relative;
 
   p {
     &:first-child {
@@ -20,28 +20,28 @@ $toggle-color: $action-font-color;
 }
 
 .toggle-heading {
-  display: block;
-  padding: 0.25rem 1.75rem 0.25rem 0.5rem;
-  margin: 1.5rem auto 0;
+  border: 1px solid $toggle-color;
   color: $toggle-color;
   cursor: pointer;
-  border: 1px solid $toggle-color;
+  display: block;
+  margin: 1.5rem auto 0;
+  padding: 0.25rem 1.75rem 0.25rem 0.5rem;
   position: relative;
 
-  &:after {
+  &::after {
     @include icons;
 
-    content: "\f078";
-    color: $toggle-color;
-    position: absolute;
-    display: block;
     bottom: 0.2rem;
-    right: 0.5rem;
+    color: $toggle-color;
+    content: "\f078";
+    display: block;
     line-height: inherit;
+    position: absolute;
+    right: 0.5rem;
   }
 
   &.active {
-    &:after {
+    &::after {
       content: "\f077";
     }
   }

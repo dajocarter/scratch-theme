@@ -3,20 +3,22 @@
 
 .slider-row {
   .slide-text {
-    margin: 0 auto;
-    padding: 1rem 2rem;
-    color: $white;
-
     @include media(">=tablet") {
       padding: 1rem 6rem;
     }
+
+
+    color: $white;
+    margin: 0 auto;
+    padding: 1rem 2rem;
   }
 }
 
 .slick-slider {
-  &, .slick-slide {
-    overflow: hidden;
+  &,
+  .slick-slide {
     height: 350px;
+    overflow: hidden;
 
     @media (min-width: 567px) {
       height: 500px;
@@ -24,18 +26,18 @@
   }
 
   .slick-slide {
+    background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    background-position: center;
   }
 
   .slick-arrow {
-    width: auto;
-    height: auto;
-    z-index: 1;
     background-color: transparent;
+    height: auto;
+    width: auto;
+    z-index: 1;
 
-    &:before {
+    &::before {
       content: '';
     }
 
@@ -46,9 +48,11 @@
         left: auto;
         right: 25px;
 
-        .fa:before {
-          content: '\f054'; // Right arrow
+        .fa {
+          &::before {
+            content: '\f054'; // Right arrow
 
+          }
         }
       }
     }
@@ -57,27 +61,30 @@
       right: 25px;
 
       [dir="rtl"] & {
-        right: auto;
         left: 25px;
+        right: auto;
 
-        .fa:before {
-          content: '\f053'; // Left arrow
+        .fa {
+          &::before {
+            content: '\f053'; // Left arrow
 
+          }
         }
       }
     }
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       outline: none;
 
       i {
-        color: rgba($white, 1);
+        color: $white;
       }
     }
 
     i {
       font-size: 2rem;
-      color: rgba($white, 0.75);
+      opacity: 0.75;
     }
   }
 
@@ -92,26 +99,30 @@
     li {
       height: 15px;
       width: 15px;
+    }
 
+    .slick-active {
       button {
-        height: 15px;
-        width: 15px;
-        padding: 0px;
-        background-color: transparent;
-
-        &:before {
-          width: 15px;
-          height: 15px;
-          font-size: 15px;
-          line-height: 17px;
-          color: white;
-          opacity: 0.498039;
+        &::before {
+          color: $white;
+          opacity: 1;
         }
       }
+    }
 
-      &.slick-active button:before {
-        color: white;
-        opacity: 1;
+    button {
+      background-color: transparent;
+      height: 15px;
+      padding: 0;
+      width: 15px;
+
+      &::before {
+        color: $white;
+        font-size: 15px;
+        height: 15px;
+        line-height: 17px;
+        opacity: 0.498039;
+        width: 15px;
       }
     }
   }

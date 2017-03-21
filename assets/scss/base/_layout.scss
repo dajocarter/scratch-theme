@@ -7,17 +7,19 @@ $alt-background-color: tint($base-background-color, 75%);
 $overlay-color: rgba($black, 0.4);
 
 html {
-  box-sizing: border-box;
   background-color: $base-background-color;
+  box-sizing: border-box;
   color: $base-font-color;
   font-size: $base-font-size;
   line-height: $base-line-height;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: inherit;
+* {
+  &,
+  &::before,
+  &::after {
+    box-sizing: inherit;
+  }
 }
 
 html,
@@ -35,11 +37,11 @@ main {
 // These selection rule sets have to be separate.
 // Customize the background color to match your design.
 ::-moz-selection {
-  background: #b3d4fc;
+  background: $alt-background-color;
   text-shadow: none;
 }
 
 ::selection {
-  background: #b3d4fc;
+  background: $alt-background-color;
   text-shadow: none;
 }

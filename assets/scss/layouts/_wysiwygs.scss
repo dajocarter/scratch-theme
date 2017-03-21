@@ -2,12 +2,14 @@
 // The corresponding PHP file is layouts/layout-wysiwyg.php
 
 .wysiwygs {
-  [class^="row-"], [class*=" row-"] {
+  [class^="row-"],
+  [class*=" row-"] {
     // row-specific styles here
 
   }
 
-  [class^="column-"], [class*=" column-"] {
+  [class^="column-"],
+  [class*=" column-"] {
     // column-specific styles here
 
   }
