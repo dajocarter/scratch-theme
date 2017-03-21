@@ -31,6 +31,36 @@ const mqpacker = require( 'css-mqpacker' );
 const neat = require( 'bourbon-neat' ).includePaths;
 const reload = browserSync.reload;
 
+// Set assets paths.
+const paths = {
+  'css': [ 'assets/css/*.css', '!assets/css/*.min.css' ],
+  'fonts': 'assets/fonts/*',
+  'images': [ 'assets/img/*', '!assets/img/**/*.svg'],
+  'logos': 'assets/img/svg-logos/*.svg',
+  'php': [ './**/*.php', '!node_modules/**/*.php' ],
+  'sass': 'assets/scss/**/*.scss',
+  'scripts': 'assets/js/scripts/*.js',
+  'js': [ 'assets/js/*.js', '!assets/js/*.min.js' ]
+};
+
+/**
+ * Handle errors and alert the user.
+ */
+function handleErrors () {
+  const args = Array.prototype.slice.call( arguments );
+
+  $.notify.onError( {
+    'title': 'Task Failed [<%= error.message %>',
+    'message': 'See console.',
+    'sound': 'Sosumi' // See: https://github.com/mikaelbr/node-notifier#all-notification-options-with-their-defaults
+  } ).apply( this, args );
+
+  $.util.beep(); // Beep 'sosumi' again.
+
+  // Prevent the 'watch' task from stopping.
+  this.emit( 'end' );
+}
+
 
 gulp.task('assets', function() {
   var css = gulp.src([
