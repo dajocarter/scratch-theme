@@ -155,28 +155,24 @@ gulp.task('copy:fonts', function() {
   return merge(toAssetsCss, toAssetsFonts);
 });
 
-gulp.task('js', function() {
-  return gulp.src([
-    'node_modules/slick-carousel/slick/slick.js',
-    'node_modules/magnific-popup/dist/jquery.magnific-popup.js',
-    'node_modules/velocity-animate/velocity.js',
-    'node_modules/waypoints/lib/jquery.waypoints.js',
-    'node_modules/headroom.js/dist/headroom.js',
-    'node_modules/headroom.js/dist/jQuery.headroom.js',
-    'assets/js/plugins.js',
-    'assets/js/acf-google-maps.js',
-    'assets/js/main.js'
-  ])
-    .pipe($.concat('main.js', {
-      newLine: ';'
-    }))
-    .pipe(gulp.dest('assets/js/concat'))
-    .pipe($.uglify(false))
-    .pipe($.rename('main.min.js'))
-    .pipe(gulp.dest('assets/js/compiled'))
-    .pipe(browserSync.stream());
-});
 
+
+/**
+ * Concatenate and transform JavaScript.
+ *
+ * https://www.npmjs.com/package/gulp-concat
+ * https://github.com/babel/gulp-babel
+ * https://www.npmjs.com/package/gulp-sourcemaps
+ */
+gulp.task( 'concat', () =>
+  gulp.src( [
+      'node_modules/slick-carousel/slick/slick.js',
+      'node_modules/magnific-popup/dist/jquery.magnific-popup.js',
+      'node_modules/velocity-animate/velocity.js',
+      'node_modules/waypoints/lib/jquery.waypoints.js',
+      'node_modules/headroom.js/dist/headroom.js',
+      'node_modules/headroom.js/dist/jQuery.headroom.js',
+      paths.scripts
     ])
 
 gulp.task('watch', function() {
@@ -185,6 +181,8 @@ gulp.task('watch', function() {
   gulp.watch(['assets/js/*.js', 'assets/js/vendor/*.js'], ['js']);
   gulp.watch(['assets/scss/**/*.scss', 'assets/core/scss/**/*.scss'], ['sass']);
 });
+    // Deal with errors.
+    .pipe( $.plumber( { 'errorHandler': handleErrors } ) )
 
 gulp.task('browserSync', function() {
   browserSync.init({
@@ -192,5 +190,36 @@ gulp.task('browserSync', function() {
     watchTask: true
   });
 });
+    // Start a sourcemap.
+    .pipe( $.sourcemaps.init() )
+
+    // Convert ES6+ to ES2015.
+    .pipe( $.babel( {
+      presets: [ 'es2015' ]
+    } ) )
+
+    // Concatenate partials into a single script.
+    .pipe( $.concat( 'project.js' ) )
+
+    // Append the sourcemap to project.js.
+    .pipe( $.sourcemaps.write() )
+
+    // Save project.js
+    .pipe( gulp.dest( 'assets/js' ) )
+    .pipe( browserSync.stream() )
+);
+
+/**
+  * Minify compiled JavaScript.
+  *
+  * https://www.npmjs.com/package/gulp-uglify
+  */
+gulp.task( 'uglify', [ 'concat' ], () =>
+  gulp.src( paths.js )
+    .pipe( $.rename( { 'suffix': '.min' } ) )
+    .pipe( $.uglify( { 'mangle': false } ) )
+    .pipe( gulp.dest( 'assets/js' ) )
+);
+
 
 gulp.task('default', ['browserSync', 'watch']);
