@@ -1,3 +1,7 @@
+// This file should house all of the styles for anything related to the layout of the website.
+// Think of <html>, <body>, <main>, <section> tags
+// or wrapper classes like .wrap, .contain, .constrain
+
 $base-background-color: $white;
 $alt-background-color: tint($base-background-color, 75%);
 $overlay-color: rgba($black, 0.4);
@@ -25,14 +29,11 @@ main {
   padding-top: 72px;
 }
 
-/*
- * Remove text-shadow in selection highlight:
- * https://twitter.com/miketaylr/status/12228805301
- *
- * These selection rule sets have to be separate.
- * Customize the background color to match your design.
- */
-
+// Remove text-shadow in selection highlight:
+// https://twitter.com/miketaylr/status/12228805301
+//
+// These selection rule sets have to be separate.
+// Customize the background color to match your design.
 ::-moz-selection {
   background: #b3d4fc;
   text-shadow: none;

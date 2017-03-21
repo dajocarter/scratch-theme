@@ -1,9 +1,10 @@
-/* Color Schemes
-   ========================================================================== */
+// This file should house all of the color variables.
+// Define and set your color schemes here.
 
-/*
-Cool
-*/
+// Color Schemes
+// ==========================================================================
+
+// Cool
 
 $aqua: #7fdbff;
 $blue: #0074d9;
@@ -13,9 +14,7 @@ $green: #2ecc40;
 $olive: #3d9970;
 $lime: #01ff70;
 
-/*
-Warm
-*/
+// Warm
 
 $yellow: #ffdc00;
 $orange: #ff851b;
@@ -24,17 +23,15 @@ $fuchsia: #f012be;
 $purple: #b10dc9;
 $maroon: #85144b;
 
-/*
-Gray Scale
-*/
+// Gray Scale
 
 $white: white;
 $gray: #eeeeee;
 $silver: #cccccc;
 $black: #444444;
 
-/* Color Classes
-   ========================================================================== */
+// Color Classes
+// ==========================================================================
 
 $colors: "aqua" $aqua, "blue" $blue, "navy" $navy, "teal" $teal, "green" $green, "olive" $olive, "lime" $lime, "yellow" $yellow, "orange" $orange, "red" $red, "fuchsia" $fuchsia, "purple" $purple, "maroon" $maroon, "white" $white, "gray" $gray, "silver" $silver, "black" $black;
 

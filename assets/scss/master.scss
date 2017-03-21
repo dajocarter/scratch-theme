@@ -6,7 +6,7 @@
 // Variables
 @import "variables/colors";
 @import "variables/fonts";
-@import "variables/variables";
+@import "variables/general";
 
 // Mixins & Helpers
 @import "helpers/mixins";
@@ -46,7 +46,7 @@ $use-all: true; // Enable animations by overriding variables from node_modules/a
 @import "layouts/staggered-rows";
 @import "layouts/toggles";
 @import "layouts/wysiwygs";
-@import "layouts/layouts";
+@import "layouts/general";
 
 // Partials
 @import "partials/footer";

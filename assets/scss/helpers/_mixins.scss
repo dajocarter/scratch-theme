@@ -1,13 +1,11 @@
-/********************MIXINS*********************/
-
-/* CSS Horizontal Centering */
+// CSS Horizontal Centering
 @mixin halign {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
 }
 
-/* CSS Vertical Centering */
+// CSS Vertical Centering
 @mixin valign {
   position: absolute;
   top: 50%;
@@ -16,7 +14,7 @@
   margin-bottom: 0;
 }
 
-/* CSS Horizontal & Vertical Centering */
+// CSS Horizontal & Vertical Centering
 @mixin hvalign {
   position: absolute;
   top: 50%;
@@ -26,7 +24,7 @@
   margin-bottom: 0;
 }
 
-/* Font Awesome */
+// Font Awesome
 @mixin icons {
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;
@@ -36,7 +34,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* WebKit-proof */
+// WebKit-proof
 @mixin webkit-proof {
   -webkit-backface-visibility: hidden;
   -webkit-transform-style: preserve-3d;

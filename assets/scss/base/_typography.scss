@@ -1,3 +1,6 @@
+// This file should house all of the styles for anything typography related.
+// Think <h1>, <h2>, <h3>, <p>, <hr>, <pre> tags.
+
 $base-font-color: $black;
 $heading-font-color: $base-font-color;
 $action-font-color: $blue;
@@ -98,7 +101,7 @@ small, .small {
   font-size: 70%;
 }
 
-/* Code */
+// Code
 code, kbd, pre, samp, .code {
   background-color: $gray;
   color: $base-font-color;
@@ -126,8 +129,6 @@ pre, .pre {
 
 br {
   &.brm {
-    // Background Colors
-    $base-background-color: $white;
 
     @include media(">=tablet") {
       display: none;
@@ -138,9 +139,6 @@ br {
   &.mbr {
     display: none;
     visibility: hidden;
-
-    // Background Colors
-    $base-background-color: $white;
 
     @include media(">=tablet") {
       display: block;

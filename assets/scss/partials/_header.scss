@@ -1,10 +1,7 @@
-/********************HEADER********************/
-$header-color: $action-font-color;
+// This file should house all of the styles for the header.
+// The corresponding php file is partials/header.php
 
-/*
- * This file should house all of the styles for
- * header.php.
- */
+$header-color: $action-font-color;
 
 #header {
   background-color: $header-color;
@@ -23,12 +20,6 @@ $header-color: $action-font-color;
     }
   }
 }
-
-/* Adds dropdown support, gives a good example of nesting
- * with SCSS. The classes are specific to the Tweek
- * Theme for WordPress. If you are not using Tweek, you
- * can simply get rid of them.
- */
 
 nav {
   ul.main-nav {

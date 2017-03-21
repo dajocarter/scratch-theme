@@ -1,11 +1,11 @@
+// This file should house all of the styles for the Sliders layout.
+// The corresponding PHP file is layouts/layout-sliders.php
+
 .slider-row {
   .slide-text {
     margin: 0 auto;
     padding: 1rem 2rem;
     color: $white;
-
-    // Background Colors
-    $base-background-color: $white;
 
     @include media(">=tablet") {
       padding: 1rem 6rem;

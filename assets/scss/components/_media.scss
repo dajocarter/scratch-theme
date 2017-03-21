@@ -1,9 +1,9 @@
-/*
- * Remove the gap between audio, canvas, iframes,
- * images, videos and the bottom of their containers:
- * https://github.com/h5bp/html5-boilerplate/issues/440
- */
+// This file should house all of the styles for any media related elements.
+// Think <img>, <figure>, <audio>, <video> tags.
 
+// Remove the gap between audio, canvas, iframes,
+// images, videos and the bottom of their containers:
+// https://github.com/h5bp/html5-boilerplate/issues/440
 audio,
 canvas,
 iframe,
@@ -31,7 +31,7 @@ figcaption {
   text-align: center;
 }
 
-/* WordPress Image Styles */
+// WordPress Image Styles
 [class^="wp-image-"], [class*=" wp-image-"], .wp-caption {
   display: block;
   padding: 4px;
@@ -53,11 +53,8 @@ figcaption {
   }
 }
 
-/*
- * oEmbed Styles
- * To make an oEmbed responsive, simply wrap it in
- * `.embed-container`.
- */
+// oEmbed Styles
+// To make an oEmbed responsive, simply wrap it in .embed-container
 .embed-container {
   position: relative;
   padding-bottom: 56.25%;

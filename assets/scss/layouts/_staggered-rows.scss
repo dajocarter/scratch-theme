@@ -1,3 +1,6 @@
+// This file should house all of the styles for the Staggered Rows layout.
+// The corresponding PHP file is layouts/layout-staggered_rows.php
+
 $staggered-row-height: 500px;
 $staggered-circle-size: 250px;
 $staggered-icon-size: 6rem;
@@ -8,9 +11,6 @@ $staggered-icon-color: $white;
     .circle {
       width: $staggered-circle-size;
       height: $staggered-circle-size;
-
-      // Background Colors
-      $base-background-color: $white;
 
       @include media(">=tablet") {
         @include valign;
@@ -50,9 +50,6 @@ $staggered-icon-color: $white;
     p.button-wrapper {
       clear: both;
     }
-
-    // Background Colors
-    $base-background-color: $white;
 
     @include media(">=tablet") {
       height: $staggered-row-height;

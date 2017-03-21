@@ -1,3 +1,6 @@
+// This file should house all of the styles for the Hero Unit layout.
+// The corresponding PHP file is layouts/layout-hero_unit.php
+
 .hero-unit {
   .tweek-bg {
     height: auto;
@@ -5,16 +8,11 @@
 
   .content {
     margin: 10rem auto;
-
-    // Background Colors
-    $base-background-color: $white;
+    color: $white;
 
     @include media(">=tablet") {
       width: 65%;
     }
-
-
-    color: $white;
   }
 
   .left {
