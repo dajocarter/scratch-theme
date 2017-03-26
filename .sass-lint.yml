@@ -20,7 +20,7 @@ files:
 
 # Rule Configuration
 rules:
- # Extends
+  # Extends
   placeholder-in-extend: 0
 
   # Mixins
@@ -101,7 +101,7 @@ rules:
   indentation:
     - 1
     -
-      size: tab
+      size: 2
   leading-zero:
     - 1
     -
@@ -112,10 +112,7 @@ rules:
     -
       max-depth: 3
 
-  property-units:
-    - 1
-    -
-      per-property: { width: ['rem', 'vw'], height: ['rem', 'vh'], margin: ['rem'], padding: ['rem'] }
+  property-units: 0
 
   quotes:
     - 1
