@@ -14,7 +14,6 @@ body {
   line-height: $base-line-height;
 }
 
-
 $headings: (
   h1: (2.5, 2, 4, 1),
   h2: (1.6875, 1.5, 2.5, 0.5),
@@ -23,6 +22,17 @@ $headings: (
   h5: (1, 1, 2.5, 0.5),
   h6: (1, 1, 2.5, 0.5)
 );
+
+$_headings-list: (
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6"
+);
+
+$all-headings: _assign-inputs($_headings-list);
 
 // Set headings sizes, line-heights and margins
 @each $heading, $properties in $headings {

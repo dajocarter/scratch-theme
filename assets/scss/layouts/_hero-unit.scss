@@ -7,13 +7,15 @@
   }
 
   .content {
+    color: $white;
+
+    #{$all-headings} {
+      margin-top: 0;
+    }
+
     @include media(">=tablet") {
       width: 65%;
     }
-
-
-    color: $white;
-    margin: 10rem auto;
   }
 
   .left {

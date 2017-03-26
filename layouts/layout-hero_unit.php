@@ -38,7 +38,7 @@ if(!function_exists('tweek_bg_position')) {
       ?>
       <div class="wrap <?php echo $text_align_class; ?> hpad clearfix white">
         <div class="content"
-             style="margin: <?php the_sub_field('text_margin'); ?>em auto;">
+             style="padding: <?php the_sub_field('text_margin'); ?>em;">
 
           <?php if(get_sub_field('header')): ?>
             <h2><?php the_sub_field('header'); ?></h2>
@@ -47,7 +47,6 @@ if(!function_exists('tweek_bg_position')) {
           <?php the_sub_field('blurb'); ?>
 
           <?php if(get_sub_field('add_button')): ?>
-            <p>
 
               <?php if (get_sub_field('internal_link')) : ?>
 
@@ -69,7 +68,6 @@ if(!function_exists('tweek_bg_position')) {
 
               <?php endif; ?>
 
-            </p>
           <?php endif; ?>
         </div>
       </div>
