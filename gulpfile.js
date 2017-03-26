@@ -244,7 +244,6 @@ gulp.task( 'watch', function () {
 
   // Kick off BrowserSync.
   browserSync( {
-    'open': false,             // Open project in a new tab?
     'injectChanges': true,     // Auto inject changes instead of full reload.
     'proxy': 'tweek.dev',    // Use http://localhost:3000 to use BrowserSync.
     'watchOptions': {
