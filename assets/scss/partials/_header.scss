@@ -30,7 +30,7 @@ body > header {
   margin: 0;
   padding: 0;
   position: absolute;
-  top: 80px;
+  top: 72px;
   width: 100%;
   z-index: 100;
 
@@ -139,17 +139,12 @@ body > header {
 
 
 .nav-toggle {
-  @include media(">=tablet") {
-    display: none;
-  }
-
-
   color: $white;
   cursor: pointer;
   font-size: 2rem;
   position: absolute;
   right: 1rem;
-  top: 1.2rem;
+  top: 0.5rem;
   transition: transform 0.25s ease-in-out 0s;
 
   &.active {
@@ -158,5 +153,9 @@ body > header {
 
   i {
     vertical-align: middle;
+  }
+
+  @include media(">=tablet") {
+    display: none;
   }
 }
