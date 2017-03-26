@@ -1,5 +1,5 @@
 // Require our dependencies
-const $ = require('gulp-load-plugins')();
+const $ = require( 'gulp-load-plugins' )();
 const autoprefixer = require( 'autoprefixer' );
 const bourbon = require( 'bourbon' ).includePaths;
 const browserSync = require( 'browser-sync' );
@@ -67,13 +67,13 @@ gulp.task( 'postcss', [ 'clean:styles' ], () =>
       .pipe( $.sass( {
         'includePaths': [
           // Include paths for any npm package to use @import
-          'node_modules/slick-carousel/slick/',
-          'node_modules/font-awesome/scss',
+          'node_modules/animate-sass/',
+          'node_modules/include-media/dist/',
           'node_modules/magnific-popup/dist/',
           'node_modules/normalize.css/',
-          'node_modules/animate-sass/',
           'node_modules/family.scss/source/src/',
-          'node_modules/include-media/dist/'
+          'node_modules/font-awesome/scss/',
+          'node_modules/slick-carousel/slick/'
         ].concat( bourbon, neat ),
         'errLogToConsole': true,
         'outputStyle': 'expanded' // Options: nested, expanded, compact, compressed
@@ -81,9 +81,7 @@ gulp.task( 'postcss', [ 'clean:styles' ], () =>
 
       // Parse with PostCSS plugins.
       .pipe( $.postcss( [
-        autoprefixer( {
-          'browsers': [ 'last 2 version' ]
-        } ),
+        autoprefixer( ),
         mqpacker( {
           'sort': true
         } )
@@ -125,8 +123,8 @@ gulp.task('copy:fonts', function() {
     .pipe(gulp.dest('assets/css'));
 
   var toAssetsFonts = gulp.src([
-      'node_modules/slick-carousel/slick/fonts/*',
-      'node_modules/font-awesome/fonts/*'
+      'node_modules/font-awesome/fonts/*',
+      'node_modules/slick-carousel/slick/fonts/*'
     ])
     .pipe(gulp.dest('assets/fonts'));
 
@@ -158,13 +156,13 @@ gulp.task( 'imagemin', () =>
  */
 gulp.task( 'concat', () =>
   gulp.src( [
-      'node_modules/slick-carousel/slick/slick.js',
+      'node_modules/headroom.js/dist/headroom.js',
+      'node_modules/headroom.js/dist/jQuery.headroom.js',
       'node_modules/magnific-popup/dist/jquery.magnific-popup.js',
+      'node_modules/slick-carousel/slick/slick.js',
       'node_modules/velocity-animate/velocity.js',
       'node_modules/velocity-animate/velocity.ui.js',
       'node_modules/waypoints/lib/jquery.waypoints.js',
-      'node_modules/headroom.js/dist/headroom.js',
-      'node_modules/headroom.js/dist/jQuery.headroom.js',
       paths.scripts
     ])
 
@@ -248,7 +246,7 @@ gulp.task( 'watch', function () {
   browserSync( {
     'open': false,             // Open project in a new tab?
     'injectChanges': true,     // Auto inject changes instead of full reload.
-    'proxy': 'tweek.dev',    // Use http://_s.com:3000 to use BrowserSync.
+    'proxy': 'tweek.dev',    // Use http://localhost:3000 to use BrowserSync.
     'watchOptions': {
       'debounceDelay': 1000  // Wait 1 second before injecting.
     }
@@ -270,4 +268,5 @@ gulp.task( 'copy', [ 'copy:fonts' ] );
 gulp.task( 'js', [ 'uglify' ] );
 gulp.task( 'sass', [ 'cssnano' ] );
 gulp.task( 'lint', [ 'lint:sass', 'lint:js' ] );
-gulp.task( 'default', [ 'copy', 'sass', 'js', 'imagemin' ] );
+gulp.task( 'build', [ 'copy', 'sass', 'js', 'imagemin' ] );
+gulp.task( 'default', [ 'build', 'watch' ] );
