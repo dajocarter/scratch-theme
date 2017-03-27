@@ -4,9 +4,23 @@
 @import "neat";
 
 // Variables
-@import "variables/colors";
-@import "variables/fonts";
-@import "variables/general";
+@import "variables/custom/colors";
+@import "variables/custom/fonts";
+@import "variables/custom/base";
+@import "variables/custom/general";
+@import "variables/custom/components";
+@import "variables/custom/partials";
+@import "variables/custom/layouts";
+@import "variables/custom/templates";
+
+@import "variables/default/colors";
+@import "variables/default/fonts";
+@import "variables/default/base";
+@import "variables/default/general";
+@import "variables/default/components";
+@import "variables/default/partials";
+@import "variables/default/layouts";
+@import "variables/default/templates";
 
 // Mixins & Helpers
 @import "helpers/mixins";
