@@ -30,6 +30,23 @@ $gray: #eee;
 $silver: #ccc;
 $black: #000;
 
+// Default Colors
+
+// Action Colors
+$base-action-color: $blue;
+$alt-action-color: $orange;
+
+// Font colors
+$base-font-color: $black;
+$heading-font-color: $base-action-color;
+$base-border-color: $base-action-color;
+
+// Header color
+$header-color: $base-action-color;
+
+// Toggle color
+$toggle-color: $base-action-color;
+
 // Color Classes
 // ==========================================================================
 

@@ -1,0 +1,37 @@
+// Common Among Layouts
+// ==========================================================================
+
+$layout-action-color: $base-action-color !default;
+$layout-icon-color: $white !default;
+
+// Flexible Columns
+// ==========================================================================
+
+$column-circle-size: 160px !default;
+$column-icon-size: 3rem !default;
+$column-icon-color: $layout-icon-color !default;
+
+// Hero Unit
+// ==========================================================================
+
+// Slider
+// ==========================================================================
+
+$slider-arrow-color: $white !default;
+$slider-dots-color: $slider-arrow-color !default;
+
+// Staggered Rows
+// ==========================================================================
+
+$staggered-row-height: 500px !default;
+$staggered-circle-size: 250px !default;
+$staggered-icon-size: 6rem !default;
+$staggered-icon-color: $layout-icon-color !default;
+
+// Toggles
+// ==========================================================================
+
+$toggle-color: $layout-action-color !default;
+
+// WYSIWYGs
+// ==========================================================================

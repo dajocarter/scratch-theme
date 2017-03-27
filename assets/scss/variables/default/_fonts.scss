@@ -1,0 +1,42 @@
+// This file should house all of the font variables.
+// Define and set your font schemes here.
+
+// Pick a font stack from node_modules/bourbon/core/bourbon/library/_font-stacks.scss
+// Options include:
+
+// Sans Serif Fonts:
+// * $font-stack-helvetica
+// * $font-stack-lucida-grande
+// * $font-stack-verdana
+// * $font-stack-system
+
+// Serif Fonts:
+// * $font-stack-garamond
+// * $font-stack-georgia
+// * $font-stack-hoefler-text
+
+// Monospace Fonts:
+// * $font-stack-consolas
+// * $font-stack-courier-new
+// * $font-stack-monaco
+
+// Otherwise roll your own below
+
+// @import url("//fonts.googleapis.com/css?family=Alegreya:400,400i,700|Alegreya+Sans:300,300i,400,400i,700");
+// $font-stack-alegreya: "Alegreya", serif;
+// $font-stack-alegreya-sans: "Alegreya Sans", sans-serif;
+
+// Font themes
+// ==========================================================================
+
+// Font family
+$base-font-family: $font-stack-helvetica !default;
+$heading-font-family: $font-stack-georgia !default;
+
+// Font sizes
+$base-font-size: 16px !default;
+$heading-font-size: $base-font-size !default;
+
+// Line height
+$base-line-height: 1.5 !default;
+$heading-line-height: 1.2 !default;

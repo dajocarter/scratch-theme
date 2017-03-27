@@ -1,0 +1,21 @@
+// Layout
+// ==========================================================================
+
+$base-background-color: $white !default;
+$alt-background-color: tint($base-background-color, 75%) !default;
+
+// Miscellaneous
+// ==========================================================================
+
+$overlay-color: rgba($black, 0.4) !default;
+
+// Typography
+// ==========================================================================
+
+$base-font-family: $font-stack-helvetica !default;
+$base-font-size: 16px !default;
+$base-line-height: 1.5 !default;
+
+$heading-font-family: $font-stack-georgia !default;
+$heading-font-size: $base-font-size !default;
+$heading-line-height: 1.2 !default;

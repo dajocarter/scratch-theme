@@ -1,0 +1,16 @@
+// This file should house all of the general variables.
+// Define and set your variables here.
+
+// Breakpoints
+$breakpoints: (phone: 320px, tablet: 768px, desktop: 1024px) !default;
+
+// Other Sizes
+$base-border: 1px solid $base-border-color !default;
+$base-border-radius: 3px !default;
+$base-spacing: $base-line-height * 1em !default;
+$small-spacing: $base-spacing / 2 !default;
+$base-z-index: 0 !default;
+
+// Animations
+$base-duration: 150ms !default;
+$base-timing: ease !default;

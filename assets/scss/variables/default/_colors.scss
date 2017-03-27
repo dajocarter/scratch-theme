@@ -1,0 +1,66 @@
+// This file should house all of the color variables.
+// Define and set your color schemes here.
+
+// Color Schemes
+// ==========================================================================
+
+// Cool
+
+$aqua: #7fdbff !default;
+$blue: #0074d9 !default;
+$navy: #001f3f !default;
+$teal: #39cccc !default;
+$green: #2ecc40 !default;
+$olive: #3d9970 !default;
+$lime: #01ff70 !default;
+
+// Warm
+
+$yellow: #ffdc00 !default;
+$orange: #ff851b !default;
+$red: #ff4136 !default;
+$fuchsia: #f012be !default;
+$purple: #b10dc9 !default;
+$maroon: #85144b !default;
+
+// Gray Scale
+
+$white: #fff !default;
+$gray: #eee !default;
+$silver: #ccc !default;
+$black: #000 !default;
+
+// Default Colors
+
+// Action Colors
+$base-action-color: $teal !default;
+$alt-action-color: $fuchsia !default;
+
+// Font colors
+$base-font-color: $black !default;
+$heading-font-color: $base-action-color !default;
+$base-border-color: $base-action-color !default;
+
+// Header color
+$header-color: $base-action-color !default;
+
+// Toggle color
+$toggle-color: $base-action-color !default;
+
+// Color Classes
+// ==========================================================================
+
+$colors: "aqua" $aqua, "blue" $blue, "navy" $navy, "teal" $teal, "green" $green, "olive" $olive, "lime" $lime, "yellow" $yellow, "orange" $orange, "red" $red, "fuchsia" $fuchsia, "purple" $purple, "maroon" $maroon, "white" $white, "gray" $gray, "silver" $silver, "black" $black;
+
+@each $color in $colors {
+  $label: nth($color, 1);
+  $value: nth($color, 2);
+
+  .#{$label} {
+    color: $value;
+  }
+
+  .#{$label}-bg {
+    background-color: $value;
+  }
+}
