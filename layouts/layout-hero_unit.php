@@ -38,7 +38,7 @@ if(!function_exists('tweek_bg_position')) {
       ?>
       <div class="wrap <?php echo $text_align_class; ?> hpad clearfix white">
         <div class="content"
-             style="padding: <?php the_sub_field('text_margin'); ?>em;">
+             style="padding: <?php the_sub_field('text_margin'); ?>em 0;">
 
           <?php if(get_sub_field('header')): ?>
             <h2><?php the_sub_field('header'); ?></h2>
