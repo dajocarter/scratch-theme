@@ -3,14 +3,13 @@
 
 .slider-row {
   .slide-text {
-    @include media(">=tablet") {
-      padding: 1rem 6rem;
-    }
-
-
     color: $white;
     margin: 0 auto;
     padding: 1rem 2rem;
+
+    @include media(">=tablet") {
+      padding: 1rem 6rem;
+    }
   }
 }
 
@@ -20,7 +19,7 @@
     height: 350px;
     overflow: hidden;
 
-    @media (min-width: 567px) {
+    @include media(">=tablet") {
       height: 500px;
     }
   }
@@ -79,11 +78,12 @@
       outline: none;
 
       i {
-        color: $white;
+        opacity: 1;
       }
     }
 
     i {
+      color: $slider-arrow-color;
       font-size: 2rem;
       opacity: 0.75;
     }
@@ -105,8 +105,7 @@
     .slick-active {
       button {
         &::before {
-          color: $white;
-          opacity: 1;
+          color: $slider-dots-color;
         }
       }
     }
@@ -118,11 +117,10 @@
       width: 15px;
 
       &::before {
-        color: $white;
+        color: $slider-dots-color;
         font-size: 15px;
         height: 15px;
         line-height: 17px;
-        opacity: 0.498039;
         width: 15px;
       }
     }

@@ -2,10 +2,6 @@
 // Think of <html>, <body>, <main>, <section> tags
 // or wrapper classes like .wrap, .contain, .constrain
 
-$base-background-color: $white;
-$alt-background-color: tint($base-background-color, 75%);
-$overlay-color: rgba($black, 0.4);
-
 html {
   background-color: $base-background-color;
   box-sizing: border-box;

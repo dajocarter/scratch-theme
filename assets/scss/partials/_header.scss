@@ -1,8 +1,6 @@
 // This file should house all of the styles for the header.
 // The corresponding php file is partials/header.php
 
-$header-color: $action-font-color;
-
 body > header {
   background-color: $header-color;
   position: fixed;

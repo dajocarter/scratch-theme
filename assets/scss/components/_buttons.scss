@@ -1,13 +1,5 @@
 // This file should house all of the styles for any buttons.
 
-$base-btn-background: $base-link-color;
-$base-btn-background-hover: shade($base-btn-background, 20%);
-
-$alt-btn-background: $black;
-$alt-btn-background-hover: shade($alt-btn-background, 20%);
-
-$base-btn-color: $white;
-
 #{$all-buttons},
 
 .button,

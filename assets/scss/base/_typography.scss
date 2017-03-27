@@ -1,12 +1,6 @@
 // This file should house all of the styles for anything typography related.
 // Think <h1>, <h2>, <h3>, <p>, <hr>, <pre> tags.
 
-$base-font-color: $black;
-$heading-font-color: $base-font-color;
-$action-font-color: $blue;
-$base-border-color: $base-font-color;
-$base-border: 1px solid $base-border-color;
-
 body {
   color: $base-font-color;
   font-family: $base-font-family;

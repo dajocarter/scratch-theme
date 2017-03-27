@@ -1,23 +1,17 @@
 // This file should house all of the styles for the Staggered Rows layout.
 // The corresponding PHP file is layouts/layout-staggered_rows.php
 
-$staggered-row-height: 500px;
-$staggered-circle-size: 250px;
-$staggered-icon-size: 6rem;
-$staggered-icon-color: $white;
-
 .staggered {
   .circle {
-    @include media(">=tablet") {
-      @include valign;
-    }
-
-
     @include size($staggered-circle-size);
 
     i {
       color: $staggered-icon-color;
       font-size: $staggered-icon-size;
+    }
+
+    @include media(">=tablet") {
+      @include valign;
     }
   }
 
@@ -74,12 +68,6 @@ $staggered-icon-color: $white;
       &:nth-child(even) {
         .first {
           float: right;
-          margin-left: 2.762430939%;
-        }
-
-        .last {
-          float: left;
-          margin-left: 0;
         }
       }
     }
