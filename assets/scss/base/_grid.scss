@@ -26,65 +26,22 @@
   max-width: 450px;
 }
 
-.onecol,
-.twocol,
-.threecol,
-.fourcol,
-.fivecol,
-.sixcol,
-.sevencol,
-.eightcol,
-.ninecol,
-.tencol,
-.elevencol,
-.twelvecol {
+$_grid-sizes: ("one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12);
+
+%position {
   position: relative;
 }
 
-.onecol {
-  @include grid-column(1);
-}
+@each $size, $value in $_grid-sizes {
+  .#{$size}col {
+    @extend %position;
 
-.twocol {
-  @include grid-column(2);
-}
+    @include media(">=tablet") {
+      @include grid-column($value);
+    }
+  }
 
-.threecol {
-  @include grid-column(3);
-}
-
-.fourcol {
-  @include grid-column(4);
-}
-
-.fivecol {
-  @include grid-column(5);
-}
-
-.sixcol {
-  @include grid-column(6);
-}
-
-.sevencol {
-  @include grid-column(7);
-}
-
-.eightcol {
-  @include grid-column(8);
-}
-
-.ninecol {
-  @include grid-column(9);
-}
-
-.tencol {
-  @include grid-column(10);
-}
-
-.elevencol {
-  @include grid-column(11);
-}
-
-.twelvecol {
-  @include grid-column(12);
+  .#{$size}col-always {
+    @include grid-column($value);
+  }
 }
