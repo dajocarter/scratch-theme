@@ -4,7 +4,8 @@ jQuery( document ).ready( function( $ ) {
 			'initial': 'animated',
 			'pinned': 'slideInDown',
 			'unpinned': 'slideOutUp'
-		}
+		},
+    'offset': 72
 	});
 	$( '.slick' ).slick({
 		autoplay: false,
