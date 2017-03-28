@@ -42,7 +42,7 @@
 
   .row {
     &:nth-child(odd) {
-      background-color: $gray;
+      background-color: $silver;
     }
 
     @include media("<tablet") {
