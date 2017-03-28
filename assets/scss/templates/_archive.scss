@@ -1,3 +1,10 @@
 // This file should house all of the styles for any archive template.
 // Corresponding PHP files are
 // archive.php, archive-#{post_type}.php, category.php, category-#{cat_name}.php, taxonomy.php, taxonomy-#{tax_name}.php, search.php, home.php, index.php
+
+.blog,
+.search {
+  aside {
+    margin-top: 2.5rem;
+  }
+}
