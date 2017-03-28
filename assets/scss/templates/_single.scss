@@ -1,3 +1,15 @@
 // This file should house all of the styles for any single template.
 // Corresponding PHP files are
 // single.php, single-#{post_type}.php
+
+.post {
+  header {
+    border-bottom: 1px solid $alt-action-color;
+    margin-bottom: 1rem;
+  }
+}
+
+.info {
+  font-size: .85rem;
+  margin-bottom: 0;
+}
