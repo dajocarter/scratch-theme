@@ -23,7 +23,12 @@ add_action('acf/init', 'tweek_acf_google_map_api');
 }
 add_filter('acf/fields/google_map/api', 'tweek_acf_google_map_api');*/
 
-
+// Replaces the excerpt "[...]" text with a link
+function tweek_excerpt_more_link($more) {
+  global $post;
+  return '<div><a class="button" href="'. get_permalink($post->ID) . '">Read more</a></div>';
+}
+add_filter('excerpt_more', 'tweek_excerpt_more_link');
 
 
 
