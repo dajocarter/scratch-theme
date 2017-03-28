@@ -4,7 +4,7 @@
   <div class="wrap hpad clearfix">
 
     <?php if( get_sub_field('header')): ?>
-      <h2><?php the_sub_field('header'); ?></h2>
+      <h2 class="center"><?php the_sub_field('header'); ?></h2>
     <?php endif; ?>
 
     <?php the_sub_field('blurb'); ?>
