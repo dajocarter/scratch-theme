@@ -22,6 +22,16 @@
 
     </article>
 
+    <?php if (comments_open() ) : ?>
+
+      <?php comment_form(); ?>
+
+      <div class="comments">
+        <?php comments_template(); ?>
+      </div>
+
+    <?php endif; ?>
+
   </section>
 
 </main>

@@ -8,3 +8,14 @@ $header-color: $base-action-color !default;
 
 // Sidebar
 // ==========================================================================
+
+// Comments
+// ==========================================================================
+
+$comment-gutter: 1.4em !default;
+$comment-image-padding: 0.7em !default;
+$comment-image-width: 4em !default;
+$comment-color: $base-font-color !default;
+$comment-background: lighten($base-action-color, 15%) !default;
+$comment-detail-color: transparentize($comment-color, 0.5) !default;
+$comment-image-vert-alignment: top !default;

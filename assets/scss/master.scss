@@ -66,6 +66,7 @@ $use-all: true; // Enable animations by overriding variables from node_modules/a
 @import "partials/footer";
 @import "partials/header";
 @import "partials/sidebar";
+@import "partials/comments";
 
 // Templates
 @import "templates/archive";
