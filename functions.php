@@ -145,16 +145,16 @@ function tweek_login_stylesheet() { ?>
   <!-- FOR DEVELOPMENT -->
   <link rel="stylesheet"
         id="custom_wp_admin_css"
-        href="<?php echo get_template_directory_uri() . 'assets/css/login.css?ver=' . filemtime(dirname(__FILE__) . 'assets/css/login.css'); ?>"
+        href="<?php echo get_template_directory_uri() . 'assets/css/login.css'; ?>"
         type="text/css"
         media="all" />
 
   <!-- FOR PRODUCTION -->
-  <link rel="stylesheet"
+  <!-- <link rel="stylesheet"
         id="custom_wp_admin_css"
-        href="<?php echo get_template_directory_uri() . 'assets/css/login.min.css?ver=' . filemtime(dirname(__FILE__) . 'assets/css/login.min.css'); ?>"
+        href="<?php // echo get_template_directory_uri() . 'assets/css/login.min.css?ver=' . filemtime(dirname(__FILE__) . 'assets/css/login.min.css'); ?>"
         type="text/css"
-        media="all" />
+        media="all" /> -->
 <?php }
 add_action( 'login_enqueue_scripts', 'tweek_login_stylesheet' );
 
