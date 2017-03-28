@@ -12,6 +12,8 @@
         <h1 itemprop="headline">
           <?php the_title(); ?>
         </h1>
+
+        <p class="info">Posted on <span class="date"><meta itemprop="datePublished" content="<?php echo get_the_date('Y-m-d'); ?>"><?php echo get_the_date('F j, Y'); ?></span> by <span rel="author"><?php the_author_posts_link(); ?><span>.</p>
       </header>
 
       <div itemprop="articleBody">

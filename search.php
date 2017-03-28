@@ -1,31 +1,33 @@
-<?php get_template_part('partials/header'); ?>
+<?php get_template_part('partials/header'); global $wp_query; ?>
 
-<main itemscope itemtype="http://schema.org/SearchResultsPage">
+<main class="clearfix" itemscope itemtype="http://schema.org/SearchResultsPage">
 
-<p class="center">
-  <strong>Search results for:</strong>
-  <?php echo esc_attr(get_search_query()); ?>
-</p>
+<h1 class="center">Search Results</h1>
 
-  <section class="wrap hpad clearfix">
+<p class="hpad">Found <?php echo sprintf( _n( '%s post', '%s posts', $wp_query->found_posts ), $wp_query->found_posts ); ?> for the search query <span class="italize"><?php echo esc_attr(get_search_query()); ?></span>.</p>
+
+  <section class="eightcol first hpad">
 
   <?php if (have_posts()): ?>
     <?php while (have_posts()): the_post(); ?>
 
     <article id="post-<?php the_ID(); ?>"
-             <?php post_class(); ?>>
+             <?php post_class(); ?>
+             itemscope itemtype="http://schema.org/BlogPosting">
 
       <header>
-        <h2>
+        <h2 itemprop="headline">
           <a href="<?php the_permalink(); ?>"
              title="<?php the_title_attribute(); ?>">
             <?php the_title(); ?>
           </a>
         </h2>
+
+        <p class="info">Posted on <span class="date"><meta itemprop="datePublished" content="<?php echo get_the_date('Y-m-d'); ?>"><?php echo get_the_date('F j, Y'); ?></span> by <span rel="author"><?php the_author_posts_link(); ?><span>.</p>
       </header>
 
-      <div itemprop="description">
-        <?php the_content(); ?>
+      <div itemprop="articleBody">
+        <?php the_excerpt(); ?>
       </div>
 
     </article>
@@ -37,6 +39,8 @@
   <?php endif; ?>
 
   </section>
+
+  <?php get_template_part('partials/sidebar'); ?>
 
 </main>
 

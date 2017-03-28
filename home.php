@@ -1,8 +1,8 @@
 <?php get_template_part('partials/header'); ?>
 
-<main>
+<main class="clearfix">
 
-  <section class="wrap hpad clearfix">
+  <section class="eightcol first hpad">
 
   <?php if (have_posts()): ?>
     <?php while (have_posts()): the_post(); ?>
@@ -18,10 +18,12 @@
             <?php the_title(); ?>
           </a>
         </h2>
+
+        <p class="info">Posted on <span class="date"><meta itemprop="datePublished" content="<?php echo get_the_date('Y-m-d'); ?>"><?php echo get_the_date('F j, Y'); ?></span> by <span rel="author"><?php the_author_posts_link(); ?><span>.</p>
       </header>
 
       <div itemprop="articleBody">
-        <?php the_content(); ?>
+        <?php the_excerpt(); ?>
       </div>
 
     </article>
@@ -33,6 +35,8 @@
   <?php endif; ?>
 
   </section>
+
+  <?php get_template_part('partials/sidebar'); ?>
 
 </main>
 
