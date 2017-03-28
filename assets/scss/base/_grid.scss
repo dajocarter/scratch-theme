@@ -45,3 +45,13 @@ $_grid-sizes: ("one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "
     @include grid-column($value);
   }
 }
+
+@include media(">=tablet") {
+  .first {
+    margin-left: 0;
+  }
+
+  .last {
+    float: right;
+  }
+}
