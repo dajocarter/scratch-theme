@@ -1,6 +1,6 @@
 <?php get_template_part('partials/header'); global $wp_query; ?>
 
-<main class="clearfix" itemscope itemtype="http://schema.org/SearchResultsPage">
+<main class="wrap clearfix" itemscope itemtype="http://schema.org/SearchResultsPage">
 
 <h1 class="center">Search Results</h1>
 
