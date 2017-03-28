@@ -12,6 +12,12 @@ if( have_rows('layout') ) {
       <?php get_template_part( 'layouts/layout', 'flexible_columns' ); ?>
 
     <?php
+    } elseif( get_row_layout() === 'logos_section' ) {
+    ?>
+
+      <?php get_template_part( 'layouts/layout', 'logos_section' ); ?>
+
+    <?php
     } elseif( get_row_layout() === 'staggered_images_with_text' ) {
     ?>
 

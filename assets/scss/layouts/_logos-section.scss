@@ -1,0 +1,11 @@
+.all-logos {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+  align-items: center;
+
+  > a,
+  > img {
+    flex: 0 0 auto;
+  }
+}
