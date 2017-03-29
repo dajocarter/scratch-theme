@@ -10,21 +10,11 @@ Powerful automated workflow for WordPress + [Advanced Custom Fields](http://adva
 
 ### Rapidize your development time and add robust layouts on-the-fly with the [Layouts Page Template](http://tweektheme.com/docs/advanced/#layouts)
 
-![Tweek's Layouts in action](http://tweektheme.com/assets/img/marketing-page.gif)
-
 **NOTE:** must have [Advanced Custom Fields Pro](http://www.advancedcustomfields.com/pro) installed and activated.
 
 ### Mobile-Friendly
 
-![Mobile-Friendly](http://tweektheme.com/assets/img/mobile-friendly.gif)
-
 ### Save a file, and watch your site instantly refresh across all browsers & devices via [BrowserSync](http://www.browsersync.io/)
-
-![BrowserSync](http://tweektheme.com/assets/img/browsersync.gif)
-
-### Keep your WordPress pages lightweight by [automatically optimizing images](https://github.com/gruntjs/grunt-contrib-imagemin) as you upload them to the Media Library
-
-![WordPress Image Optimization](http://tweektheme.com/assets/img/image-optimization.gif)
 
 ### Comes generously [pre-packaged](https://github.com/dajocarter/tweek-theme/blob/master/package.json) with 3rd-party front end development vendors
 
